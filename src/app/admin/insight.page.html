@@ -1,0 +1,48 @@
+<p class="kicker">Hotel story</p>
+<h1 class="font-display text-5xl">Dining and facilities</h1>
+<label class="mt-4 grid max-w-md gap-1 text-sm">
+  Hotel
+  <select class="field" [value]="hotelId() ?? ''" (change)="openHotel($event)">
+    <option value="">Choose a hotel</option>
+    @for (hotel of hotels(); track hotel.id) {
+      <option [value]="hotel.id">{{ hotel.name }}</option>
+    }
+  </select>
+</label>
+
+@if (hotelId()) {
+  <form class="mt-5 grid gap-4" [formGroup]="form" (ngSubmit)="save()">
+    <label class="grid gap-1 text-sm">Restaurant<textarea class="field" rows="3" formControlName="restaurantDescription"></textarea></label>
+    <label class="grid gap-1 text-sm">Restaurant Arabic<textarea class="field" rows="3" formControlName="restaurantDescriptionAr"></textarea></label>
+    <label class="grid gap-1 text-sm">Cafe<textarea class="field" rows="3" formControlName="cafeDescription"></textarea></label>
+    <label class="grid gap-1 text-sm">Cafe Arabic<textarea class="field" rows="3" formControlName="cafeDescriptionAr"></textarea></label>
+    <fieldset class="panel grid gap-2 p-4">
+      <legend class="px-2">Facilities</legend>
+      @for (item of facilityEntries(); track item[0]) {
+        <label class="flex items-center gap-2 text-sm">
+          <input type="checkbox" [checked]="item[1]" (change)="toggle(item[0])" />
+          {{ featureLabel(item[0]) }}
+        </label>
+      }
+      <div class="flex gap-2">
+        <input class="field" [value]="newFacility()" (input)="onFacility($event)" placeholder="Facility key" />
+        <button type="button" class="btn btn-line" (click)="addFacility()">Add</button>
+      </div>
+    </fieldset>
+    <div class="grid gap-3 md:grid-cols-2">
+      <label class="btn btn-line">Restaurant photos<input class="sr-only" type="file" accept="image/*" multiple (change)="upload($event, 'restaurant')" /></label>
+      <label class="btn btn-line">Cafe photos<input class="sr-only" type="file" accept="image/*" multiple (change)="upload($event, 'cafe')" /></label>
+      <label class="btn btn-line">Restaurant menu<input class="sr-only" type="file" accept="application/pdf" multiple (change)="upload($event, 'restaurantMenu')" /></label>
+      <label class="btn btn-line">Cafe menu<input class="sr-only" type="file" accept="application/pdf" multiple (change)="upload($event, 'cafeMenu')" /></label>
+    </div>
+    <p class="text-sm text-gold-200/80">
+      Photos {{ restaurantImageIds().length }} / {{ cafeImageIds().length }} · menus {{ restaurantMenuPdfIds().length }} / {{ cafeMenuPdfIds().length }}
+    </p>
+    @if (error()) { <p class="text-red-200" role="alert">{{ error() }}</p> }
+    <div class="flex gap-3">
+      <button class="btn btn-gold" type="submit" [disabled]="saving()">{{ exists() ? 'Update' : 'Create' }}</button>
+      @if (exists()) { <button type="button" class="btn btn-danger" (click)="remove()">Delete</button> }
+      <a class="btn btn-line" routerLink="/admin">Back</a>
+    </div>
+  </form>
+}

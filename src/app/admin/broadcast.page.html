@@ -1,0 +1,60 @@
+<div>
+  <p class="kicker">Broadcast</p>
+  <h1 class="font-display text-5xl leading-none">Email partners</h1>
+  <p class="mt-3 max-w-2xl text-sm text-gold-200/80">
+    Send one formatted message to the partners linked to a hotel. Attachments are optional.
+  </p>
+</div>
+
+<form class="panel mt-6 grid max-w-3xl gap-4 p-5 md:p-6" [formGroup]="mail" (ngSubmit)="send()">
+  <label class="grid gap-1 text-sm">
+    Hotel
+    <select class="field" formControlName="hotelId">
+      <option value="">Choose a hotel</option>
+      @for (hotel of hotels(); track hotel.id) {
+        <option [value]="hotel.id">{{ hotelLabel(hotel) }}</option>
+      }
+    </select>
+  </label>
+  @if (hotelId()) {
+    <div class="text-sm">
+      @if (recipients().length) {
+        <p class="text-gold-300">{{ recipients().length }} {{ recipients().length === 1 ? 'partner' : 'partners' }} on this desk</p>
+        <ul class="mt-2 flex flex-wrap gap-2">
+          @for (partner of recipients(); track partner.id) {
+            <li class="rounded-full border border-gold-300/30 px-3 py-1 text-xs text-gold-200">
+              {{ partner.name }} · {{ partner.email }}
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="text-gold-200/80">No partners on this desk are linked to that hotel. The API still sends to the accounts it has for the hotel.</p>
+      }
+    </div>
+  }
+  <label class="grid gap-1 text-sm">
+    Subject
+    <input class="field" formControlName="subject" />
+  </label>
+  <div class="grid gap-1 text-sm">
+    <p id="broadcast-message">Message</p>
+    <app-rich-text formControlName="body" />
+  </div>
+  <label class="btn btn-line w-fit">
+    Add attachments
+    <input class="sr-only" type="file" multiple (change)="pickFiles($event)" />
+  </label>
+  @if (attachments().length) {
+    <ul class="grid gap-1 text-sm text-gold-200/80">
+      @for (file of attachments(); track file.name) {
+        <li>{{ file.name }}</li>
+      }
+    </ul>
+  }
+  @if (error()) {
+    <p class="text-red-200" role="alert">{{ error() }}</p>
+  }
+  <button class="btn btn-gold w-fit" type="submit" [disabled]="sending()">
+    {{ sending() ? 'Sending…' : 'Send email' }}
+  </button>
+</form>

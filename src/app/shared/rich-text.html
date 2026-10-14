@@ -1,0 +1,101 @@
+<div class="flex flex-wrap gap-1" role="toolbar" aria-label="Message formatting">
+  <button
+    type="button"
+    class="rounded-lg border px-2.5 py-1 text-sm font-bold"
+    [class.border-gold-300]="marks().bold"
+    [class.bg-gold-400/10]="marks().bold"
+    [class.border-gold-300/40]="!marks().bold"
+    [attr.aria-pressed]="marks().bold"
+    [disabled]="disabled()"
+    (mousedown)="keepSelection($event)"
+    (click)="format('bold')"
+  >
+    Bold
+  </button>
+  <button
+    type="button"
+    class="rounded-lg border px-2.5 py-1 text-sm italic"
+    [class.border-gold-300]="marks().italic"
+    [class.bg-gold-400/10]="marks().italic"
+    [class.border-gold-300/40]="!marks().italic"
+    [attr.aria-pressed]="marks().italic"
+    [disabled]="disabled()"
+    (mousedown)="keepSelection($event)"
+    (click)="format('italic')"
+  >
+    Italic
+  </button>
+  <button
+    type="button"
+    class="rounded-lg border px-2.5 py-1 text-sm underline"
+    [class.border-gold-300]="marks().underline"
+    [class.bg-gold-400/10]="marks().underline"
+    [class.border-gold-300/40]="!marks().underline"
+    [attr.aria-pressed]="marks().underline"
+    [disabled]="disabled()"
+    (mousedown)="keepSelection($event)"
+    (click)="format('underline')"
+  >
+    Underline
+  </button>
+  <button
+    type="button"
+    class="rounded-lg border border-gold-300/40 px-2.5 py-1 text-sm"
+    [disabled]="disabled()"
+    (mousedown)="keepSelection($event)"
+    (click)="format('insertUnorderedList')"
+  >
+    Bullets
+  </button>
+  <button
+    type="button"
+    class="rounded-lg border border-gold-300/40 px-2.5 py-1 text-sm"
+    [disabled]="disabled()"
+    (mousedown)="keepSelection($event)"
+    (click)="format('insertOrderedList')"
+  >
+    Numbers
+  </button>
+  <button
+    type="button"
+    class="rounded-lg border border-gold-300/40 px-2.5 py-1 text-sm"
+    [disabled]="disabled()"
+    [attr.aria-expanded]="linkOpen()"
+    (mousedown)="keepSelection($event)"
+    (click)="openLink()"
+  >
+    Link
+  </button>
+</div>
+
+@if (linkOpen()) {
+  <div class="flex flex-wrap items-center gap-2">
+    <label class="sr-only" for="rich-link">Link address</label>
+    <input
+      #linkInput
+      id="rich-link"
+      class="field min-w-56 flex-1"
+      type="url"
+      [value]="linkUrl()"
+      (input)="linkUrl.set($any($event.target).value)"
+      (keydown.enter)="$event.preventDefault(); applyLink()"
+    />
+    <button type="button" class="btn btn-gold" (click)="applyLink()">Add link</button>
+    <button type="button" class="btn btn-line" (click)="cancelLink()">Cancel</button>
+  </div>
+  @if (linkError()) {
+    <p class="text-sm text-red-200" role="alert">{{ linkError() }}</p>
+  }
+}
+
+<div
+  #editor
+  class="field rich-text min-h-48"
+  role="textbox"
+  aria-multiline="true"
+  aria-label="Message"
+  [attr.contenteditable]="disabled() ? 'false' : 'true'"
+  (input)="onInput()"
+  (blur)="onBlur()"
+  (paste)="onPaste($event)"
+></div>

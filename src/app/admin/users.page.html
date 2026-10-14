@@ -1,0 +1,41 @@
+<p class="kicker">Access</p>
+<h1 class="font-display text-5xl">Users</h1>
+<p class="mt-2 max-w-2xl text-sm text-gold-200/80">
+  Role changes apply to the selected account. The account you are signed in with keeps this desk session.
+</p>
+<div class="mt-5 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+  <form class="panel grid gap-3 p-4" [formGroup]="form" (ngSubmit)="save()">
+    <h2 class="font-display text-3xl">{{ editingId() ? 'Edit user' : 'New user' }}</h2>
+    <label class="grid gap-1 text-sm">Name<input class="field" formControlName="userName" /></label>
+    <label class="grid gap-1 text-sm">Email<input class="field" type="email" formControlName="email" /></label>
+    <label class="grid gap-1 text-sm">
+      Role
+      <select class="field" formControlName="role">
+        @for (role of roles; track role.value) {
+          <option [ngValue]="role.value">{{ role.label }}</option>
+        }
+      </select>
+    </label>
+    <label class="grid gap-1 text-sm">Password<input class="field" type="password" formControlName="password" /></label>
+    <label class="grid gap-1 text-sm">Confirm password<input class="field" type="password" formControlName="passwordConfirmed" /></label>
+    @if (error()) { <p class="text-red-200" role="alert">{{ error() }}</p> }
+    <div class="flex gap-2">
+      <button class="btn btn-gold" type="submit" [disabled]="saving()">Save</button>
+      <button class="btn btn-line" type="button" (click)="reset()">Clear</button>
+    </div>
+  </form>
+  <div class="grid gap-3">
+    @for (user of users(); track user.id) {
+      <article class="panel flex items-center justify-between gap-3 p-4">
+        <div>
+          <h2 class="font-display text-3xl">{{ user.userName }}</h2>
+          <p class="text-sm text-gold-200/80">{{ user.email }} · {{ roleLabel(user.role) }}</p>
+        </div>
+        <div class="flex gap-2">
+          <button type="button" class="btn btn-line" (click)="edit(user)">Edit</button>
+          <button type="button" class="btn btn-danger" (click)="remove(user)">Delete</button>
+        </div>
+      </article>
+    }
+  </div>
+</div>

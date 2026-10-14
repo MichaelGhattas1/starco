@@ -1,0 +1,55 @@
+<p class="kicker">{{ roomId() ? 'Edit' : 'Create' }}</p>
+<h1 class="font-display text-5xl">{{ roomId() ? 'Edit room' : 'New room' }}</h1>
+<form class="mt-5 grid gap-4" [formGroup]="form" (ngSubmit)="submit()">
+  <div class="grid gap-4 md:grid-cols-2">
+    <label class="grid gap-1 text-sm md:col-span-2">
+      Hotel
+      <select class="field" formControlName="hotelId">
+        <option value="">Select a hotel</option>
+        @for (hotel of hotels(); track hotel.id) {
+          <option [value]="hotel.id">{{ hotel.name }}</option>
+        }
+      </select>
+    </label>
+    <label class="grid gap-1 text-sm">Name<input class="field" formControlName="name" /></label>
+    <label class="grid gap-1 text-sm">Arabic name<input class="field" formControlName="nameAr" /></label>
+    <label class="grid gap-1 text-sm">
+      Type
+      <select class="field" formControlName="type">
+        @for (type of roomTypes; track type.value) {
+          <option [ngValue]="type.value">{{ type.label }}</option>
+        }
+      </select>
+    </label>
+    <label class="grid gap-1 text-sm">Price per night<input class="field" type="number" formControlName="pricePerNight" /></label>
+    <label class="grid gap-1 text-sm">Sleeps<input class="field" type="number" formControlName="maxSleep" /></label>
+    <label class="grid gap-1 text-sm">Extra bed price<input class="field" type="number" formControlName="priceForExtraBed" /></label>
+    <label class="flex items-center gap-2 text-sm"><input type="checkbox" formControlName="extraBed" /> Extra bed offered</label>
+  </div>
+  <fieldset class="panel grid gap-2 p-4 sm:grid-cols-2">
+    <legend class="px-2 text-sm text-gold-300">Features</legend>
+    @for (key of featureKeys; track key) {
+      <label class="flex items-center gap-2 text-sm">
+        <input type="checkbox" [checked]="!!features()[key]" (change)="toggle(key)" />
+        {{ featureLabel(key) }}
+      </label>
+    }
+  </fieldset>
+  <div class="panel grid gap-3 p-4">
+    <p class="text-sm">Image ids: {{ imageIds().join(', ') || 'none yet' }}</p>
+    <label class="btn btn-line w-fit">
+      Upload images
+      <input class="sr-only" type="file" accept="image/*" multiple (change)="upload($event)" />
+    </label>
+    <div class="flex flex-wrap gap-2">
+      @for (id of imageIds(); track id) {
+        <button type="button" class="btn btn-line" (click)="removeImage(id)">Remove {{ id }}</button>
+      }
+    </div>
+  </div>
+  @if (error()) { <p class="text-red-200" role="alert">{{ error() }}</p> }
+  <div class="flex gap-3">
+    <button class="btn btn-gold" type="submit" [disabled]="saving()">Save room</button>
+    <a class="btn btn-line" routerLink="/admin/rooms">Cancel</a>
+  </div>
+</form>

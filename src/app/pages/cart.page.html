@@ -1,0 +1,79 @@
+<p class="kicker">Cart</p>
+<h1 class="font-display text-5xl leading-none">Your stays</h1>
+<p class="mt-3 max-w-xl text-sm text-gold-200/80">
+  Add rooms from a hotel, then reserve them with your account. Each room is booked on its own.
+</p>
+
+@if (!cart.lines().length) {
+  <div class="panel mt-8 p-6">
+    <p>Your cart is empty.</p>
+    <a class="btn btn-gold mt-4" routerLink="/hotels">Browse hotels</a>
+  </div>
+} @else {
+  <div class="mt-8 grid items-start gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+    <div class="grid gap-4">
+      @for (line of cart.lines(); track line.key) {
+        <article class="panel flex flex-col gap-4 p-4 sm:flex-row">
+          @if (line.image) {
+            <img [src]="line.image" [alt]="line.roomName" class="h-32 w-full rounded-2xl object-cover sm:w-40" />
+          }
+          <div class="min-w-0 flex-1">
+            <p class="kicker">{{ line.hotelName }}</p>
+            <h2 class="mt-1 font-display text-3xl leading-none">{{ line.roomName }}</h2>
+            <p class="mt-2 text-sm text-gold-200/80">
+              {{ line.checkIn }} to {{ line.checkOut }} · {{ nights(line.checkIn, line.checkOut) }}
+              {{ nights(line.checkIn, line.checkOut) === 1 ? 'night' : 'nights' }} · {{ line.adults }}
+              {{ line.adults === 1 ? 'adult' : 'adults' }}
+            </p>
+            <p class="mt-2 text-sm text-gold-300">{{ money(lineTotal(line)) }}</p>
+          </div>
+          <button type="button" class="btn btn-line self-start" (click)="remove(line)">Remove</button>
+        </article>
+      }
+    </div>
+
+    <form class="panel grid gap-4 p-5" [formGroup]="form" (ngSubmit)="checkout()">
+      <div class="flex items-end justify-between gap-4">
+        <div>
+          <p class="kicker">Checkout</p>
+          <h2 class="mt-1 font-display text-4xl leading-none">{{ money(cart.total()) }}</h2>
+        </div>
+        <p class="text-sm text-gold-200/70">{{ cart.count() }} {{ cart.count() === 1 ? 'stay' : 'stays' }}</p>
+      </div>
+      @if (auth.isLoggedIn()) {
+        <p class="text-sm text-gold-200/80">Reserved with {{ auth.email() }}.</p>
+        <label class="grid gap-1 text-sm">
+          Full name
+          <input class="field" formControlName="customerName" autocomplete="name" />
+        </label>
+        <label class="grid gap-1 text-sm">
+          Account email
+          <input class="field" type="email" formControlName="customerEmail" autocomplete="email" />
+        </label>
+        <label class="grid gap-1 text-sm">
+          Phone
+          <input class="field" formControlName="phone" inputmode="numeric" autocomplete="tel" placeholder="01xxxxxxxxx" />
+        </label>
+        <p class="text-sm text-gold-200/70">Phone is digits only, 6 to 15 characters. It is sent to Paymob with the bill.</p>
+        @if (error()) {
+          <p class="text-red-200" role="alert">{{ error() }}</p>
+        }
+        @if (payNote()) {
+          <p class="text-gold-200" role="status">{{ payNote() }}</p>
+        }
+        @if (held().length) {
+          <p class="text-sm text-gold-200" role="status">
+            {{ held().length }} {{ held().length === 1 ? 'stay was' : 'stays were' }} reserved before the next room failed.
+          </p>
+          <button type="button" class="btn btn-line" (click)="payHeld()" [disabled]="working()">Pay reserved stays</button>
+        }
+        <button class="btn btn-gold" type="submit" [disabled]="working()">
+          {{ working() ? 'Reserving…' : 'Reserve and pay' }}
+        </button>
+      } @else {
+        <p class="text-sm text-gold-200/80">Sign in to reserve these stays. Your cart stays here.</p>
+        <a class="btn btn-gold" routerLink="/login" [queryParams]="{ returnUrl: '/cart' }">Sign in to reserve</a>
+      }
+    </form>
+  </div>
+}

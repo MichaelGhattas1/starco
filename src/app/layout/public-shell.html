@@ -1,0 +1,89 @@
+<a href="#content" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-gold-400 focus:px-3 focus:py-2 focus:text-navy-950">
+  Skip to content
+</a>
+
+@if (notice.message(); as msg) {
+  <div
+    class="relative z-40 px-4 py-3 text-center text-sm"
+    role="status"
+    [class.bg-emerald-900]="msg.type === 'ok'"
+    [class.text-emerald-100]="msg.type === 'ok'"
+    [class.bg-red-950]="msg.type === 'err'"
+    [class.text-red-100]="msg.type === 'err'"
+  >
+    {{ msg.text }}
+    <button type="button" class="ms-3 underline" (click)="notice.clear()">Dismiss</button>
+  </div>
+}
+
+<header class="sticky top-0 z-30 border-b border-gold-300/20 bg-navy-950/90 backdrop-blur">
+  <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+    <a routerLink="/" class="font-display text-3xl leading-none text-gold-300" (click)="closeMenu()">
+      Plaza Inn
+    </a>
+    <button
+      type="button"
+      class="btn btn-line md:hidden"
+      [attr.aria-expanded]="menuOpen()"
+      aria-controls="site-nav"
+      (click)="menuOpen.set(!menuOpen())"
+    >
+      Menu
+    </button>
+    <nav
+      id="site-nav"
+      class="absolute inset-x-0 top-full flex-col gap-1 border-b border-gold-300/20 bg-navy-950 p-4 md:static md:flex md:flex-row md:items-center md:border-0 md:bg-transparent md:p-0"
+      [class.hidden]="!menuOpen()"
+      [class.flex]="menuOpen()"
+    >
+      <a routerLink="/" routerLinkActive="nav-active" [routerLinkActiveOptions]="{ exact: true }" class="rounded-full px-3 py-2 transition hover:text-gold-300" (click)="closeMenu()">Home</a>
+      <a routerLink="/hotels" routerLinkActive="nav-active" class="rounded-full px-3 py-2 transition hover:text-gold-300" (click)="closeMenu()">Hotels</a>
+      <a routerLink="/offers" routerLinkActive="nav-offer-active" class="nav-offer" (click)="closeMenu()"><span>Offers</span></a>
+      <a routerLink="/trips" routerLinkActive="nav-active" class="rounded-full px-3 py-2 transition hover:text-gold-300" (click)="closeMenu()">Trips</a>
+      <a routerLink="/transport" routerLinkActive="nav-active" class="rounded-full px-3 py-2 transition hover:text-gold-300" (click)="closeMenu()">Transport</a>
+      <a routerLink="/about" routerLinkActive="nav-active" class="rounded-full px-3 py-2 transition hover:text-gold-300" (click)="closeMenu()">About</a>
+      <a routerLink="/contact" routerLinkActive="nav-active" class="rounded-full px-3 py-2 transition hover:text-gold-300" (click)="closeMenu()">Contact</a>
+      @if (auth.canWrite()) {
+        <a routerLink="/admin" class="rounded-full px-3 py-2 text-gold-300" (click)="closeMenu()">Admin</a>
+      }
+      <a
+        routerLink="/cart"
+        class="btn btn-line"
+        [attr.aria-label]="'Cart, ' + cart.count() + (cart.count() === 1 ? ' stay' : ' stays')"
+        (click)="closeMenu()"
+      >
+        Cart
+        @if (cart.count()) {
+          <span class="grid h-6 min-w-6 place-items-center rounded-full bg-gold-400 px-1 text-xs font-bold text-navy-950" aria-hidden="true">{{ cart.count() }}</span>
+        }
+      </a>
+      @if (auth.isLoggedIn()) {
+        <button type="button" class="btn btn-line" (click)="logout()">Sign out</button>
+      } @else {
+        <a routerLink="/login" class="btn btn-gold" (click)="closeMenu()">Sign in</a>
+      }
+      <button type="button" class="btn btn-line" (click)="locale.toggle()">
+        {{ locale.isAr() ? 'EN' : 'عربي' }}
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main id="content" class="mx-auto min-h-[70vh] max-w-6xl px-4 py-8">
+  <router-outlet />
+</main>
+
+<footer class="mt-8 border-t border-gold-300/20">
+  <div class="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-[1.4fr_1fr_auto] md:items-start">
+    <div>
+      <p class="font-display text-4xl leading-none text-gold-300">Plaza Inn</p>
+      <p class="mt-3 max-w-sm text-sm text-gold-200/80">Hotels, reservations, and Paymob checkout.</p>
+    </div>
+    <nav class="grid gap-2 text-sm" aria-label="Footer">
+      <a routerLink="/hotels" class="w-fit hover:text-gold-300">Hotels</a>
+      <a routerLink="/about" class="w-fit hover:text-gold-300">About</a>
+      <a routerLink="/contact" class="w-fit hover:text-gold-300">Contact</a>
+    </nav>
+    <p class="text-sm text-gold-200/80">© {{ year }}</p>
+  </div>
+</footer>

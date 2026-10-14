@@ -1,0 +1,48 @@
+<p class="kicker">{{ hotelId() ? 'Edit' : 'Create' }}</p>
+<h1 class="font-display text-5xl">{{ hotelId() ? 'Edit hotel' : 'New hotel' }}</h1>
+<form class="mt-5 grid gap-4" [formGroup]="form" (ngSubmit)="submit()">
+  <div class="grid gap-4 md:grid-cols-2">
+    <label class="grid gap-1 text-sm">Name<input class="field" formControlName="name" /></label>
+    <label class="grid gap-1 text-sm">Arabic name<input class="field" formControlName="nameAr" /></label>
+    <label class="grid gap-1 text-sm md:col-span-2">Description<textarea class="field" rows="3" formControlName="description"></textarea></label>
+    <label class="grid gap-1 text-sm md:col-span-2">Arabic description<textarea class="field" rows="3" formControlName="descriptionAr"></textarea></label>
+    <label class="grid gap-1 text-sm">Address<input class="field" formControlName="address" /></label>
+    <label class="grid gap-1 text-sm">Arabic address<input class="field" formControlName="addressAr" /></label>
+    <label class="grid gap-1 text-sm">City<input class="field" formControlName="city" /></label>
+    <label class="grid gap-1 text-sm">Arabic city<input class="field" formControlName="cityAr" /></label>
+    <label class="grid gap-1 text-sm md:col-span-2">Map link<input class="field" formControlName="location" placeholder="https://" /></label>
+    <label class="grid gap-1 text-sm">Phone<input class="field" formControlName="phone" /></label>
+    <label class="grid gap-1 text-sm">Email<input class="field" type="email" formControlName="email" /></label>
+    <label class="grid gap-1 text-sm">Rooms to reserve<input class="field" type="number" formControlName="numOfAvailableRoomsToReserve" /></label>
+    <label class="grid gap-1 text-sm">Suites to reserve<input class="field" type="number" formControlName="numOfAvailableSuitesToReserve" /></label>
+    <label class="grid gap-1 text-sm">Rating<input class="field" type="number" step="0.1" formControlName="rating" /></label>
+    <label class="grid gap-1 text-sm">Space<input class="field" formControlName="space" /></label>
+    <label class="grid gap-1 text-sm">Instagram<input class="field" formControlName="instagram" /></label>
+    <label class="grid gap-1 text-sm">Facebook<input class="field" formControlName="facebook" /></label>
+    <label class="grid gap-1 text-sm">WhatsApp<input class="field" formControlName="whatsApp" /></label>
+    <label class="grid gap-1 text-sm">Logo id<input class="field" type="number" formControlName="logoId" /></label>
+  </div>
+  <div class="panel grid gap-3 p-4">
+    <p class="text-sm">Hotel images: {{ imageIds().join(', ') || 'none yet' }}</p>
+    <label class="btn btn-line w-fit">
+      Upload images
+      <input class="sr-only" type="file" accept="image/*" multiple (change)="upload($event, 'images')" />
+    </label>
+    <label class="btn btn-line w-fit">
+      Upload logo
+      <input class="sr-only" type="file" accept="image/*" (change)="upload($event, 'logo')" />
+    </label>
+    <div class="flex flex-wrap gap-2">
+      @for (id of imageIds(); track id) {
+        <button type="button" class="btn btn-line" (click)="removeImage(id)">Remove {{ id }}</button>
+      }
+    </div>
+  </div>
+  @if (error()) { <p class="text-red-200" role="alert">{{ error() }}</p> }
+  <div class="flex flex-wrap gap-3">
+    <button class="btn btn-gold" type="submit" [disabled]="saving() || uploading()">
+      {{ saving() ? 'Saving…' : 'Save hotel' }}
+    </button>
+    <a class="btn btn-line" routerLink="/admin/hotels">Cancel</a>
+  </div>
+</form>

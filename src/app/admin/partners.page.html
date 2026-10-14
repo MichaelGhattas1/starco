@@ -1,0 +1,96 @@
+<div class="flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <p class="kicker">Network</p>
+    <h1 class="font-display text-5xl leading-none">Partners</h1>
+    <p class="mt-3 max-w-xl text-sm text-gold-200/80">
+      Link each partner to the hotels they represent.
+    </p>
+  </div>
+  <div class="flex flex-wrap items-center gap-3">
+    <a routerLink="/admin/broadcast" class="btn btn-line">Email partners</a>
+    <p class="text-sm text-gold-300">{{ partners().length }} {{ partners().length === 1 ? 'partner' : 'partners' }}</p>
+  </div>
+</div>
+
+<div class="mt-6 grid items-start gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+  <form class="panel grid gap-4 p-5 md:p-6" [formGroup]="form" (ngSubmit)="save()">
+    <div>
+      <p class="kicker">{{ editingId() ? 'Editing' : 'New' }}</p>
+      <h2 class="mt-1 font-display text-4xl leading-none">{{ editingId() ? 'Edit partner' : 'New partner' }}</h2>
+    </div>
+    <label class="grid gap-1 text-sm">
+      Name
+      <input class="field" formControlName="name" autocomplete="organization" />
+    </label>
+    <label class="grid gap-1 text-sm">
+      Email
+      <input class="field" type="email" formControlName="email" autocomplete="email" />
+    </label>
+    <fieldset class="grid gap-2">
+      <legend class="mb-2 text-sm text-gold-300">
+        Hotels
+        <span class="text-gold-200/70">· {{ selectedHotels().length }} selected</span>
+      </legend>
+      @if (!hotels().length) {
+        <p class="text-sm text-gold-200/80">No hotels are published yet.</p>
+      } @else {
+        <div class="grid max-h-64 gap-2 overflow-auto pe-1 sm:grid-cols-2">
+          @for (hotel of hotels(); track hotel.id) {
+            <label
+              class="flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm"
+              [class.border-gold-300]="checked(hotel.id)"
+              [class.bg-gold-400/10]="checked(hotel.id)"
+              [class.border-gold-300/20]="!checked(hotel.id)"
+            >
+              <input class="accent-gold-400" type="checkbox" [checked]="checked(hotel.id)" (change)="toggleHotel(hotel.id)" />
+              <span>{{ hotelLabel(hotel) }}</span>
+            </label>
+          }
+        </div>
+      }
+    </fieldset>
+    @if (error()) { <p class="text-red-200" role="alert">{{ error() }}</p> }
+    <div class="flex gap-2">
+      <button class="btn btn-gold" type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Save partner' }}</button>
+      <button class="btn btn-line" type="button" (click)="reset()">Clear</button>
+    </div>
+  </form>
+
+  <div class="grid gap-3">
+    @if (error() && !partners().length) {
+      <p class="panel p-4 text-red-200" role="alert">{{ error() }}</p>
+    } @else if (!partners().length) {
+      <p class="panel p-6 text-sm text-gold-200/80">No partners yet. Add the first one beside this list.</p>
+    }
+    @for (partner of partners(); track partner.id) {
+      <article
+        class="panel flex flex-col gap-4 p-4 sm:flex-row sm:items-center"
+        [class.ring-2]="editingId() === partner.id"
+        [class.ring-gold-300]="editingId() === partner.id"
+      >
+        <div class="flex min-w-0 flex-1 items-start gap-3">
+          <span class="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-navy-800 font-display text-2xl text-gold-300" aria-hidden="true">
+            {{ initial(partner.name) }}
+          </span>
+          <div class="min-w-0">
+            <h2 class="font-display text-3xl leading-none">{{ partner.name }}</h2>
+            <p class="mt-1 truncate text-sm text-gold-200/80">{{ partner.email }}</p>
+            @if (linkedHotels(partner).length) {
+              <ul class="mt-3 flex flex-wrap gap-2">
+                @for (name of linkedHotels(partner); track $index) {
+                  <li class="rounded-full border border-gold-300/30 px-3 py-1 text-xs text-gold-200">{{ name }}</li>
+                }
+              </ul>
+            } @else {
+              <p class="mt-2 text-xs text-gold-200/60">No hotels linked</p>
+            }
+          </div>
+        </div>
+        <div class="flex shrink-0 gap-2">
+          <button type="button" class="btn btn-line" (click)="edit(partner)">Edit</button>
+          <button type="button" class="btn btn-danger" (click)="remove(partner)">Delete</button>
+        </div>
+      </article>
+    }
+  </div>
+</div>

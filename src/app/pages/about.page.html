@@ -1,0 +1,36 @@
+@if (loading()) {
+  <p role="status">Loading…</p>
+} @else if (error()) {
+  <p class="panel p-4 text-red-200" role="alert">{{ error() }}</p>
+} @else if (about(); as page) {
+  <div class="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+    <div>
+      <p class="kicker">Our story</p>
+      <h1 class="mt-2 font-display text-6xl leading-none">{{ page.tittle || 'About Plaza Inn' }}</h1>
+      <p class="mt-4 text-xl text-gold-300">{{ page.subTittle }}</p>
+      <p class="mt-4 max-w-xl text-gold-100/90">{{ page.description }}</p>
+    </div>
+    <div class="relative mx-auto aspect-[4/3] w-full max-w-xl">
+      @if (image(page.square1ImageId); as src) {
+        <img [src]="src" [alt]="page.tittle || 'Plaza Inn'" class="absolute start-0 top-0 h-[78%] w-[72%] rounded-[2rem] object-cover" />
+      }
+      @if (image(page.square2ImageId); as src) {
+        <img [src]="src" alt="" class="absolute end-0 top-[18%] z-10 h-[48%] w-[54%] rounded-[1.6rem] object-cover shadow-2xl ring-4 ring-navy-950" />
+      }
+      @if (image(page.circleImageId); as src) {
+        <img [src]="src" alt="" class="absolute bottom-0 start-[10%] z-20 aspect-square w-[42%] rounded-full object-cover shadow-2xl ring-4 ring-navy-950" />
+      }
+    </div>
+  </div>
+}
+
+@if (partners().length) {
+  <section class="mt-12">
+    <h2 class="font-display text-4xl">Partners</h2>
+    <ul class="mt-4 flex flex-wrap gap-3">
+      @for (partner of partners(); track partner.id) {
+        <li class="rounded-full border border-gold-300/30 px-4 py-2">{{ partner.name }}</li>
+      }
+    </ul>
+  </section>
+}

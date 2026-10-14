@@ -1,0 +1,33 @@
+<p class="kicker">Desk</p>
+<h1 class="font-display text-5xl">Contact details</h1>
+<form class="mt-5 grid max-w-3xl gap-4" [formGroup]="form" (ngSubmit)="save()">
+  <div class="grid gap-4 md:grid-cols-2">
+    <label class="grid gap-1 text-sm">Email<input class="field" formControlName="email" /></label>
+    <label class="grid gap-1 text-sm">Phone<input class="field" formControlName="phone" /></label>
+    <label class="grid gap-1 text-sm md:col-span-2">Address<input class="field" formControlName="address" /></label>
+    <label class="grid gap-1 text-sm">Instagram<input class="field" formControlName="instagram" /></label>
+    <label class="grid gap-1 text-sm">Facebook<input class="field" formControlName="facebook" /></label>
+    <label class="grid gap-1 text-sm">WhatsApp<input class="field" formControlName="whatsApp" /></label>
+    <label class="grid gap-1 text-sm">LinkedIn<input class="field" formControlName="linkedIn" /></label>
+  </div>
+  <div class="grid gap-3" formArrayName="workingHours">
+    <div class="flex items-center justify-between">
+      <h2 class="font-display text-3xl">Hours</h2>
+      <button type="button" class="btn btn-line" (click)="addHour()">Add day</button>
+    </div>
+    @for (hour of form.controls.workingHours.controls; track $index; let index = $index) {
+      <div class="grid gap-2 md:grid-cols-[1fr_1fr_1fr_auto]" [formGroupName]="index">
+        <select class="field" formControlName="day">
+          @for (day of weekdays; track day; let dayIndex = $index) {
+            <option [ngValue]="dayIndex">{{ day }}</option>
+          }
+        </select>
+        <input class="field" type="time" formControlName="openTime" />
+        <input class="field" type="time" formControlName="closeTime" />
+        <button type="button" class="btn btn-danger" (click)="removeHour(index)">Remove</button>
+      </div>
+    }
+  </div>
+  @if (error()) { <p class="text-red-200" role="alert">{{ error() }}</p> }
+  <button class="btn btn-gold w-fit" type="submit" [disabled]="saving()">Save contact</button>
+</form>

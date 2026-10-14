@@ -1,0 +1,32 @@
+<p class="kicker">Homepage</p>
+<h1 class="font-display text-5xl">Slides</h1>
+<div class="mt-5 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
+  <form class="panel grid gap-3 p-4" [formGroup]="form" (ngSubmit)="save()">
+    <h2 class="font-display text-3xl">{{ editingId() == null ? 'New slide' : 'Edit slide' }}</h2>
+    <label class="grid gap-1 text-sm">Title<input class="field" formControlName="tittle" /></label>
+    <label class="grid gap-1 text-sm">Subtitle<input class="field" formControlName="subTittle" /></label>
+    <label class="grid gap-1 text-sm">Button text<input class="field" formControlName="buttonText" /></label>
+    <label class="grid gap-1 text-sm">Button link<input class="field" formControlName="buttonLink" /></label>
+    <p class="text-sm">Image ids: {{ imageIds().join(', ') || 'none' }}</p>
+    <label class="btn btn-line w-fit">Upload<input class="sr-only" type="file" accept="image/*" multiple (change)="upload($event)" /></label>
+    @if (error()) { <p class="text-red-200" role="alert">{{ error() }}</p> }
+    <div class="flex gap-2">
+      <button class="btn btn-gold" type="submit" [disabled]="saving()">Save</button>
+      <button class="btn btn-line" type="button" (click)="reset()">Clear</button>
+    </div>
+  </form>
+  <div class="grid gap-3">
+    @for (slide of slides(); track slide.id) {
+      <article class="panel flex items-center justify-between gap-3 p-4">
+        <div>
+          <h2 class="font-display text-3xl">{{ slide.tittle }}</h2>
+          <p class="text-sm text-gold-200/80">{{ slide.subTittle }}</p>
+        </div>
+        <div class="flex gap-2">
+          <button type="button" class="btn btn-line" (click)="edit(slide)">Edit</button>
+          <button type="button" class="btn btn-danger" (click)="remove(slide)">Delete</button>
+        </div>
+      </article>
+    }
+  </div>
+</div>

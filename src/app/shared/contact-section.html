@@ -1,0 +1,94 @@
+<section class="grid items-start gap-10 lg:grid-cols-[0.85fr_1.15fr]">
+  <div>
+    <p class="kicker">Desk</p>
+    @if (page()) {
+      <h1 class="mt-2 font-display text-6xl leading-none">Contact</h1>
+    } @else {
+      <h2 class="mt-2 font-display text-5xl leading-none">Contact us</h2>
+    }
+    <p class="mt-4 max-w-md text-gold-100/90">
+      Call, visit, or write. A message opens in your email app, addressed to the desk.
+    </p>
+
+    @if (loading()) {
+      <p class="mt-6" role="status">Loading contact details…</p>
+    } @else if (error()) {
+      <p class="panel mt-6 p-4 text-red-200" role="alert">{{ error() }}</p>
+    } @else if (contact(); as info) {
+      <dl class="mt-8 divide-y divide-gold-300/15 border-y border-gold-300/20 text-sm">
+        @if (info.address) {
+          <div class="grid gap-1 py-3 sm:grid-cols-[7rem_1fr]">
+            <dt class="text-gold-300">Address</dt>
+            <dd>{{ info.address }}</dd>
+          </div>
+        }
+        @if (info.phone) {
+          <div class="grid gap-1 py-3 sm:grid-cols-[7rem_1fr]">
+            <dt class="text-gold-300">Phone</dt>
+            <dd><a class="underline decoration-gold-300/40 underline-offset-4" [href]="'tel:' + info.phone">{{ info.phone }}</a></dd>
+          </div>
+        }
+        @if (info.email) {
+          <div class="grid gap-1 py-3 sm:grid-cols-[7rem_1fr]">
+            <dt class="text-gold-300">Email</dt>
+            <dd><a class="underline decoration-gold-300/40 underline-offset-4" [href]="'mailto:' + info.email">{{ info.email }}</a></dd>
+          </div>
+        }
+      </dl>
+
+      <h3 class="mt-8 font-display text-3xl">Hours</h3>
+      @if (info.workingHours?.length) {
+        <ul class="mt-3 grid gap-1 text-sm">
+          @for (hour of info.workingHours; track hour.id ?? hour.day) {
+            <li class="flex justify-between gap-4 border-b border-gold-300/15 py-2">
+              <span>{{ day(hour.day) }}</span>
+              <span class="text-gold-300">{{ hours(hour.openTime) }} – {{ hours(hour.closeTime) }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="mt-3 text-sm text-gold-200/80">Hours have not been published yet.</p>
+      }
+
+      @if (socials(info).length) {
+        <h3 class="mt-8 font-display text-3xl">Social</h3>
+        <ul class="mt-3 flex flex-wrap gap-2">
+          @for (item of socials(info); track item.label) {
+            <li>
+              <a class="inline-flex min-h-11 items-center rounded-full border border-gold-300/40 px-4 text-sm transition hover:border-gold-300 hover:text-gold-300" [href]="item.href" target="_blank" rel="noopener noreferrer">{{ item.label }}</a>
+            </li>
+          }
+        </ul>
+      }
+    }
+  </div>
+
+  <form class="panel grid content-start gap-4 p-6 md:p-8" [formGroup]="form" (ngSubmit)="send()">
+    <h2 class="font-display text-4xl leading-none">Write to us</h2>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <label class="grid gap-1 text-sm">
+        Name
+        <input class="field" formControlName="name" autocomplete="name" />
+      </label>
+      <label class="grid gap-1 text-sm">
+        Email
+        <input class="field" type="email" formControlName="email" autocomplete="email" />
+      </label>
+    </div>
+    <label class="grid gap-1 text-sm">
+      Phone
+      <input class="field" type="tel" formControlName="phone" autocomplete="tel" />
+    </label>
+    <label class="grid gap-1 text-sm">
+      Message
+      <textarea class="field min-h-32" rows="5" formControlName="message"></textarea>
+    </label>
+    @if (formError()) {
+      <p class="text-red-200" role="alert">{{ formError() }}</p>
+    }
+    @if (sent()) {
+      <p role="status">{{ sent() }}</p>
+    }
+    <button class="btn btn-gold w-fit" type="submit">Send message</button>
+  </form>
+</section>

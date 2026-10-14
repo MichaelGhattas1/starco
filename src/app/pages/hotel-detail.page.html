@@ -1,0 +1,188 @@
+@if (loading()) {
+  <p role="status">Loading hotel…</p>
+} @else if (error()) {
+  <p class="panel p-4 text-red-200" role="alert">{{ error() }}</p>
+} @else if (hotel(); as stay) {
+  <p class="kicker">{{ city() }}</p>
+  <h1 class="font-display text-5xl md:text-6xl">{{ name() }}</h1>
+  <p class="mt-3 max-w-3xl text-gold-200/85">{{ description() }}</p>
+
+  <div class="mt-6 grid gap-4 lg:grid-cols-[1.4fr_0.6fr]">
+    <div>
+      @if (photo()) {
+        <img [src]="photo()" [alt]="name()" class="h-80 w-full rounded-3xl object-cover md:h-[28rem]" />
+      }
+      @if (gallery().length > 1) {
+        <div class="mt-3 flex gap-2 overflow-auto">
+          @for (image of gallery(); track image.id; let index = $index) {
+            <button type="button" class="shrink-0" (click)="activeImage.set(index)" [attr.aria-label]="'Photo ' + (index + 1)">
+              <img [src]="mediaUrl(image.url)" alt="" class="h-16 w-24 rounded-xl object-cover" [class.ring-2]="activeImage() === index" [class.ring-gold-300]="activeImage() === index" />
+            </button>
+          }
+        </div>
+      }
+    </div>
+    <aside class="panel h-fit p-5">
+      <p class="kicker">Stay facts</p>
+      <dl class="mt-3 grid gap-2 text-sm">
+        <div><dt class="text-gold-300">Address</dt><dd>{{ address() }}</dd></div>
+        <div><dt class="text-gold-300">Phone</dt><dd><a [href]="'tel:' + stay.phone">{{ stay.phone }}</a></dd></div>
+        <div><dt class="text-gold-300">Email</dt><dd><a [href]="'mailto:' + stay.email">{{ stay.email }}</a></dd></div>
+        <div><dt class="text-gold-300">Rooms open</dt><dd>{{ stay.numOfAvailableRoomsToReserve }}</dd></div>
+        <div><dt class="text-gold-300">Suites open</dt><dd>{{ stay.numOfAvailableSuitesToReserve }}</dd></div>
+      </dl>
+      @if (stay.location) {
+        <a class="btn btn-line mt-4 w-full" [href]="stay.location" target="_blank" rel="noopener">Map</a>
+      }
+    </aside>
+  </div>
+
+  @if (facilities().length) {
+    <section class="mt-8">
+      <h2 class="font-display text-4xl">Facilities</h2>
+      <ul class="mt-3 flex flex-wrap gap-2">
+        @for (item of facilities(); track item[0]) {
+          <li class="rounded-full border border-gold-300/30 px-3 py-1 text-sm" [class.opacity-40]="!item[1]">
+            {{ featureLabel(item[0]) }}{{ item[1] ? '' : ' · off' }}
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  @if (showRestaurant() || showCafe()) {
+    <section class="mt-16">
+      <p class="kicker">Dining</p>
+      <h2 class="font-display text-5xl leading-none">Cafe and restaurant</h2>
+      <p class="mt-3 max-w-xl text-sm text-gold-200/80">Meals and drinks served at {{ name() }}.</p>
+
+      @if (showRestaurant()) {
+        <article class="mt-10 grid items-center gap-8 lg:grid-cols-2">
+          @if (restaurantImages().length === 1) {
+            <img [src]="restaurantImages()[0]" [alt]="'Restaurant at ' + name()" class="mx-auto aspect-[4/3] w-full max-w-xl rounded-[2rem] object-cover" />
+          } @else if (restaurantImages().length) {
+            <div>
+            <div class="relative mx-auto aspect-[4/3] w-full max-w-xl">
+              <img [src]="restaurantImages()[0]" [alt]="'Restaurant at ' + name()" class="absolute start-0 top-0 h-[78%] w-[72%] rounded-[2rem] object-cover" />
+              @if (restaurantImages()[1]; as second) {
+                <img [src]="second" alt="" class="absolute end-0 top-[18%] z-10 h-[48%] w-[54%] rounded-[1.6rem] object-cover shadow-2xl ring-4 ring-navy-950" />
+              }
+              @if (restaurantImages()[2]; as third) {
+                <img [src]="third" alt="" class="absolute bottom-0 start-[8%] z-20 aspect-square w-[40%] rounded-full object-cover shadow-2xl ring-4 ring-navy-950" />
+              }
+            </div>
+            @if (restaurantImages().length > 3) {
+              <ul class="mx-auto mt-4 flex max-w-xl gap-2 overflow-auto">
+                @for (src of restaurantImages(); track src; let index = $index) {
+                  @if (index > 2) {
+                    <li class="shrink-0"><img [src]="src" alt="" class="h-16 w-24 rounded-xl object-cover" /></li>
+                  }
+                }
+              </ul>
+            }
+            </div>
+          }
+          <div>
+            <p class="kicker">Restaurant</p>
+            <h3 class="mt-3 font-display text-5xl leading-none">The dining room</h3>
+            @if (restaurantText()) {
+              <p class="mt-4 max-w-md font-display text-3xl leading-snug text-gold-100">{{ restaurantText() }}</p>
+            }
+            @if (restaurantMenus().length) {
+              <div class="mt-6 flex flex-wrap gap-3">
+                @for (menu of restaurantMenus(); track menu.id; let index = $index) {
+                  <a class="btn btn-line" [href]="menu.url" target="_blank" rel="noopener">{{ menuName('Restaurant', index, restaurantMenus().length) }}</a>
+                }
+              </div>
+            }
+          </div>
+        </article>
+      }
+
+      @if (showCafe()) {
+        <article class="mt-16 grid items-center gap-8 lg:grid-cols-2">
+          <div class="order-2 lg:order-1">
+            <p class="kicker">Cafe</p>
+            <h3 class="mt-3 font-display text-5xl leading-none">The cafe</h3>
+            @if (cafeText()) {
+              <p class="mt-4 max-w-md font-display text-3xl leading-snug text-gold-100">{{ cafeText() }}</p>
+            }
+            @if (cafeMenus().length) {
+              <div class="mt-6 flex flex-wrap gap-3">
+                @for (menu of cafeMenus(); track menu.id; let index = $index) {
+                  <a class="btn btn-line" [href]="menu.url" target="_blank" rel="noopener">{{ menuName('Cafe', index, cafeMenus().length) }}</a>
+                }
+              </div>
+            }
+          </div>
+          @if (cafeImages().length) {
+            <div class="order-1 lg:order-2">
+              <div class="relative mx-auto aspect-[4/3] w-full max-w-xl">
+                <img [src]="cafeImages()[0]" [alt]="'Cafe at ' + name()" class="h-full w-full rounded-[2rem] object-cover" />
+                @if (cafeImages()[1]; as second) {
+                  <img [src]="second" alt="" class="absolute bottom-4 end-6 z-10 h-36 w-48 rounded-[1.4rem] object-cover shadow-2xl ring-4 ring-navy-950" />
+                }
+              </div>
+              @if (cafeImages().length > 2) {
+                <ul class="mx-auto mt-4 flex max-w-xl gap-2 overflow-auto">
+                  @for (src of cafeImages(); track src; let index = $index) {
+                    @if (index > 1) {
+                      <li class="shrink-0"><img [src]="src" alt="" class="h-16 w-24 rounded-xl object-cover" /></li>
+                    }
+                  }
+                </ul>
+              }
+            </div>
+          }
+        </article>
+      }
+    </section>
+  }
+
+  <section class="mt-10">
+    <div class="mb-4 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+      <div>
+        <p class="kicker">Reservation</p>
+        <h2 class="font-display text-4xl">Available rooms</h2>
+        <a routerLink="/cart" class="mt-2 inline-block text-sm text-gold-300">Cart · {{ cart.count() }}</a>
+      </div>
+      <form class="flex flex-wrap items-end gap-3" [formGroup]="form" (ngSubmit)="loadRooms()">
+        <label class="grid gap-1 text-sm">Check in<input class="field" type="date" formControlName="checkIn" [min]="today" /></label>
+        <label class="grid gap-1 text-sm">Check out<input class="field" type="date" formControlName="checkOut" [min]="minCheckOut()" /></label>
+        <label class="grid gap-1 text-sm">Adults<input class="field w-24" type="number" min="1" max="20" step="1" formControlName="adults" /></label>
+        <button class="btn btn-gold" type="submit">Check</button>
+      </form>
+    </div>
+    @if (roomsLoading()) {
+      <p role="status">Checking availability…</p>
+    } @else if (roomsError()) {
+      <p class="text-red-200" role="alert">{{ roomsError() }}</p>
+    } @else if (!rooms().length) {
+      <p>No rooms were returned for these dates.</p>
+    } @else {
+      <div class="grid gap-4 md:grid-cols-2">
+        @for (room of rooms(); track room.encodedRoomId) {
+          <article class="panel overflow-hidden">
+            @if (room.images?.[0]?.url) {
+              <img [src]="mediaUrl(room.images?.[0]?.url)" [alt]="roomName(room)" class="h-44 w-full object-cover" />
+            }
+            <div class="p-5">
+              <h3 class="font-display text-3xl">{{ roomName(room) }}</h3>
+              <p class="mt-1 text-sm text-gold-200/80">
+                {{ room.pricePerNight }} EGP / night · sleeps {{ room.maxSleep || '—' }}
+                · {{ room.isAvailable ? 'Available' : 'Unavailable' }}
+              </p>
+              @if (room.isAvailable && room.encodedRoomId && stay.id) {
+                @if (inCart(room)) {
+                  <a class="btn btn-line mt-4" routerLink="/cart">In cart</a>
+                } @else {
+                  <button type="button" class="btn btn-gold mt-4" (click)="addToCart(room)">Add to cart</button>
+                }
+              }
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
+}
