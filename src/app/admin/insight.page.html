@@ -2,20 +2,134 @@
 <h1 class="font-display text-5xl">Dining and facilities</h1>
 <label class="mt-4 grid max-w-md gap-1 text-sm">
   Hotel
-  <select class="field" [value]="hotelId() ?? ''" (change)="openHotel($event)">
-    <option value="">Choose a hotel</option>
+  <select class="field" (change)="openHotel($event)">
+    <option value="" [selected]="!hotelId()">Choose a hotel</option>
     @for (hotel of hotels(); track hotel.id) {
-      <option [value]="hotel.id">{{ hotel.name }}</option>
+      <option [value]="hotel.id" [selected]="hotel.id === hotelId()">{{ hotel.name }}</option>
     }
   </select>
 </label>
 
 @if (hotelId()) {
-  <form class="mt-5 grid gap-4" [formGroup]="form" (ngSubmit)="save()">
-    <label class="grid gap-1 text-sm">Restaurant<textarea class="field" rows="3" formControlName="restaurantDescription"></textarea></label>
-    <label class="grid gap-1 text-sm">Restaurant Arabic<textarea class="field" rows="3" formControlName="restaurantDescriptionAr"></textarea></label>
-    <label class="grid gap-1 text-sm">Cafe<textarea class="field" rows="3" formControlName="cafeDescription"></textarea></label>
-    <label class="grid gap-1 text-sm">Cafe Arabic<textarea class="field" rows="3" formControlName="cafeDescriptionAr"></textarea></label>
+  <form class="mt-5 grid gap-6" [formGroup]="form" (ngSubmit)="save()">
+    <section class="panel grid gap-4 p-5">
+      <div>
+        <p class="kicker">Restaurant</p>
+        <h2 class="mt-1 font-display text-4xl leading-none">Dining room</h2>
+      </div>
+      <label class="grid gap-1 text-sm">Description<textarea class="field" rows="3" formControlName="restaurantDescription"></textarea></label>
+      <label class="grid gap-1 text-sm">Arabic<textarea class="field" rows="3" formControlName="restaurantDescriptionAr"></textarea></label>
+      <div>
+        <h3 class="font-display text-3xl">Photos</h3>
+        @if (!restaurantImages().length) {
+          <p class="mt-2 text-sm text-gold-200/80">No restaurant photos yet.</p>
+        } @else {
+          <ul class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            @for (file of restaurantImages(); track file.id; let index = $index) {
+              <li class="overflow-hidden rounded-2xl border border-gold-300/20">
+                @if (mediaUrl(file.url); as src) {
+                  <img [src]="src" [alt]="'Restaurant photo ' + (index + 1)" class="h-40 w-full object-cover" />
+                } @else {
+                  <p class="grid h-40 place-items-center text-sm text-gold-200/80">Photo {{ index + 1 }}</p>
+                }
+                <div class="flex items-center justify-between gap-2 p-3">
+                  <span class="text-sm text-gold-200/80">Photo {{ index + 1 }}</span>
+                  <button type="button" class="btn btn-danger" [disabled]="saving()" [attr.aria-label]="'Delete restaurant photo ' + (index + 1)" (click)="drop('restaurant', file.id)">Delete</button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+        <label class="btn btn-line mt-3 w-fit">
+          Add restaurant photos
+          <input class="sr-only" type="file" accept="image/jpeg,image/png,image/webp" multiple (change)="upload($event, 'restaurant')" />
+        </label>
+        <p class="mt-2 text-sm text-gold-200/80">JPEG, PNG, or WebP. Shorter side at least 480 px, longer side at most 4096 px, and 5 MB or less.</p>
+      </div>
+      <div>
+        <h3 class="font-display text-3xl">Menus</h3>
+        @if (!restaurantMenus().length) {
+          <p class="mt-2 text-sm text-gold-200/80">No restaurant menus yet.</p>
+        } @else {
+          <ul class="mt-3 grid gap-2">
+            @for (file of restaurantMenus(); track file.id; let index = $index) {
+              <li class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold-300/20 px-4 py-3">
+                @if (mediaUrl(file.url); as href) {
+                  <a class="text-gold-300 underline" [href]="href" target="_blank" rel="noopener">Restaurant menu {{ index + 1 }}</a>
+                } @else {
+                  <span>Restaurant menu {{ index + 1 }}</span>
+                }
+                <button type="button" class="btn btn-danger" [disabled]="saving()" [attr.aria-label]="'Delete restaurant menu ' + (index + 1)" (click)="drop('restaurantMenu', file.id)">Delete</button>
+              </li>
+            }
+          </ul>
+        }
+        <label class="btn btn-line mt-3 w-fit">
+          Add restaurant menu
+          <input class="sr-only" type="file" accept="application/pdf" multiple (change)="upload($event, 'restaurantMenu')" />
+        </label>
+      </div>
+    </section>
+
+    <section class="panel grid gap-4 p-5">
+      <div>
+        <p class="kicker">Cafe</p>
+        <h2 class="mt-1 font-display text-4xl leading-none">Cafe</h2>
+      </div>
+      <label class="grid gap-1 text-sm">Description<textarea class="field" rows="3" formControlName="cafeDescription"></textarea></label>
+      <label class="grid gap-1 text-sm">Arabic<textarea class="field" rows="3" formControlName="cafeDescriptionAr"></textarea></label>
+      <div>
+        <h3 class="font-display text-3xl">Photos</h3>
+        @if (!cafeImages().length) {
+          <p class="mt-2 text-sm text-gold-200/80">No cafe photos yet.</p>
+        } @else {
+          <ul class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            @for (file of cafeImages(); track file.id; let index = $index) {
+              <li class="overflow-hidden rounded-2xl border border-gold-300/20">
+                @if (mediaUrl(file.url); as src) {
+                  <img [src]="src" [alt]="'Cafe photo ' + (index + 1)" class="h-40 w-full object-cover" />
+                } @else {
+                  <p class="grid h-40 place-items-center text-sm text-gold-200/80">Photo {{ index + 1 }}</p>
+                }
+                <div class="flex items-center justify-between gap-2 p-3">
+                  <span class="text-sm text-gold-200/80">Photo {{ index + 1 }}</span>
+                  <button type="button" class="btn btn-danger" [disabled]="saving()" [attr.aria-label]="'Delete cafe photo ' + (index + 1)" (click)="drop('cafe', file.id)">Delete</button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+        <label class="btn btn-line mt-3 w-fit">
+          Add cafe photos
+          <input class="sr-only" type="file" accept="image/jpeg,image/png,image/webp" multiple (change)="upload($event, 'cafe')" />
+        </label>
+        <p class="mt-2 text-sm text-gold-200/80">JPEG, PNG, or WebP. Shorter side at least 480 px, longer side at most 4096 px, and 5 MB or less.</p>
+      </div>
+      <div>
+        <h3 class="font-display text-3xl">Menus</h3>
+        @if (!cafeMenus().length) {
+          <p class="mt-2 text-sm text-gold-200/80">No cafe menus yet.</p>
+        } @else {
+          <ul class="mt-3 grid gap-2">
+            @for (file of cafeMenus(); track file.id; let index = $index) {
+              <li class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold-300/20 px-4 py-3">
+                @if (mediaUrl(file.url); as href) {
+                  <a class="text-gold-300 underline" [href]="href" target="_blank" rel="noopener">Cafe menu {{ index + 1 }}</a>
+                } @else {
+                  <span>Cafe menu {{ index + 1 }}</span>
+                }
+                <button type="button" class="btn btn-danger" [disabled]="saving()" [attr.aria-label]="'Delete cafe menu ' + (index + 1)" (click)="drop('cafeMenu', file.id)">Delete</button>
+              </li>
+            }
+          </ul>
+        }
+        <label class="btn btn-line mt-3 w-fit">
+          Add cafe menu
+          <input class="sr-only" type="file" accept="application/pdf" multiple (change)="upload($event, 'cafeMenu')" />
+        </label>
+      </div>
+    </section>
+
     <fieldset class="panel grid gap-2 p-4">
       <legend class="px-2">Facilities</legend>
       @for (item of facilityEntries(); track item[0]) {
@@ -29,19 +143,11 @@
         <button type="button" class="btn btn-line" (click)="addFacility()">Add</button>
       </div>
     </fieldset>
-    <div class="grid gap-3 md:grid-cols-2">
-      <label class="btn btn-line">Restaurant photos<input class="sr-only" type="file" accept="image/*" multiple (change)="upload($event, 'restaurant')" /></label>
-      <label class="btn btn-line">Cafe photos<input class="sr-only" type="file" accept="image/*" multiple (change)="upload($event, 'cafe')" /></label>
-      <label class="btn btn-line">Restaurant menu<input class="sr-only" type="file" accept="application/pdf" multiple (change)="upload($event, 'restaurantMenu')" /></label>
-      <label class="btn btn-line">Cafe menu<input class="sr-only" type="file" accept="application/pdf" multiple (change)="upload($event, 'cafeMenu')" /></label>
-    </div>
-    <p class="text-sm text-gold-200/80">
-      Photos {{ restaurantImageIds().length }} / {{ cafeImageIds().length }} · menus {{ restaurantMenuPdfIds().length }} / {{ cafeMenuPdfIds().length }}
-    </p>
+
     @if (error()) { <p class="text-red-200" role="alert">{{ error() }}</p> }
-    <div class="flex gap-3">
+    <div class="flex flex-wrap gap-3">
       <button class="btn btn-gold" type="submit" [disabled]="saving()">{{ exists() ? 'Update' : 'Create' }}</button>
-      @if (exists()) { <button type="button" class="btn btn-danger" (click)="remove()">Delete</button> }
+      @if (exists()) { <button type="button" class="btn btn-danger" [disabled]="saving()" (click)="remove()">Delete dining</button> }
       <a class="btn btn-line" routerLink="/admin">Back</a>
     </div>
   </form>

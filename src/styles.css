@@ -115,6 +115,22 @@
     box-shadow: 0 20px 50px rgb(0 0 0 / 0.22);
   }
 
+  .room-dialog {
+    width: min(42rem, calc(100% - 2rem));
+    max-height: calc(100% - 2rem);
+    overflow: auto;
+    margin: auto;
+    border: 1px solid rgb(230 207 138 / 0.22);
+    border-radius: 1.25rem;
+    background: var(--color-navy-900);
+    color: var(--color-gold-100);
+    padding: 0;
+  }
+
+  .room-dialog::backdrop {
+    background: rgb(7 20 34 / 0.72);
+  }
+
   .rich-text :is(ul, ol) {
     margin: 0.4rem 0;
     padding-inline-start: 1.25rem;
@@ -139,6 +155,20 @@
     font-size: 0.72rem;
     font-weight: 700;
     color: var(--color-gold-300);
+  }
+
+  .logo-mark {
+    display: inline-flex;
+    height: 2.5rem;
+  }
+
+  .logo-mark-lg {
+    height: 3.5rem;
+  }
+
+  .logo-mark img {
+    height: 100%;
+    width: auto;
   }
 
   .nav-active {

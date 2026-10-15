@@ -78,7 +78,7 @@
 </section>
 
 @if (about(); as page) {
-  <section class="mt-16 grid items-center gap-10 lg:grid-cols-2">
+  <section class="mt-16 grid items-start gap-10 lg:grid-cols-2">
     <div>
       <p class="kicker">Our story</p>
       <h2 class="mt-2 font-display text-5xl leading-none md:text-6xl">{{ page.tittle || 'About Plaza Inn' }}</h2>
@@ -92,13 +92,19 @@
     </div>
     <div class="relative mx-auto aspect-[4/3] w-full max-w-xl">
       @if (image(page.square1ImageId); as src) {
-        <img [src]="src" [alt]="page.tittle || 'Plaza Inn'" class="absolute start-0 top-0 h-[78%] w-[72%] rounded-[2rem] object-cover" />
+        <div class="absolute start-0 top-0 h-[78%] w-[72%] overflow-hidden rounded-[2rem]">
+          <img [src]="src" [alt]="page.tittle || 'Plaza Inn'" class="h-full w-full object-cover" />
+        </div>
       }
       @if (image(page.square2ImageId); as src) {
-        <img [src]="src" alt="" class="absolute end-0 top-[18%] z-10 h-[48%] w-[54%] rounded-[1.6rem] object-cover shadow-2xl ring-4 ring-navy-950" />
+        <div class="absolute end-0 top-[18%] z-10 h-[48%] w-[54%] overflow-hidden rounded-[1.6rem] shadow-2xl ring-4 ring-navy-950">
+          <img [src]="src" alt="" class="h-full w-full object-cover" />
+        </div>
       }
       @if (image(page.circleImageId); as src) {
-        <img [src]="src" alt="" class="absolute bottom-0 start-[10%] z-20 aspect-square w-[42%] rounded-full object-cover shadow-2xl ring-4 ring-navy-950" />
+        <div class="absolute bottom-0 start-[10%] z-20 aspect-square w-[42%] overflow-hidden rounded-full shadow-2xl ring-4 ring-navy-950">
+          <img [src]="src" alt="" class="h-full w-full object-cover" />
+        </div>
       }
     </div>
   </section>

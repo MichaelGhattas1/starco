@@ -6,6 +6,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
 import { NoticeService } from '../core/notice.service';
+import { firstPhotoProblem } from '../core/image-file';
 import { extractIds } from '../core/media';
 import { PlazaInnType } from '../core/models';
 
@@ -91,6 +92,17 @@ export class HotelFormPage {
     if (!files.length) {
       return;
     }
+    void firstPhotoProblem(files).then((problem) => {
+      if (problem) {
+        this.error.set(problem);
+        input.value = '';
+        return;
+      }
+      this.sendHotelImage(input, files, kind);
+    });
+  }
+
+  private sendHotelImage(input: HTMLInputElement, files: File[], kind: 'images' | 'logo'): void {
     this.uploading.set(true);
     const type = kind === 'logo' ? PlazaInnType.Logo : PlazaInnType.Hotel;
     this.api.upload(type, files).subscribe({

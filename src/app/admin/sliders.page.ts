@@ -4,6 +4,7 @@ import { Title } from '@angular/platform-browser';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
 import { NoticeService } from '../core/notice.service';
+import { firstPhotoProblem } from '../core/image-file';
 import { extractIds } from '../core/media';
 import { HomeSlider, PlazaInnType } from '../core/models';
 
@@ -56,6 +57,17 @@ export class SlidersPage {
     if (!files.length) {
       return;
     }
+    void firstPhotoProblem(files).then((problem) => {
+      if (problem) {
+        this.error.set(problem);
+        input.value = '';
+        return;
+      }
+      this.sendSlideImages(input, files);
+    });
+  }
+
+  private sendSlideImages(input: HTMLInputElement, files: File[]): void {
     this.api.upload(PlazaInnType.HomeSlider, files).subscribe({
       next: (payload) => {
         this.imageIds.update((current) => [...new Set([...current, ...extractIds(payload)])]);

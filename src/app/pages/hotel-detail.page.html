@@ -31,8 +31,14 @@
         <div><dt class="text-gold-300">Rooms open</dt><dd>{{ stay.numOfAvailableRoomsToReserve }}</dd></div>
         <div><dt class="text-gold-300">Suites open</dt><dd>{{ stay.numOfAvailableSuitesToReserve }}</dd></div>
       </dl>
-      @if (stay.location) {
-        <a class="btn btn-line mt-4 w-full" [href]="stay.location" target="_blank" rel="noopener">Map</a>
+      @if (mapEmbed(); as map) {
+        <iframe
+          class="mt-4 h-64 w-full rounded-2xl border border-gold-300/20"
+          [src]="map"
+          title="Hotel map"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
       }
     </aside>
   </div>
@@ -63,12 +69,18 @@
           } @else if (restaurantImages().length) {
             <div>
             <div class="relative mx-auto aspect-[4/3] w-full max-w-xl">
-              <img [src]="restaurantImages()[0]" [alt]="'Restaurant at ' + name()" class="absolute start-0 top-0 h-[78%] w-[72%] rounded-[2rem] object-cover" />
+              <div class="absolute start-0 top-0 h-[78%] w-[72%] overflow-hidden rounded-[2rem]">
+                <img [src]="restaurantImages()[0]" [alt]="'Restaurant at ' + name()" class="h-full w-full object-cover" />
+              </div>
               @if (restaurantImages()[1]; as second) {
-                <img [src]="second" alt="" class="absolute end-0 top-[18%] z-10 h-[48%] w-[54%] rounded-[1.6rem] object-cover shadow-2xl ring-4 ring-navy-950" />
+                <div class="absolute end-0 top-[18%] z-10 h-[48%] w-[54%] overflow-hidden rounded-[1.6rem] shadow-2xl ring-4 ring-navy-950">
+                  <img [src]="second" alt="" class="h-full w-full object-cover" />
+                </div>
               }
               @if (restaurantImages()[2]; as third) {
-                <img [src]="third" alt="" class="absolute bottom-0 start-[8%] z-20 aspect-square w-[40%] rounded-full object-cover shadow-2xl ring-4 ring-navy-950" />
+                <div class="absolute bottom-0 start-[8%] z-20 aspect-square w-[40%] overflow-hidden rounded-full shadow-2xl ring-4 ring-navy-950">
+                  <img [src]="third" alt="" class="h-full w-full object-cover" />
+                </div>
               }
             </div>
             @if (restaurantImages().length > 3) {
@@ -117,10 +129,12 @@
           </div>
           @if (cafeImages().length) {
             <div class="order-1 lg:order-2">
-              <div class="relative mx-auto aspect-[4/3] w-full max-w-xl">
-                <img [src]="cafeImages()[0]" [alt]="'Cafe at ' + name()" class="h-full w-full rounded-[2rem] object-cover" />
+              <div class="relative mx-auto aspect-[4/3] w-full max-w-xl overflow-hidden rounded-[2rem]">
+                <img [src]="cafeImages()[0]" [alt]="'Cafe at ' + name()" class="h-full w-full object-cover" />
                 @if (cafeImages()[1]; as second) {
-                  <img [src]="second" alt="" class="absolute bottom-4 end-6 z-10 h-36 w-48 rounded-[1.4rem] object-cover shadow-2xl ring-4 ring-navy-950" />
+                  <div class="absolute bottom-4 end-6 z-10 h-36 w-48 overflow-hidden rounded-[1.4rem] shadow-2xl ring-4 ring-navy-950">
+                    <img [src]="second" alt="" class="h-full w-full object-cover" />
+                  </div>
                 }
               </div>
               @if (cafeImages().length > 2) {
@@ -172,17 +186,75 @@
                 {{ room.pricePerNight }} EGP / night · sleeps {{ room.maxSleep || '—' }}
                 · {{ room.isAvailable ? 'Available' : 'Unavailable' }}
               </p>
-              @if (room.isAvailable && room.encodedRoomId && stay.id) {
-                @if (inCart(room)) {
-                  <a class="btn btn-line mt-4" routerLink="/cart">In cart</a>
-                } @else {
-                  <button type="button" class="btn btn-gold mt-4" (click)="addToCart(room)">Add to cart</button>
+              <div class="mt-4 flex flex-wrap gap-2">
+                <button type="button" class="btn btn-line" (click)="showRoom(room)">Show room</button>
+                @if (room.isAvailable && room.encodedRoomId && stay.id) {
+                  @if (inCart(room)) {
+                    <a class="btn btn-line" routerLink="/cart">In cart</a>
+                  } @else {
+                    <button type="button" class="btn btn-gold" (click)="addToCart(room)">Add to cart</button>
+                  }
                 }
-              }
+              </div>
             </div>
           </article>
         }
       </div>
     }
   </section>
+
+  <dialog #roomDialog class="room-dialog" aria-labelledby="room-dialog-title" (close)="openRoom.set(null)">
+    @if (openRoom(); as room) {
+      <div class="p-5 md:p-6">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p class="kicker">Room</p>
+            <h2 id="room-dialog-title" class="mt-1 font-display text-4xl leading-none">{{ roomName(roomRecord() ?? room) }}</h2>
+          </div>
+          <button type="button" class="btn btn-line" (click)="closeRoom()">Close</button>
+        </div>
+        @if (roomPhotos().length) {
+          <img [src]="roomPhotos()[roomPhoto()]" [alt]="roomName(room)" class="mt-4 h-64 w-full rounded-2xl object-cover" />
+          @if (roomPhotos().length > 1) {
+            <div class="mt-3 flex gap-2 overflow-auto">
+              @for (src of roomPhotos(); track src; let index = $index) {
+                <button type="button" class="shrink-0" (click)="roomPhoto.set(index)" [attr.aria-label]="'Room photo ' + (index + 1)">
+                  <img [src]="src" alt="" class="h-16 w-24 rounded-xl object-cover" [class.ring-2]="roomPhoto() === index" [class.ring-gold-300]="roomPhoto() === index" />
+                </button>
+              }
+            </div>
+          }
+        }
+        <p class="mt-4 text-sm text-gold-200/80">
+          {{ room.pricePerNight }} EGP / night · sleeps {{ room.maxSleep || '—' }}
+          · {{ room.isAvailable ? 'Available' : 'Unavailable' }}
+          @if (roomRecord(); as detail) {
+            · {{ roomTypeLabel(detail.type) }}
+          }
+        </p>
+        @if (roomBusy()) {
+          <p class="mt-3 text-sm" role="status">Loading room…</p>
+        }
+        @if (roomRecord()?.extraBed) {
+          <p class="mt-3 text-sm text-gold-200/80">Extra bed {{ roomRecord()?.priceForExtraBed }} EGP</p>
+        }
+        @if (roomFeatures(roomRecord()).length) {
+          <ul class="mt-4 flex flex-wrap gap-2">
+            @for (item of roomFeatures(roomRecord()); track item[0]) {
+              <li class="rounded-full border border-gold-300/30 px-3 py-1 text-sm">{{ featureLabel(item[0]) }}</li>
+            }
+          </ul>
+        }
+        @if (room.isAvailable && room.encodedRoomId && stay.id) {
+          <div class="mt-5">
+            @if (inCart(room)) {
+              <a class="btn btn-line" routerLink="/cart" (click)="closeRoom()">In cart</a>
+            } @else {
+              <button type="button" class="btn btn-gold" (click)="addToCart(room); closeRoom()">Add to cart</button>
+            }
+          </div>
+        }
+      </div>
+    }
+  </dialog>
 }

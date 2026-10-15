@@ -4,6 +4,7 @@ import { Title } from '@angular/platform-browser';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
 import { NoticeService } from '../core/notice.service';
+import { firstPhotoProblem, PHOTO_RULES } from '../core/image-file';
 import { extractIds, fileId } from '../core/media';
 import { PlazaInnType } from '../core/models';
 
@@ -21,7 +22,8 @@ import { PlazaInnType } from '../core/models';
       <label class="grid gap-1 text-sm">Square image id<input class="field" type="number" formControlName="square1ImageId" /></label>
       <label class="grid gap-1 text-sm">Circle image id<input class="field" type="number" formControlName="circleImageId" /></label>
       <label class="grid gap-1 text-sm">Second square id<input class="field" type="number" formControlName="square2ImageId" /></label>
-      <label class="btn btn-line w-fit">Upload about image<input class="sr-only" type="file" accept="image/*" (change)="upload($event)" /></label>
+      <label class="btn btn-line w-fit">Upload about image<input class="sr-only" type="file" accept="image/jpeg,image/png,image/webp" (change)="upload($event)" /></label>
+      <p class="text-sm text-gold-200/80">{{ photoRules }}</p>
       @if (error()) { <p class="text-red-200" role="alert">{{ error() }}</p> }
       <button class="btn btn-gold w-fit" type="submit" [disabled]="saving()">Save about</button>
     </form>
@@ -30,6 +32,7 @@ import { PlazaInnType } from '../core/models';
 export class AboutAdminPage {
   private readonly api = inject(ApiService);
   private readonly notice = inject(NoticeService);
+  readonly photoRules = PHOTO_RULES;
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
   readonly form = inject(FormBuilder).nonNullable.group({
@@ -67,6 +70,17 @@ export class AboutAdminPage {
     if (!files.length) {
       return;
     }
+    void firstPhotoProblem(files).then((problem) => {
+      if (problem) {
+        this.error.set(problem);
+        input.value = '';
+        return;
+      }
+      this.sendAboutImage(input, files);
+    });
+  }
+
+  private sendAboutImage(input: HTMLInputElement, files: File[]): void {
     this.api.upload(PlazaInnType.AboutUs, files).subscribe({
       next: (payload) => {
         const id = extractIds(payload)[0];

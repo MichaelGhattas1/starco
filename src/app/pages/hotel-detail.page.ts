@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Title } from '@angular/platform-browser';
+import { DomSanitizer, Title } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { switchMap } from 'rxjs';
 import { errorMessage } from '../core/api-error';
@@ -10,7 +10,7 @@ import { CartStore } from '../core/cart.store';
 import { LocaleService } from '../core/locale.service';
 import { NoticeService } from '../core/notice.service';
 import { featureLabel, firstImage, inputDate, mediaUrl, nextDate, toApiDateTime } from '../core/media';
-import { AvailableRoom, FileDto, Hotel } from '../core/models';
+import { AvailableRoom, FileDto, Hotel, Room, RoomType } from '../core/models';
 
 @Component({
   selector: 'app-hotel-detail-page',
@@ -22,9 +22,15 @@ export class HotelDetailPage {
   private readonly api = inject(ApiService);
   private readonly route = inject(ActivatedRoute);
   private readonly title = inject(Title);
+  private readonly sanitizer = inject(DomSanitizer);
   readonly locale = inject(LocaleService);
   readonly cart = inject(CartStore);
   private readonly notice = inject(NoticeService);
+  private readonly roomDialog = viewChild<ElementRef<HTMLDialogElement>>('roomDialog');
+  readonly openRoom = signal<AvailableRoom | null>(null);
+  readonly roomRecord = signal<Room | null>(null);
+  readonly roomBusy = signal(false);
+  readonly roomPhoto = signal(0);
 
   readonly hotel = signal<Hotel | null>(null);
   readonly rooms = signal<AvailableRoom[]>([]);
@@ -50,6 +56,10 @@ export class HotelDetailPage {
     this.locale.pick(this.hotel()?.description, this.hotel()?.descriptionAr),
   );
   readonly address = computed(() => this.locale.pick(this.hotel()?.address, this.hotel()?.addressAr));
+  readonly mapEmbed = computed(() => {
+    const url = googleMapEmbed(this.hotel()?.location, this.address(), this.city());
+    return url ? this.sanitizer.bypassSecurityTrustResourceUrl(url) : null;
+  });
   readonly gallery = computed(() => this.hotel()?.images ?? []);
   readonly photo = computed(() => mediaUrl(this.gallery()[this.activeImage()]?.url) || firstImage(this.gallery()));
   readonly facilities = computed(() => Object.entries(this.hotel()?.insight?.facilities ?? {}));
@@ -166,8 +176,56 @@ export class HotelDetailPage {
     });
   }
 
-  roomName(room: AvailableRoom): string {
+  roomName(room: AvailableRoom | Room): string {
     return this.locale.pick(room.name, room.nameAr) || 'Room';
+  }
+
+  roomTypeLabel(type: RoomType | null | undefined): string {
+    if (type === RoomType.Double) {
+      return 'Double';
+    }
+    if (type === RoomType.Suite) {
+      return 'Suite';
+    }
+    return 'Single';
+  }
+
+  roomFeatures(room: Room | null): [string, boolean][] {
+    return Object.entries(room?.features ?? {}).filter((entry) => entry[1]);
+  }
+
+  roomPhotos(): string[] {
+    const files = this.roomRecord()?.images?.length ? this.roomRecord()?.images : this.openRoom()?.images;
+    return (files ?? []).map((file) => mediaUrl(file.url)).filter((url): url is string => !!url);
+  }
+
+  showRoom(room: AvailableRoom): void {
+    this.openRoom.set(room);
+    this.roomRecord.set(null);
+    this.roomPhoto.set(0);
+    this.roomBusy.set(true);
+    setTimeout(() => {
+      const dialog = this.roomDialog()?.nativeElement;
+      if (dialog && !dialog.open) {
+        dialog.showModal();
+      }
+    });
+    const id = room.encodedRoomId;
+    if (!id) {
+      this.roomBusy.set(false);
+      return;
+    }
+    this.api.room(id).subscribe({
+      next: (record) => {
+        this.roomRecord.set(record);
+        this.roomBusy.set(false);
+      },
+      error: () => this.roomBusy.set(false),
+    });
+  }
+
+  closeRoom(): void {
+    this.roomDialog()?.nativeElement.close();
   }
 
   inCart(room: AvailableRoom): boolean {
@@ -225,4 +283,54 @@ export class HotelDetailPage {
       return url ? [{ id: file.id, url }] : [];
     });
   }
+}
+
+function googleMapEmbed(location: string | null | undefined, address: string, city: string): string | null {
+  const fromLink = mapsLinkEmbed(location);
+  if (fromLink) {
+    return fromLink;
+  }
+  const query = [address, city].map((part) => part.trim()).filter(Boolean).join(', ');
+  return query ? embedQuery(query) : null;
+}
+
+function mapsLinkEmbed(location: string | null | undefined): string | null {
+  const raw = (location ?? '').trim();
+  if (!raw) {
+    return null;
+  }
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    return null;
+  }
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+    return null;
+  }
+  const host = url.hostname.toLowerCase();
+  if (host !== 'google.com' && !host.endsWith('.google.com')) {
+    return null;
+  }
+  if (/\/maps\/embed/i.test(url.pathname) || url.searchParams.get('output') === 'embed') {
+    url.protocol = 'https:';
+    return url.toString();
+  }
+  const query = url.searchParams.get('q') || url.searchParams.get('query');
+  if (query?.trim()) {
+    return embedQuery(query.trim());
+  }
+  const at = url.href.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
+  if (at) {
+    return embedQuery(`${at[1]},${at[2]}`);
+  }
+  const place = url.pathname.match(/\/maps\/place\/([^/@]+)/);
+  if (place?.[1]) {
+    return embedQuery(decodeURIComponent(place[1].replace(/\+/g, ' ')));
+  }
+  return null;
+}
+
+function embedQuery(query: string): string {
+  return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&z=15&output=embed`;
 }

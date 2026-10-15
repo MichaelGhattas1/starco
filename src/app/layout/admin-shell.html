@@ -1,6 +1,9 @@
 <div class="grid gap-6 lg:grid-cols-[220px_1fr]">
   <aside class="panel h-fit p-4">
-    <p class="kicker">Admin</p>
+    <a routerLink="/" class="logo-mark" aria-label="Starco">
+      <img src="assets/logo.png" alt="" />
+    </a>
+    <p class="kicker mt-4">Admin</p>
     <p class="mt-2 font-display text-3xl">{{ auth.name() || 'Plaza desk' }}</p>
     <p class="text-sm text-gold-300">{{ roleLabel() }}</p>
     <nav class="mt-4 grid gap-1 text-sm">

@@ -7,6 +7,7 @@ import { forkJoin } from 'rxjs';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
 import { NoticeService } from '../core/notice.service';
+import { firstPhotoProblem } from '../core/image-file';
 import { extractIds, featureLabel } from '../core/media';
 import { HotelLookup, PlazaInnType, ROOM_FEATURES, ROOM_TYPE_OPTIONS, RoomType } from '../core/models';
 
@@ -85,6 +86,17 @@ export class RoomFormPage {
     if (!files.length) {
       return;
     }
+    void firstPhotoProblem(files).then((problem) => {
+      if (problem) {
+        this.error.set(problem);
+        input.value = '';
+        return;
+      }
+      this.sendRoomImages(input, files);
+    });
+  }
+
+  private sendRoomImages(input: HTMLInputElement, files: File[]): void {
     this.api.upload(PlazaInnType.Room, files).subscribe({
       next: (payload) => {
         const ids = extractIds(payload);
