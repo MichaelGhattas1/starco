@@ -2,69 +2,63 @@
   Skip to content
 </a>
 
-@if (notice.message(); as msg) {
-  <div
-    class="relative z-40 px-4 py-3 text-center text-sm"
-    role="status"
-    [class.bg-emerald-900]="msg.type === 'ok'"
-    [class.text-emerald-100]="msg.type === 'ok'"
-    [class.bg-red-950]="msg.type === 'err'"
-    [class.text-red-100]="msg.type === 'err'"
-  >
-    {{ msg.text }}
-    <button type="button" class="ms-3 underline" (click)="notice.clear()">Dismiss</button>
-  </div>
-}
-
-<header class="sticky top-0 z-30 border-b border-gold-300/20 bg-navy-950/90 backdrop-blur">
-  <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-    <a routerLink="/" class="logo-mark" aria-label="Starco" (click)="closeMenu()">
+<header class="site-header">
+  <div class="site-bar">
+    <a routerLink="/" class="logo-mark site-logo" aria-label="Starco" (click)="closeMenu()">
       <img src="assets/logo.png" alt="" />
     </a>
     <button
       type="button"
-      class="btn btn-line md:hidden"
+      class="nav-toggle"
       [attr.aria-expanded]="menuOpen()"
+      [attr.aria-label]="menuOpen() ? 'Close menu' : 'Open menu'"
       aria-controls="site-nav"
       (click)="menuOpen.set(!menuOpen())"
     >
-      Menu
+      <span class="nav-toggle-bars" [class.is-open]="menuOpen()" aria-hidden="true"></span>
     </button>
-    <nav
-      id="site-nav"
-      class="absolute inset-x-0 top-full flex-col gap-1 border-b border-gold-300/20 bg-navy-950 p-4 md:static md:flex md:flex-row md:items-center md:border-0 md:bg-transparent md:p-0"
-      [class.hidden]="!menuOpen()"
-      [class.flex]="menuOpen()"
-    >
-      <a routerLink="/" routerLinkActive="nav-active" [routerLinkActiveOptions]="{ exact: true }" class="rounded-full px-3 py-2 transition hover:text-gold-300" (click)="closeMenu()">Home</a>
-      <a routerLink="/hotels" routerLinkActive="nav-active" class="rounded-full px-3 py-2 transition hover:text-gold-300" (click)="closeMenu()">Hotels</a>
-      <a routerLink="/offers" routerLinkActive="nav-offer-active" class="nav-offer" (click)="closeMenu()"><span>Offers</span></a>
-      <a routerLink="/trips" routerLinkActive="nav-active" class="rounded-full px-3 py-2 transition hover:text-gold-300" (click)="closeMenu()">Trips</a>
-      <a routerLink="/transport" routerLinkActive="nav-active" class="rounded-full px-3 py-2 transition hover:text-gold-300" (click)="closeMenu()">Transport</a>
-      <a routerLink="/about" routerLinkActive="nav-active" class="rounded-full px-3 py-2 transition hover:text-gold-300" (click)="closeMenu()">About</a>
-      <a routerLink="/contact" routerLinkActive="nav-active" class="rounded-full px-3 py-2 transition hover:text-gold-300" (click)="closeMenu()">Contact</a>
-      @if (auth.canWrite()) {
-        <a routerLink="/admin" class="rounded-full px-3 py-2 text-gold-300" (click)="closeMenu()">Admin</a>
-      }
-      <a
-        routerLink="/cart"
-        class="btn btn-line"
-        [attr.aria-label]="'Cart, ' + cart.count() + (cart.count() === 1 ? ' stay' : ' stays')"
-        (click)="closeMenu()"
-      >
-        Cart
-        @if (cart.count()) {
-          <span class="grid h-6 min-w-6 place-items-center rounded-full bg-gold-400 px-1 text-xs font-bold text-navy-950" aria-hidden="true">{{ cart.count() }}</span>
+    <nav id="site-nav" class="site-nav" [class.is-open]="menuOpen()">
+      <div class="site-links">
+        <a routerLink="/" routerLinkActive="nav-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link" (click)="closeMenu()">Home</a>
+        <a routerLink="/hotels" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">Hotels</a>
+        <a routerLink="/packages" routerLinkActive="nav-offer-active" class="nav-offer" (click)="closeMenu()"><span>Offers</span></a>
+        <a routerLink="/trips" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">Trips</a>
+        <a routerLink="/transport" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">Transport</a>
+        <a routerLink="/events" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">Events</a>
+        <a routerLink="/about" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">About</a>
+        <a routerLink="/contact" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">Contact</a>
+      </div>
+      <div class="site-actions">
+        @if (auth.canWrite()) {
+          <a routerLink="/admin" class="nav-link" (click)="closeMenu()">Admin</a>
         }
-      </a>
-      @if (auth.isLoggedIn()) {
-        <button type="button" class="btn btn-line" (click)="logout()">Sign out</button>
-      } @else {
-        <a routerLink="/login" class="btn btn-gold" (click)="closeMenu()">Sign in</a>
-      }
-      <button type="button" class="btn btn-line" (click)="locale.toggle()">
-        {{ locale.isAr() ? 'EN' : 'عربي' }}
-      </button>
+        @if (auth.isLoggedIn()) {
+          <a routerLink="/bookings" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">Bookings</a>
+        }
+        <a
+          routerLink="/cart"
+          class="btn btn-line nav-cart"
+          [attr.aria-label]="'Cart, ' + cart.count() + (cart.count() === 1 ? ' stay' : ' stays')"
+          (click)="closeMenu()"
+        >
+          <svg viewBox="0 0 24 24" class="nav-bag" aria-hidden="true">
+            <path d="M6.5 8h11l-.8 12h-9.4L6.5 8z" />
+            <path d="M9 8V6.8A3 3 0 0 1 12 3.8 3 3 0 0 1 15 6.8V8" />
+          </svg>
+          Cart
+          @if (cart.count()) {
+            <span class="nav-count" aria-hidden="true">{{ cart.count() }}</span>
+          }
+        </a>
+        @if (auth.isLoggedIn()) {
+          <button type="button" class="btn btn-line" (click)="logout()">Sign out</button>
+        } @else {
+          <a routerLink="/login" class="btn btn-gold" (click)="closeMenu()">Sign in</a>
+        }
+        <button type="button" class="btn btn-line nav-lang" (click)="locale.toggle()">
+          {{ locale.isAr() ? 'EN' : 'عربي' }}
+        </button>
+      </div>
     </nav>
   </div>
 </header>

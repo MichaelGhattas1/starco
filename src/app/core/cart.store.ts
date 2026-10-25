@@ -1,4 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
+import { quotedHotelBreakdown } from './hotel-charges';
 
 const CART_KEY = 'plaza_cart';
 export const UNPAID_KEY = 'plaza_unpaid_bookings';
@@ -45,8 +46,12 @@ export function stayNights(checkIn: string, checkOut: string): number {
   return nights > 0 ? nights : 1;
 }
 
+export function lineBase(line: CartLine): number {
+  return line.pricePerNight * stayNights(line.checkIn, line.checkOut);
+}
+
 export function lineTotal(line: CartLine): number {
-  return line.quote ?? line.pricePerNight * stayNights(line.checkIn, line.checkOut);
+  return quotedHotelBreakdown(lineBase(line), line.quote).total;
 }
 
 @Injectable({ providedIn: 'root' })

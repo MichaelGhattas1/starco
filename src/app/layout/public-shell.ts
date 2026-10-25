@@ -12,6 +12,9 @@ import { NoticeService } from '../core/notice.service';
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './public-shell.html',
+  host: {
+    '(document:keydown.escape)': 'closeMenu()',
+  },
 })
 export class PublicShell {
   readonly auth = inject(AuthService);
@@ -24,6 +27,10 @@ export class PublicShell {
   private readonly route = inject(ActivatedRoute);
 
   constructor() {
+    if (sessionStorage.getItem('plaza_expired') === '1') {
+      sessionStorage.removeItem('plaza_expired');
+      this.notice.error('Your session expired. Sign in again.');
+    }
     this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
       const notice = params.get('notice');
       if (notice) {

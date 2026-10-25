@@ -6,13 +6,15 @@ import { concatMap, from, tap, toArray } from 'rxjs';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
 import { AuthService } from '../core/auth.service';
-import { CartLine, CartStore, lineTotal, stayNights, UNPAID_KEY, UnpaidStay } from '../core/cart.store';
-import { money, toApiDateTime } from '../core/media';
-import { BookingResult } from '../core/models';
+import { CartLine, CartStore, lineBase, lineTotal, stayNights, UNPAID_KEY, UnpaidStay } from '../core/cart.store';
+import { PAYMENT_CURRENCY, CurrencyService } from '../core/currency.service';
+import { paymentLink, toApiDateTime } from '../core/media';
+import { BookingResult, BookingType } from '../core/models';
+import { HotelPrice } from '../shared/hotel-price';
 
 @Component({
   selector: 'app-cart-page',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, HotelPrice],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './cart.page.html',
 })
@@ -21,9 +23,10 @@ export class CartPage {
   private readonly router = inject(Router);
   readonly auth = inject(AuthService);
   readonly cart = inject(CartStore);
+  readonly currency = inject(CurrencyService);
   readonly nights = stayNights;
+  readonly lineBase = lineBase;
   readonly lineTotal = lineTotal;
-  readonly money = money;
   readonly working = signal(false);
   readonly error = signal<string | null>(null);
   readonly payNote = signal<string | null>(null);
@@ -49,6 +52,10 @@ export class CartPage {
 
   remove(line: CartLine): void {
     this.cart.remove(line.key);
+  }
+
+  checkoutBase(): number {
+    return this.cart.lines().reduce((sum, line) => sum + lineBase(line), 0);
   }
 
   payHeld(): void {
@@ -96,7 +103,6 @@ export class CartPage {
   }
 
   private quoteLines(): void {
-    const guest = this.form.getRawValue();
     for (const line of this.cart.lines()) {
       this.api
         .calculatePrice({
@@ -104,11 +110,18 @@ export class CartPage {
           encodedRoomId: line.roomId,
           checkIn: toApiDateTime(line.checkIn, 12),
           checkOut: toApiDateTime(line.checkOut, 12),
-          customerName: guest.customerName || 'Guest',
-          customerEmail: guest.customerEmail || 'guest@example.com',
+          adults: line.adults,
+          children: 0,
+          roomsCount: 1,
+          extraBed: false,
         })
         .subscribe({
-          next: (quote) => this.cart.setQuote(line.key, quote.totalPrice),
+          next: (quote) => {
+            const total = Number(quote?.totalPrice);
+            if (Number.isFinite(total)) {
+              this.cart.setQuote(line.key, total);
+            }
+          },
           error: () => undefined,
         });
     }
@@ -117,12 +130,18 @@ export class CartPage {
   private request(line: CartLine) {
     const guest = this.form.getRawValue();
     return {
+      bookingType: BookingType.Hotel,
       encodedHotelId: line.hotelId,
       encodedRoomId: line.roomId,
       checkIn: toApiDateTime(line.checkIn, 12),
       checkOut: toApiDateTime(line.checkOut, 12),
+      adults: line.adults,
+      children: 0,
+      roomsCount: 1,
+      extraBed: false,
       customerName: guest.customerName,
       customerEmail: guest.customerEmail,
+      customerPhone: guest.phone,
     };
   }
 
@@ -158,7 +177,7 @@ export class CartPage {
       .createPayment({
         encodedBookingId: bookingId,
         amountCents: Math.round(Number(booking.totalPrice) * 100),
-        currency: 'EGP',
+        currency: PAYMENT_CURRENCY,
         billingData: {
           name: guest.customerName,
           email: guest.customerEmail,
@@ -185,23 +204,3 @@ export class CartPage {
   }
 }
 
-function paymentLink(payload: unknown): string | null {
-  if (typeof payload === 'string') {
-    const value = payload.trim().replace(/^"|"$/g, '');
-    return /^https?:\/\//i.test(value) ? value : null;
-  }
-  if (!payload || typeof payload !== 'object') {
-    return null;
-  }
-  const record = payload as Record<string, unknown>;
-  for (const key of ['url', 'paymentUrl', 'iframeUrl', 'redirectUrl', 'link', 'paymentLink']) {
-    const value = record[key];
-    if (typeof value === 'string' && /^https?:\/\//i.test(value)) {
-      return value;
-    }
-  }
-  if ('data' in record) {
-    return paymentLink(record['data']);
-  }
-  return null;
-}

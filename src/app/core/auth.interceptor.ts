@@ -1,12 +1,40 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
 import { environment } from './environment';
+import { NoticeService } from './notice.service';
 import { SessionStore } from './session.store';
 
+const ACCOUNT_AUTH = /\/api\/Account\/(login|register|forgot-password|reset-password)(?:\?|$)/;
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = inject(SessionStore).token();
-  if (!token || !req.url.startsWith(environment.apiUrl)) {
-    return next(req);
-  }
-  return next(req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }));
+  const session = inject(SessionStore);
+  const router = inject(Router);
+  const notice = inject(NoticeService);
+  const token = session.token();
+  const authed =
+    token && req.url.startsWith(environment.apiUrl)
+      ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+      : req;
+
+  return next(authed).pipe(
+    catchError((error: unknown) => {
+      if (
+        error instanceof HttpErrorResponse &&
+        error.status === 401 &&
+        token &&
+        req.url.startsWith(environment.apiUrl) &&
+        !ACCOUNT_AUTH.test(req.url)
+      ) {
+        session.clear();
+        notice.error('Your session expired. Sign in again.');
+        const returnUrl = router.url.startsWith('/login') ? null : router.url;
+        void router.navigate(['/login'], {
+          queryParams: returnUrl ? { returnUrl } : {},
+        });
+      }
+      return throwError(() => error);
+    }),
+  );
 };

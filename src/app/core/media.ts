@@ -76,13 +76,43 @@ export function toApiDateTime(date: string, hour: number): string {
   return `${date}T${String(hour).padStart(2, '0')}:00:00`;
 }
 
-export function money(value: number | null | undefined): string {
-  const amount = Number(value ?? 0);
-  return new Intl.NumberFormat('en-EG', {
-    style: 'currency',
-    currency: 'EGP',
-    maximumFractionDigits: 2,
-  }).format(amount);
+export function fromApiDate(value: string | null | undefined): string {
+  return value ? value.slice(0, 10) : '';
+}
+
+export function fromApiDateTime(value: string | null | undefined): string {
+  if (!value) {
+    return '';
+  }
+  const match = /^(\d{4}-\d{2}-\d{2})(?:T(\d{2}:\d{2}))?/.exec(value);
+  if (!match) {
+    return value;
+  }
+  if (!match[2] || match[2] === '00:00') {
+    return match[1];
+  }
+  return `${match[1]} ${match[2]}`;
+}
+
+export function paymentLink(payload: unknown): string | null {
+  if (typeof payload === 'string') {
+    const value = payload.trim().replace(/^"|"$/g, '');
+    return /^https?:\/\//i.test(value) ? value : null;
+  }
+  if (!payload || typeof payload !== 'object') {
+    return null;
+  }
+  const record = payload as Record<string, unknown>;
+  for (const key of ['url', 'paymentUrl', 'iframeUrl', 'redirectUrl', 'link', 'paymentLink']) {
+    const value = record[key];
+    if (typeof value === 'string' && /^https?:\/\//i.test(value)) {
+      return value;
+    }
+  }
+  if ('data' in record) {
+    return paymentLink(record['data']);
+  }
+  return null;
 }
 
 const FEATURE_LABELS: Record<string, string> = {

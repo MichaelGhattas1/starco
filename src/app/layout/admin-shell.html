@@ -8,6 +8,7 @@
     <p class="text-sm text-gold-300">{{ roleLabel() }}</p>
     <nav class="mt-4 grid gap-1 text-sm">
       <a routerLink="/admin" routerLinkActive="bg-gold-400/15" [routerLinkActiveOptions]="{ exact: true }" class="rounded-xl px-3 py-2">Dashboard</a>
+      <a routerLink="/admin/currency" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Currency</a>
       <a routerLink="/admin/hotels" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Hotels</a>
       <a routerLink="/admin/rooms" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Rooms</a>
       <a routerLink="/admin/insight" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Dining</a>
@@ -17,24 +18,17 @@
       <a routerLink="/admin/partners" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Partners</a>
       <a routerLink="/admin/broadcast" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Broadcast</a>
       <a routerLink="/admin/users" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Users</a>
+      <a routerLink="/admin/trips" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Trips</a>
+      <a routerLink="/admin/transport" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Transport</a>
+      <a routerLink="/admin/events" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Events</a>
+      <a routerLink="/admin/packages" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Packages</a>
+      <a routerLink="/admin/bookings" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Bookings</a>
+      <a routerLink="/admin/section-images" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Section photos</a>
     </nav>
     <a routerLink="/" class="btn btn-line mt-4 w-full">View site</a>
     <button type="button" class="btn btn-danger mt-2 w-full" (click)="logout()">Sign out</button>
   </aside>
   <section>
-    @if (notice.message(); as msg) {
-      <div
-        class="mb-4 rounded-2xl px-4 py-3 text-sm"
-        role="status"
-        [class.bg-emerald-900]="msg.type === 'ok'"
-        [class.text-emerald-100]="msg.type === 'ok'"
-        [class.bg-red-950]="msg.type === 'err'"
-        [class.text-red-100]="msg.type === 'err'"
-      >
-        {{ msg.text }}
-        <button type="button" class="ms-3 underline" (click)="notice.clear()">Dismiss</button>
-      </div>
-    }
     <router-outlet />
   </section>
 </div>

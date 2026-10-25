@@ -3,6 +3,7 @@ import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
+import { PAYMENT_CURRENCY } from '../core/currency.service';
 import { UNPAID_KEY, UnpaidStay } from '../core/cart.store';
 
 @Component({
@@ -46,7 +47,7 @@ export class PaymentResultPage {
       .createPayment({
         encodedBookingId: stay.encodedId,
         amountCents: Math.round(Number(stay.totalPrice) * 100),
-        currency: 'EGP',
+        currency: PAYMENT_CURRENCY,
         billingData: {
           name: stay.name,
           email: stay.email,

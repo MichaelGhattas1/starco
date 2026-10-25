@@ -21,9 +21,26 @@
         }
       </select>
     </label>
-    <label class="grid gap-1 text-sm">Price per night<input class="field" type="number" formControlName="pricePerNight" /></label>
+    <label class="grid gap-1 text-sm">
+      Price per night (USD)
+      @if (pricesReady()) {
+        <input class="field" type="number" min="0.01" step="0.01" formControlName="pricePerNight" />
+        <span class="text-xs text-gold-200/70">{{ currency.usdInputNote(form.controls.pricePerNight.value) }}</span>
+        <app-hotel-price class="mt-2" [base]="nightlyBase()" mode="charge" />
+      } @else {
+        <span class="field">Loading the USD price…</span>
+      }
+    </label>
     <label class="grid gap-1 text-sm">Sleeps<input class="field" type="number" formControlName="maxSleep" /></label>
-    <label class="grid gap-1 text-sm">Extra bed price<input class="field" type="number" formControlName="priceForExtraBed" /></label>
+    <label class="grid gap-1 text-sm">
+      Extra bed price (USD)
+      @if (pricesReady()) {
+        <input class="field" type="number" min="0" step="0.01" formControlName="priceForExtraBed" />
+        <span class="text-xs text-gold-200/70">{{ currency.usdInputNote(form.controls.priceForExtraBed.value) }}</span>
+      } @else {
+        <span class="field">Loading the USD price…</span>
+      }
+    </label>
     <label class="flex items-center gap-2 text-sm"><input type="checkbox" formControlName="extraBed" /> Extra bed offered</label>
   </div>
   <fieldset class="panel grid gap-2 p-4 sm:grid-cols-2">
@@ -49,7 +66,7 @@
   </div>
   @if (error()) { <p class="text-red-200" role="alert">{{ error() }}</p> }
   <div class="flex gap-3">
-    <button class="btn btn-gold" type="submit" [disabled]="saving()">Save room</button>
+    <button class="btn btn-gold" type="submit" [disabled]="saving() || !pricesReady()">Save room</button>
     <a class="btn btn-line" routerLink="/admin/rooms">Cancel</a>
   </div>
 </form>

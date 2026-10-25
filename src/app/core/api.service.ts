@@ -1,31 +1,50 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, catchError, map, throwError } from 'rxjs';
+import { errorMessage } from './api-error';
 import { environment } from './environment';
+import { NoticeService } from './notice.service';
 import {
   AboutUs,
   AvailableRoom,
+  BookingQuery,
   BookingRequest,
   BookingResult,
+  CatalogLookup,
   ContactUs,
+  EventQuery,
+  EventWrite,
+  FileDto,
   HomeSlider,
   Hotel,
   HotelLookup,
   HotelWrite,
   Insight,
   LoginResult,
+  PackageQuery,
+  PackageWrite,
   Partner,
   PaymentRequest,
+  PlazaEvent,
   PlazaInnType,
   PriceQuote,
+  PriceQuoteRequest,
   Room,
   RoomWrite,
+  TransportOffer,
+  TransportQuery,
+  TransportWrite,
+  TravelPackage,
+  Trip,
+  TripQuery,
+  TripWrite,
   UserAccount,
 } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
+  private readonly notice = inject(NoticeService);
   private readonly base = environment.apiUrl;
 
   hotels(): Observable<Hotel[]> {
@@ -83,7 +102,7 @@ export class ApiService {
     });
   }
 
-  calculatePrice(body: BookingRequest): Observable<PriceQuote> {
+  calculatePrice(body: PriceQuoteRequest): Observable<PriceQuote> {
     return this.send<PriceQuote>('POST', '/api/hotels/calculate-price', body);
   }
 
@@ -96,7 +115,7 @@ export class ApiService {
   }
 
   createPayment(body: PaymentRequest): Observable<unknown> {
-    return this.send('POST', '/api/Payment/test', body);
+    return this.send('POST', '/api/Payment/initiate', body);
   }
 
   checkOrder(paymobOrderId: string): Observable<unknown> {
@@ -141,6 +160,130 @@ export class ApiService {
 
   partners(): Observable<Partner[]> {
     return this.get<Partner[]>('/api/Partner');
+  }
+
+  partnersByHotel(hotelId: string): Observable<Partner[]> {
+    return this.get<Partner[]>(`/api/Partner/hotel/${encodeURIComponent(hotelId)}`);
+  }
+
+  myBookings(query: BookingQuery = {}): Observable<BookingResult[]> {
+    return this.get<BookingResult[]>(`/api/bookings/my${toQuery(query)}`);
+  }
+
+  adminBookings(query: BookingQuery = {}): Observable<BookingResult[]> {
+    return this.get<BookingResult[]>(`/api/admin/bookings${toQuery(query)}`);
+  }
+
+  booking(id: string): Observable<BookingResult> {
+    return this.get<BookingResult>(`/api/bookings/${encodeURIComponent(id)}`);
+  }
+
+  cancelBooking(id: string): Observable<unknown> {
+    return this.send('POST', `/api/bookings/${encodeURIComponent(id)}/cancel`);
+  }
+
+  trips(query: TripQuery = {}): Observable<Trip[]> {
+    return this.get<Trip[]>(`/api/Trip${toQuery(query)}`);
+  }
+
+  tripLookup(): Observable<CatalogLookup[]> {
+    return this.get<CatalogLookup[]>('/api/Trip/lookup');
+  }
+
+  trip(id: string): Observable<Trip> {
+    return this.get<Trip>(`/api/Trip/${encodeURIComponent(id)}`);
+  }
+
+  createTrip(body: TripWrite): Observable<unknown> {
+    return this.send('POST', '/api/Trip', body);
+  }
+
+  updateTrip(id: string, body: TripWrite): Observable<unknown> {
+    return this.send('PUT', `/api/Trip/${encodeURIComponent(id)}`, body);
+  }
+
+  deleteTrip(id: string): Observable<unknown> {
+    return this.send('DELETE', `/api/Trip/${encodeURIComponent(id)}`);
+  }
+
+  transports(query: TransportQuery = {}): Observable<TransportOffer[]> {
+    return this.get<TransportOffer[]>(`/api/Transport${toQuery(query)}`);
+  }
+
+  transportLookup(): Observable<CatalogLookup[]> {
+    return this.get<CatalogLookup[]>('/api/Transport/lookup');
+  }
+
+  transport(id: string): Observable<TransportOffer> {
+    return this.get<TransportOffer>(`/api/Transport/${encodeURIComponent(id)}`);
+  }
+
+  createTransport(body: TransportWrite): Observable<unknown> {
+    return this.send('POST', '/api/Transport', body);
+  }
+
+  updateTransport(id: string, body: TransportWrite): Observable<unknown> {
+    return this.send('PUT', `/api/Transport/${encodeURIComponent(id)}`, body);
+  }
+
+  deleteTransport(id: string): Observable<unknown> {
+    return this.send('DELETE', `/api/Transport/${encodeURIComponent(id)}`);
+  }
+
+  events(query: EventQuery = {}): Observable<PlazaEvent[]> {
+    return this.get<PlazaEvent[]>(`/api/Event${toQuery(query)}`);
+  }
+
+  eventLookup(): Observable<CatalogLookup[]> {
+    return this.get<CatalogLookup[]>('/api/Event/lookup');
+  }
+
+  event(id: string): Observable<PlazaEvent> {
+    return this.get<PlazaEvent>(`/api/Event/${encodeURIComponent(id)}`);
+  }
+
+  createEvent(body: EventWrite): Observable<unknown> {
+    return this.send('POST', '/api/Event', body);
+  }
+
+  updateEvent(id: string, body: EventWrite): Observable<unknown> {
+    return this.send('PUT', `/api/Event/${encodeURIComponent(id)}`, body);
+  }
+
+  deleteEvent(id: string): Observable<unknown> {
+    return this.send('DELETE', `/api/Event/${encodeURIComponent(id)}`);
+  }
+
+  packages(query: PackageQuery = {}): Observable<TravelPackage[]> {
+    return this.get<TravelPackage[]>(`/api/Package${toQuery(query)}`);
+  }
+
+  packageLookup(): Observable<CatalogLookup[]> {
+    return this.get<CatalogLookup[]>('/api/Package/lookup');
+  }
+
+  package(id: string): Observable<TravelPackage> {
+    return this.get<TravelPackage>(`/api/Package/${encodeURIComponent(id)}`);
+  }
+
+  createPackage(body: PackageWrite): Observable<unknown> {
+    return this.send('POST', '/api/Package', body);
+  }
+
+  updatePackage(id: string, body: PackageWrite): Observable<unknown> {
+    return this.send('PUT', `/api/Package/${encodeURIComponent(id)}`, body);
+  }
+
+  deletePackage(id: string): Observable<unknown> {
+    return this.send('DELETE', `/api/Package/${encodeURIComponent(id)}`);
+  }
+
+  sectionImages(type: PlazaInnType): Observable<FileDto[]> {
+    return this.get<unknown>(`/api/section-images?type=${type}`).pipe(map((payload) => asFiles(payload)));
+  }
+
+  updateSectionImages(type: PlazaInnType, imagesId: number[]): Observable<unknown> {
+    return this.send('PUT', `/api/section-images?type=${type}`, { imagesId });
   }
 
   createPartner(body: unknown): Observable<unknown> {
@@ -227,13 +370,96 @@ export class ApiService {
   }
 
   private send<T>(method: string, path: string, body?: unknown): Observable<T> {
+    const toast = writesRecord(method, path);
     return this.http
       .request(method, `${this.base}${path}`, {
         body,
         responseType: 'text',
       })
-      .pipe(map((text) => unwrap<T>(text)));
+      .pipe(
+        map((text) => {
+          const data = unwrap<T>(text);
+          if (toast) {
+            const message = responseMessage(text);
+            if (message) {
+              this.notice.apiSuccess(message);
+            }
+          }
+          return data;
+        }),
+        catchError((error: unknown) => {
+          if (toast) {
+            this.notice.error(errorMessage(error));
+          }
+          return throwError(() => error);
+        }),
+      );
   }
+}
+
+function writesRecord(method: string, path: string): boolean {
+  if (method === 'GET' || method === 'HEAD') {
+    return false;
+  }
+  if (path.includes('/calculate-price') || path.includes('/api/Payment/') || path.includes('/confirm-payment')) {
+    return false;
+  }
+  if (/\/api\/hotels\/[^/]+\/rooms(?:\?|$)/.test(path)) {
+    return false;
+  }
+  if (path.includes('/api/Account/forgot-password') || path.includes('/api/Account/reset-password')) {
+    return false;
+  }
+  return true;
+}
+
+function responseMessage(text: string): string | null {
+  if (!text) {
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(text) as { message?: unknown };
+    if (typeof parsed.message === 'string' && parsed.message.trim() && !looksTechnical(parsed.message)) {
+      return parsed.message.trim();
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+function looksTechnical(value: string): boolean {
+  return value.length > 240 || /at\s+\S+\s+\(/.test(value) || /stack trace/i.test(value);
+}
+
+function toQuery(params: object): string {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value === null || value === undefined || value === '') {
+      continue;
+    }
+    search.set(key, String(value));
+  }
+  const text = search.toString();
+  return text ? `?${text}` : '';
+}
+
+function asFiles(payload: unknown): FileDto[] {
+  const value = Array.isArray(payload)
+    ? payload
+    : payload && typeof payload === 'object' && Array.isArray((payload as { images?: unknown }).images)
+      ? (payload as { images: unknown[] }).images
+      : [];
+  return value.flatMap((item) => {
+    if (typeof item === 'number') {
+      return [{ id: item, url: null }];
+    }
+    if (item && typeof item === 'object' && typeof (item as FileDto).id === 'number') {
+      const file = item as FileDto;
+      return [{ id: file.id, url: file.url ?? null }];
+    }
+    return [];
+  });
 }
 
 function unwrap<T>(text: string): T {

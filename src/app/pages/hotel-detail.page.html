@@ -183,9 +183,12 @@
             <div class="p-5">
               <h3 class="font-display text-3xl">{{ roomName(room) }}</h3>
               <p class="mt-1 text-sm text-gold-200/80">
-                {{ room.pricePerNight }} EGP / night · sleeps {{ room.maxSleep || '—' }}
+                {{ currency.display(room.pricePerNight) }} {{ currency.per('night') }} × {{ nights(form.controls.checkIn.value, form.controls.checkOut.value) }}
+                {{ nightWord(nights(form.controls.checkIn.value, form.controls.checkOut.value)) }}
+                · sleeps {{ room.maxSleep || '—' }}
                 · {{ room.isAvailable ? 'Available' : 'Unavailable' }}
               </p>
+              <app-hotel-price class="mt-3" [base]="stayBase(room)" />
               <div class="mt-4 flex flex-wrap gap-2">
                 <button type="button" class="btn btn-line" (click)="showRoom(room)">Show room</button>
                 @if (room.isAvailable && room.encodedRoomId && stay.id) {
@@ -226,17 +229,20 @@
           }
         }
         <p class="mt-4 text-sm text-gold-200/80">
-          {{ room.pricePerNight }} EGP / night · sleeps {{ room.maxSleep || '—' }}
+          {{ currency.display(room.pricePerNight) }} {{ currency.per('night') }} × {{ nights(form.controls.checkIn.value, form.controls.checkOut.value) }}
+          {{ nightWord(nights(form.controls.checkIn.value, form.controls.checkOut.value)) }}
+          · sleeps {{ room.maxSleep || '—' }}
           · {{ room.isAvailable ? 'Available' : 'Unavailable' }}
           @if (roomRecord(); as detail) {
             · {{ roomTypeLabel(detail.type) }}
           }
         </p>
+        <app-hotel-price class="mt-3" [base]="stayBase(room)" />
         @if (roomBusy()) {
           <p class="mt-3 text-sm" role="status">Loading room…</p>
         }
         @if (roomRecord()?.extraBed) {
-          <p class="mt-3 text-sm text-gold-200/80">Extra bed {{ roomRecord()?.priceForExtraBed }} EGP</p>
+          <p class="mt-3 text-sm text-gold-200/80">Extra bed {{ currency.display(roomRecord()?.priceForExtraBed) }}</p>
         }
         @if (roomFeatures(roomRecord()).length) {
           <ul class="mt-4 flex flex-wrap gap-2">

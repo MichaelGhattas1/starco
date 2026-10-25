@@ -149,6 +149,46 @@
     text-decoration: underline;
   }
 
+  .toast-host {
+    position: fixed;
+    z-index: 80;
+    inset-inline-end: 1rem;
+    bottom: 1rem;
+    width: min(22rem, calc(100vw - 2rem));
+  }
+
+  .toast {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border-radius: 1rem;
+    padding: 0.85rem 1rem;
+    font-size: 0.92rem;
+    line-height: 1.4;
+  }
+
+  .toast p {
+    margin: 0;
+  }
+
+  .toast button {
+    flex: none;
+    background: transparent;
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .toast-ok {
+    background: #064e3b;
+    color: #d1fae5;
+  }
+
+  .toast-err {
+    background: #450a0a;
+    color: #fee2e2;
+  }
+
   .kicker {
     letter-spacing: 0.22em;
     text-transform: uppercase;
@@ -171,17 +211,241 @@
     width: auto;
   }
 
-  .nav-active {
-    color: var(--color-gold-300);
-    text-decoration: underline;
-    text-underline-offset: 0.35rem;
-    text-decoration-thickness: 2px;
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    border-bottom: 1px solid rgb(230 207 138 / 0.16);
+    background: rgb(7 20 34 / 0.84);
+    backdrop-filter: blur(18px);
   }
 
-  #site-nav > .btn {
-    height: 2.5rem;
-    min-height: 2.5rem;
-    padding-block: 0;
+  .site-header::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgb(212 175 55 / 0.75), transparent);
+    pointer-events: none;
+  }
+
+  .site-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    max-width: 76rem;
+    margin-inline: auto;
+    padding: 0.7rem 1rem;
+  }
+
+  .site-logo {
+    height: 2.85rem;
+    flex: none;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-inline-start: auto;
+    border: 1px solid rgb(230 207 138 / 0.45);
+    border-radius: 999px;
+    background: rgb(12 35 64 / 0.45);
+    color: var(--color-gold-100);
+  }
+
+  .nav-toggle-bars,
+  .nav-toggle-bars::before,
+  .nav-toggle-bars::after {
+    display: block;
+    width: 1rem;
+    height: 1.5px;
+    border-radius: 999px;
+    background: currentColor;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  .nav-toggle-bars {
+    position: relative;
+  }
+
+  .nav-toggle-bars::before,
+  .nav-toggle-bars::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+  }
+
+  .nav-toggle-bars::before {
+    top: -6px;
+  }
+
+  .nav-toggle-bars::after {
+    top: 6px;
+  }
+
+  .nav-toggle-bars.is-open {
+    background: transparent;
+  }
+
+  .nav-toggle-bars.is-open::before {
+    top: 0;
+    transform: rotate(45deg);
+  }
+
+  .nav-toggle-bars.is-open::after {
+    top: 0;
+    transform: rotate(-45deg);
+  }
+
+  .site-nav {
+    display: none;
+  }
+
+  .site-nav.is-open {
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    max-height: calc(100vh - 4.5rem);
+    overflow: auto;
+    padding: 0.85rem 1rem 1rem;
+    border-bottom: 1px solid rgb(230 207 138 / 0.28);
+    background: #071422;
+    box-shadow: 0 24px 40px rgb(0 0 0 / 0.45);
+  }
+
+  .site-links,
+  .site-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .site-actions {
+    margin-top: 0.35rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgb(230 207 138 / 0.18);
+  }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    height: 2.75rem;
+    padding-inline: 0.9rem;
+    border-radius: 0.85rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: rgb(248 241 222 / 0.9);
+    white-space: nowrap;
+  }
+
+  .nav-link:hover {
+    color: var(--color-gold-300);
+    background: rgb(212 175 55 / 0.1);
+  }
+
+  .nav-active {
+    color: var(--color-gold-100);
+    background: rgb(212 175 55 / 0.16);
+    box-shadow: inset 0 0 0 1px rgb(212 175 55 / 0.5);
+    text-decoration: none;
+  }
+
+  .site-actions .btn,
+  .nav-cart {
+    width: 100%;
+    white-space: nowrap;
+  }
+
+  .nav-bag {
+    width: 1.05rem;
+    height: 1.05rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  .nav-count {
+    display: grid;
+    min-width: 1.35rem;
+    height: 1.35rem;
+    place-items: center;
+    border-radius: 999px;
+    background: var(--color-gold-400);
+    padding-inline: 0.3rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--color-navy-950);
+  }
+
+  @media (min-width: 1180px) {
+    .nav-toggle {
+      display: none;
+    }
+
+    .site-bar {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      column-gap: 1.25rem;
+      padding-block: 0.55rem;
+    }
+
+    .site-nav,
+    .site-nav.is-open {
+      display: contents;
+      position: static;
+      max-height: none;
+      overflow: visible;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .site-links {
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 0.15rem;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+
+    .site-actions {
+      flex-direction: row;
+      align-items: center;
+      gap: 0.45rem;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+
+    .nav-link {
+      height: 2.35rem;
+      padding-inline: 0.72rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+    }
+
+    .site-actions .btn,
+    .nav-cart {
+      width: auto;
+      height: 2.5rem;
+      min-height: 2.5rem;
+      padding-block: 0;
+      padding-inline: 0.95rem;
+      flex: none;
+    }
   }
 
   .nav-offer {
@@ -235,9 +499,17 @@
     text-decoration-thickness: 2px;
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 1179px) {
     .nav-offer {
       align-self: flex-start;
+    }
+  }
+
+  @media (min-width: 1180px) {
+    .nav-offer {
+      height: 2.35rem;
+      padding-inline: 0.85rem;
+      font-size: 0.9rem;
     }
   }
 

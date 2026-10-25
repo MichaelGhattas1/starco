@@ -30,6 +30,12 @@ export function errorMessage(error: unknown): string {
         return record['title'];
       }
     }
+    if (error.status === 401) {
+      return 'Your session expired. Sign in again.';
+    }
+    if (error.status === 403) {
+      return 'You do not have permission for this action.';
+    }
     return error.status ? `Request failed (${error.status})` : 'Network error';
   }
   if (error instanceof Error && error.message) {

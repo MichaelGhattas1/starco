@@ -10,7 +10,7 @@ const ADMIN_SESSION_KEY = 'plaza_admin_session';
 
 @Injectable({ providedIn: 'root' })
 export class SessionStore {
-  readonly token = signal<string | null>(localStorage.getItem(TOKEN_KEY));
+  readonly token = signal<string | null>(readFreshToken());
   readonly role = signal<number | null>(readRole());
   readonly email = signal<string | null>(localStorage.getItem(EMAIL_KEY));
   readonly name = signal<string | null>(localStorage.getItem(NAME_KEY));
@@ -79,6 +79,41 @@ export class SessionStore {
     this.userId.set(null);
     this.adminSession.set(false);
   }
+}
+
+export function tokenExpired(token: string | null): boolean {
+  if (!token) {
+    return true;
+  }
+  const part = token.split('.')[1];
+  if (!part) {
+    return true;
+  }
+  try {
+    const json = atob(part.replace(/-/g, '+').replace(/_/g, '/'));
+    const claims = JSON.parse(json) as { exp?: unknown };
+    return typeof claims.exp === 'number' && claims.exp * 1000 <= Date.now();
+  } catch {
+    return true;
+  }
+}
+
+function readFreshToken(): string | null {
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (!token) {
+    return null;
+  }
+  if (!tokenExpired(token)) {
+    return token;
+  }
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(ROLE_KEY);
+  localStorage.removeItem(EMAIL_KEY);
+  localStorage.removeItem(NAME_KEY);
+  localStorage.removeItem(USER_KEY);
+  localStorage.removeItem(ADMIN_SESSION_KEY);
+  sessionStorage.setItem('plaza_expired', '1');
+  return null;
 }
 
 function readRole(): number | null {

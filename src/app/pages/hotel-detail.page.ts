@@ -6,15 +6,17 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { switchMap } from 'rxjs';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
-import { CartStore } from '../core/cart.store';
+import { CartStore, stayNights } from '../core/cart.store';
 import { LocaleService } from '../core/locale.service';
 import { NoticeService } from '../core/notice.service';
+import { CurrencyService } from '../core/currency.service';
 import { featureLabel, firstImage, inputDate, mediaUrl, nextDate, toApiDateTime } from '../core/media';
 import { AvailableRoom, FileDto, Hotel, Room, RoomType } from '../core/models';
+import { HotelPrice } from '../shared/hotel-price';
 
 @Component({
   selector: 'app-hotel-detail-page',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, HotelPrice],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './hotel-detail.page.html',
 })
@@ -24,6 +26,7 @@ export class HotelDetailPage {
   private readonly title = inject(Title);
   private readonly sanitizer = inject(DomSanitizer);
   readonly locale = inject(LocaleService);
+  readonly currency = inject(CurrencyService);
   readonly cart = inject(CartStore);
   private readonly notice = inject(NoticeService);
   private readonly roomDialog = viewChild<ElementRef<HTMLDialogElement>>('roomDialog');
@@ -41,6 +44,7 @@ export class HotelDetailPage {
   readonly activeImage = signal(0);
   readonly featureLabel = featureLabel;
   readonly mediaUrl = mediaUrl;
+  readonly nights = stayNights;
 
   readonly today = inputDate(0);
   readonly minCheckOut = signal(nextDate(inputDate(1)));
@@ -236,6 +240,18 @@ export class HotelDetailPage {
     }
     const { checkIn, checkOut } = this.form.getRawValue();
     return this.cart.has(hotelId, roomId, checkIn, checkOut);
+  }
+
+  stayBase(room: AvailableRoom): number {
+    const { checkIn, checkOut } = this.form.getRawValue();
+    return (Number(room.pricePerNight) || 0) * this.nights(checkIn, checkOut);
+  }
+
+  nightWord(count: number): string {
+    if (this.locale.isAr()) {
+      return count === 1 ? 'ليلة' : 'ليالٍ';
+    }
+    return count === 1 ? 'night' : 'nights';
   }
 
   addToCart(room: AvailableRoom): void {

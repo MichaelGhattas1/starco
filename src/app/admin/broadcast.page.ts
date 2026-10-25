@@ -38,7 +38,10 @@ export class BroadcastPage {
 
   constructor() {
     inject(Title).setTitle('Broadcast · Admin');
-    this.mail.controls.hotelId.valueChanges.pipe(takeUntilDestroyed()).subscribe((id) => this.hotelId.set(id));
+    this.mail.controls.hotelId.valueChanges.pipe(takeUntilDestroyed()).subscribe((id) => {
+      this.hotelId.set(id);
+      this.loadRecipients(id);
+    });
     this.api.hotelLookup().subscribe({
       next: (hotels) => this.hotels.set(hotels),
       error: () => this.hotels.set([]),
@@ -46,6 +49,16 @@ export class BroadcastPage {
     this.api.partners().subscribe({
       next: (partners) => this.partners.set(partners),
       error: () => this.partners.set([]),
+    });
+  }
+
+  private loadRecipients(hotelId: string): void {
+    if (!hotelId) {
+      return;
+    }
+    this.api.partnersByHotel(hotelId).subscribe({
+      next: (partners) => this.partners.set(partners),
+      error: () => undefined,
     });
   }
 
@@ -58,7 +71,9 @@ export class BroadcastPage {
     if (!id) {
       return [];
     }
-    return this.partners().filter((partner) => (partner.hotelsIds ?? []).includes(id));
+    const listed = this.partners();
+    const matched = listed.filter((partner) => (partner.hotelsIds ?? []).includes(id));
+    return matched.length ? matched : listed;
   }
 
   pickFiles(event: Event): void {
