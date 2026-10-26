@@ -1,4 +1,4 @@
-<div class="grid gap-6 lg:grid-cols-[220px_1fr]">
+<div class="admin-shell">
   <aside class="panel h-fit p-4">
     <a routerLink="/" class="logo-mark" aria-label="Starco">
       <img src="assets/logo.png" alt="" />
@@ -6,7 +6,7 @@
     <p class="kicker mt-4">Admin</p>
     <p class="mt-2 font-display text-3xl">{{ auth.name() || 'Plaza desk' }}</p>
     <p class="text-sm text-gold-300">{{ roleLabel() }}</p>
-    <nav class="mt-4 grid gap-1 text-sm">
+    <nav class="admin-nav mt-4 text-sm">
       <a routerLink="/admin" routerLinkActive="bg-gold-400/15" [routerLinkActiveOptions]="{ exact: true }" class="rounded-xl px-3 py-2">Dashboard</a>
       <a routerLink="/admin/currency" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Currency</a>
       <a routerLink="/admin/hotels" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Hotels</a>

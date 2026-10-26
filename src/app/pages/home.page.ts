@@ -8,13 +8,16 @@ import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
 import { LocaleService } from '../core/locale.service';
 import { firstImage, inputDate, mediaUrl, nextDate } from '../core/media';
-import { AboutUs, HomeSlider, Hotel } from '../core/models';
+import { CurrencyService } from '../core/currency.service';
+import { AboutUs, HomeSlider, Hotel, TransportOffer, TravelPackage, Trip } from '../core/models';
+import { CatalogCard } from '../shared/catalog-card';
 import { ContactSection } from '../shared/contact-section';
 import { HotelCard } from '../shared/hotel-card';
+import { plainText } from '../shared/plain-text';
 
 @Component({
   selector: 'app-home-page',
-  imports: [ReactiveFormsModule, RouterLink, HotelCard, ContactSection],
+  imports: [ReactiveFormsModule, RouterLink, HotelCard, CatalogCard, ContactSection],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './home.page.html',
 })
@@ -22,13 +25,22 @@ export class HomePage {
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
   readonly locale = inject(LocaleService);
+  readonly currency = inject(CurrencyService);
+  readonly firstImage = firstImage;
+  readonly plain = plainText;
 
   readonly sliders = signal<HomeSlider[]>([]);
   readonly hotels = signal<Hotel[]>([]);
+  readonly trips = signal<Trip[]>([]);
+  readonly transports = signal<TransportOffer[]>([]);
+  readonly offers = signal<TravelPackage[]>([]);
   readonly about = signal<AboutUs | null>(null);
   readonly slideIndex = signal(0);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
+  readonly tripsError = signal<string | null>(null);
+  readonly transportError = signal<string | null>(null);
+  readonly offersError = signal<string | null>(null);
   readonly slide = computed((): HomeSlider | null => {
     const slides = this.sliders();
     const index = this.slideIndex();
@@ -56,9 +68,24 @@ export class HomePage {
       hotels: this.api.hotels(),
       sliders: this.api.sliders(),
       about: this.api.about().pipe(catchError(() => of(null))),
+      trips: this.api.trips().pipe(catchError((error) => {
+        this.tripsError.set(errorMessage(error));
+        return of([] as Trip[]);
+      })),
+      transports: this.api.transports().pipe(catchError((error) => {
+        this.transportError.set(errorMessage(error));
+        return of([] as TransportOffer[]);
+      })),
+      offers: this.api.packages().pipe(catchError((error) => {
+        this.offersError.set(errorMessage(error));
+        return of([] as TravelPackage[]);
+      })),
     }).subscribe({
-      next: ({ hotels, sliders, about }) => {
+      next: ({ hotels, sliders, about, trips, transports, offers }) => {
         this.hotels.set(hotels);
+        this.trips.set(trips);
+        this.transports.set(transports);
+        this.offers.set(offers);
         this.sliders.set(sliders);
         this.about.set(about);
         this.loading.set(false);

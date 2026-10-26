@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
@@ -36,6 +36,20 @@ export class PublicShell {
       if (notice) {
         this.notice.error(notice);
       }
+    });
+
+    const desktop = window.matchMedia('(min-width: 1180px)');
+    const closeOnDesktop = () => {
+      if (desktop.matches) {
+        this.menuOpen.set(false);
+      }
+    };
+    desktop.addEventListener('change', closeOnDesktop);
+    inject(DestroyRef).onDestroy(() => desktop.removeEventListener('change', closeOnDesktop));
+
+    effect((onCleanup) => {
+      document.body.classList.toggle('menu-lock', this.menuOpen());
+      onCleanup(() => document.body.classList.remove('menu-lock'));
     });
   }
 

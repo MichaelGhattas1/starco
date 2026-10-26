@@ -3,7 +3,7 @@
     <p class="kicker">Reservations</p>
     <h1 class="font-display text-5xl">Hotels</h1>
   </div>
-  <label class="grid gap-1 text-sm md:w-72">
+  <label class="grid w-full min-w-0 gap-1 text-sm md:max-w-xs">
     Search
     <input class="field" [value]="query()" (input)="onQuery($event)" placeholder="Name or city" />
   </label>
@@ -24,7 +24,7 @@
 } @else if (!filtered().length) {
   <p class="panel p-6">No hotels match this search.</p>
 } @else {
-  <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
     @for (hotel of filtered(); track hotel.id) {
       <app-hotel-card [hotel]="hotel" [checkIn]="checkIn()" [checkOut]="checkOut()" [adults]="adults()" />
     }

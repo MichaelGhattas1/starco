@@ -11,7 +11,7 @@ import { Hotel } from '../core/models';
   imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="mb-5 flex items-end justify-between gap-4">
+    <div class="mb-5 flex flex-wrap items-end justify-between gap-4">
       <div>
         <p class="kicker">Catalog</p>
         <h1 class="font-display text-5xl">Hotels</h1>

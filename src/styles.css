@@ -22,6 +22,8 @@
 
   body {
     margin: 0;
+    max-width: 100%;
+    overflow-x: clip;
     min-height: 100vh;
     background:
       radial-gradient(1200px 500px at 10% -10%, rgb(212 175 55 / 0.16), transparent 55%),
@@ -46,7 +48,10 @@
 
 @layer components {
   .field {
+    display: block;
     width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     border-radius: 0.85rem;
     border: 1px solid rgb(230 207 138 / 0.35);
     background: rgb(7 20 34 / 0.55);
@@ -54,11 +59,26 @@
     color: var(--color-gold-100);
   }
 
-  .field::placeholder {
+  .field :is(input, textarea, select) {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    margin-top: 0.35rem;
+    box-sizing: border-box;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    padding: 0;
+  }
+
+  .field ::placeholder {
     color: rgb(248 241 222 / 0.45);
   }
 
-  .field:focus {
+  .field:focus,
+  .field:focus-within {
     border-color: var(--color-gold-300);
     outline: none;
     box-shadow: 0 0 0 3px rgb(212 175 55 / 0.25);
@@ -540,5 +560,123 @@
   55%,
   100% {
     transform: translateX(130%);
+  }
+}
+
+body.menu-lock {
+  overflow: hidden;
+}
+
+:where(.grid) > * {
+  min-width: 0;
+}
+
+h1,
+h2,
+h3,
+dd,
+.kicker {
+  overflow-wrap: anywhere;
+}
+
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
+input[type='date'],
+input[type='time'],
+input[type='datetime-local'],
+input[type='number'],
+input[type='email'] {
+  min-width: 0;
+}
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.filters {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.filters > .btn,
+.filters .span-all {
+  grid-column: 1 / -1;
+}
+
+.admin-shell {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.admin-nav {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+}
+
+.admin-nav a {
+  flex: none;
+  white-space: nowrap;
+}
+
+@media (min-width: 576px) {
+  .filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 992px) {
+  .filters-3,
+  .filters-5 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .filters-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .admin-shell {
+    grid-template-columns: 220px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .admin-nav {
+    display: grid;
+    overflow: visible;
+    padding-bottom: 0;
+  }
+
+  .admin-nav a {
+    white-space: normal;
+  }
+}
+
+@media (min-width: 1200px) {
+  .filters-5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575px) {
+  h1.font-display,
+  h2.font-display.text-5xl,
+  h2.font-display.text-6xl,
+  h3.font-display.text-5xl {
+    font-size: clamp(2rem, 11vw, 2.6rem);
+    line-height: 0.95;
+  }
+
+  .kicker {
+    letter-spacing: 0.14em;
   }
 }

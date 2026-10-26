@@ -4,13 +4,13 @@
   <p class="panel p-4 text-red-200" role="alert">{{ error() }}</p>
 } @else if (hotel(); as stay) {
   <p class="kicker">{{ city() }}</p>
-  <h1 class="font-display text-5xl md:text-6xl">{{ name() }}</h1>
+  <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl">{{ name() }}</h1>
   <p class="mt-3 max-w-3xl text-gold-200/85">{{ description() }}</p>
 
   <div class="mt-6 grid gap-4 lg:grid-cols-[1.4fr_0.6fr]">
     <div>
       @if (photo()) {
-        <img [src]="photo()" [alt]="name()" class="h-80 w-full rounded-3xl object-cover md:h-[28rem]" />
+        <img [src]="photo()" [alt]="name()" class="h-64 w-full rounded-3xl object-cover sm:h-80 lg:h-[28rem]" />
       }
       @if (gallery().length > 1) {
         <div class="mt-3 flex gap-2 overflow-auto">
@@ -132,7 +132,7 @@
               <div class="relative mx-auto aspect-[4/3] w-full max-w-xl overflow-hidden rounded-[2rem]">
                 <img [src]="cafeImages()[0]" [alt]="'Cafe at ' + name()" class="h-full w-full object-cover" />
                 @if (cafeImages()[1]; as second) {
-                  <div class="absolute bottom-4 end-6 z-10 h-36 w-48 overflow-hidden rounded-[1.4rem] shadow-2xl ring-4 ring-navy-950">
+                  <div class="absolute bottom-3 end-3 z-10 aspect-[4/3] w-2/5 max-w-48 overflow-hidden rounded-[1.4rem] shadow-2xl ring-4 ring-navy-950">
                     <img [src]="second" alt="" class="h-full w-full object-cover" />
                   </div>
                 }
@@ -160,11 +160,11 @@
         <h2 class="font-display text-4xl">Available rooms</h2>
         <a routerLink="/cart" class="mt-2 inline-block text-sm text-gold-300">Cart · {{ cart.count() }}</a>
       </div>
-      <form class="flex flex-wrap items-end gap-3" [formGroup]="form" (ngSubmit)="loadRooms()">
-        <label class="grid gap-1 text-sm">Check in<input class="field" type="date" formControlName="checkIn" [min]="today" /></label>
-        <label class="grid gap-1 text-sm">Check out<input class="field" type="date" formControlName="checkOut" [min]="minCheckOut()" /></label>
-        <label class="grid gap-1 text-sm">Adults<input class="field w-24" type="number" min="1" max="20" step="1" formControlName="adults" /></label>
-        <button class="btn btn-gold" type="submit">Check</button>
+      <form class="grid w-full min-w-0 gap-3 sm:grid-cols-2 lg:w-auto lg:grid-cols-4" [formGroup]="form" (ngSubmit)="loadRooms()">
+        <label class="grid min-w-0 gap-1 text-sm">Check in<input class="field" type="date" formControlName="checkIn" [min]="today" /></label>
+        <label class="grid min-w-0 gap-1 text-sm">Check out<input class="field" type="date" formControlName="checkOut" [min]="minCheckOut()" /></label>
+        <label class="grid min-w-0 gap-1 text-sm">Adults<input class="field" type="number" min="1" max="20" step="1" formControlName="adults" /></label>
+        <button class="btn btn-gold sm:col-span-2 lg:col-span-1" type="submit">Check</button>
       </form>
     </div>
     @if (roomsLoading()) {
@@ -209,7 +209,7 @@
   <dialog #roomDialog class="room-dialog" aria-labelledby="room-dialog-title" (close)="openRoom.set(null)">
     @if (openRoom(); as room) {
       <div class="p-5 md:p-6">
-        <div class="flex items-start justify-between gap-4">
+        <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p class="kicker">Room</p>
             <h2 id="room-dialog-title" class="mt-1 font-display text-4xl leading-none">{{ roomName(roomRecord() ?? room) }}</h2>

@@ -41,3 +41,11 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# SSL certificates and private keys
+*.pfx
+*.p12
+*.pem
+*.key
+*.crt
+*.cer

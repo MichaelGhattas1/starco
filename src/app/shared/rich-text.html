@@ -74,7 +74,7 @@
     <input
       #linkInput
       id="rich-link"
-      class="field min-w-56 flex-1"
+      class="field w-full min-w-0 flex-1 sm:min-w-56"
       type="url"
       [value]="linkUrl()"
       (input)="linkUrl.set($any($event.target).value)"

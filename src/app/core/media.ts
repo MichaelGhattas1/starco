@@ -1,15 +1,34 @@
 import { environment } from './environment';
 import { FileDto } from './models';
 
-export function mediaUrl(url: string | null | undefined): string | null {
+export function mediaUrl(
+  url: string | null | undefined,
+  apiBase: string = environment.apiUrl,
+): string | null {
   if (!url) {
     return null;
   }
-  if (/^https?:\/\//i.test(url)) {
+  const absolute = /^https?:\/\//i.test(url)
+    ? url
+    : `${apiBase.replace(/\/+$/, '')}/${url.replace(/^wwwroot\//, '').replace(/^\/+/, '')}`;
+  return preferApiHttps(absolute, apiBase);
+}
+
+/** Upgrade same-host http links only after the configured API base is https. */
+function preferApiHttps(url: string, apiBase: string): string {
+  let target: URL;
+  let current: URL;
+  try {
+    target = new URL(apiBase);
+    current = new URL(url);
+  } catch {
     return url;
   }
-  const path = url.replace(/^wwwroot\//, '').replace(/^\/+/, '');
-  return `${environment.apiUrl}/${path}`;
+  if (current.protocol === 'http:' && target.protocol === 'https:' && current.host === target.host) {
+    current.protocol = 'https:';
+    return current.href;
+  }
+  return url;
 }
 
 export function firstImage(files: FileDto[] | null | undefined): string | null {

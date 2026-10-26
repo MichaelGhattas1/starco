@@ -20,7 +20,7 @@ import { HotelPrice } from '../shared/hotel-price';
       <p class="kicker">Desk</p>
       <h1 class="font-display text-5xl">Bookings</h1>
     </div>
-    <form class="panel mb-6 grid gap-3 p-4 md:grid-cols-3" [formGroup]="form" (ngSubmit)="load()">
+    <form class="panel filters filters-3 mb-6 p-4" [formGroup]="form" (ngSubmit)="load()">
       <label class="field">
         Hotel
         <select formControlName="hotelId">
@@ -31,7 +31,7 @@ import { HotelPrice } from '../shared/hotel-price';
         </select>
       </label>
       @if (hotelsError()) {
-        <p class="text-sm text-red-200 md:col-span-3" role="alert">{{ hotelsError() }}</p>
+        <p class="span-all text-sm text-red-200" role="alert">{{ hotelsError() }}</p>
       }
       <label class="field">
         Type

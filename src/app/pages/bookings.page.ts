@@ -20,7 +20,7 @@ import { HotelPrice } from '../shared/hotel-price';
       <p class="kicker">Account</p>
       <h1 class="font-display text-5xl">My bookings</h1>
     </div>
-    <form class="panel mb-6 grid gap-3 p-4 md:grid-cols-4" [formGroup]="form" (ngSubmit)="load()">
+    <form class="panel filters filters-4 mb-6 p-4" [formGroup]="form" (ngSubmit)="load()">
       <label class="field">
         Type
         <select formControlName="bookingType">
@@ -41,7 +41,7 @@ import { HotelPrice } from '../shared/hotel-price';
       </label>
       <label class="field">From <input type="date" formControlName="from" /></label>
       <label class="field">To <input type="date" formControlName="to" /></label>
-      <button class="btn btn-gold md:col-span-4" type="submit">Filter</button>
+      <button class="btn btn-gold" type="submit">Filter</button>
     </form>
     @if (loading()) {
       <p role="status">Loading bookings…</p>
