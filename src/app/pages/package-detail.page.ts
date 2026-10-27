@@ -14,9 +14,9 @@ import { ServiceBooking } from '../shared/service-booking';
   imports: [RouterLink, ServiceBooking],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <a routerLink="/packages" class="text-sm text-gold-300">All packages</a>
+    <a routerLink="/packages" class="text-sm text-gold-300">{{ locale.t('list.allPackages') }}</a>
     @if (loading()) {
-      <p class="mt-6" role="status">Loading package…</p>
+      <p class="mt-6" role="status">{{ locale.t('load.package') }}</p>
     } @else if (error()) {
       <p class="mt-6 text-red-200" role="alert">{{ error() }}</p>
     } @else if (item(); as pack) {
@@ -25,17 +25,17 @@ import { ServiceBooking } from '../shared/service-booking';
           @if (firstImage(pack.images); as src) {
             <img class="h-80 w-full rounded-[1.6rem] object-cover" [src]="src" [alt]="label(pack)" />
           }
-          <p class="kicker">{{ pack.durationDays }} days</p>
+          <p class="kicker">{{ locale.t('noun.days', { n: pack.durationDays }) }}</p>
           <h1 class="font-display text-5xl leading-none">{{ label(pack) }}</h1>
           <p class="text-gold-300">{{ currency.display(pack.packagePrice) }}</p>
           @if (pack.hotelName || pack.hotelNameAr) {
             <p>
-              Hotel: {{ locale.pick(pack.hotelName, pack.hotelNameAr) }}
+              {{ locale.t('field.hotel') }}: {{ locale.pick(pack.hotelName, pack.hotelNameAr) }}
               @if (pack.roomName || pack.roomNameAr) {
                 · {{ locale.pick(pack.roomName, pack.roomNameAr) }}
               }
               @if (pack.nightsCount) {
-                · {{ pack.nightsCount }} nights
+                · {{ locale.t('noun.nightsCount', { n: pack.nightsCount }) }}
               }
             </p>
           }
@@ -44,13 +44,13 @@ import { ServiceBooking } from '../shared/service-booking';
           }
           <div class="rich-text text-gold-100/90" [innerHTML]="locale.pick(pack.description, pack.descriptionAr)"></div>
           @if (pack.trips?.length) {
-            <p>Trips: {{ names(pack.trips) }}</p>
+            <p>{{ locale.t('list.withTrips', { names: names(pack.trips) }) }}</p>
           }
           @if (pack.transports?.length) {
-            <p>Transport: {{ names(pack.transports) }}</p>
+            <p>{{ locale.t('list.withTransport', { names: names(pack.transports) }) }}</p>
           }
           @if (pack.events?.length) {
-            <p>Events: {{ names(pack.events) }}</p>
+            <p>{{ locale.t('list.withEvents', { names: names(pack.events) }) }}</p>
           }
         </article>
         @if (pack.id) {
@@ -87,10 +87,10 @@ export class PackageDetailPage {
   }
 
   label(item: TravelPackage): string {
-    return this.locale.pick(item.name, item.nameAr) || 'Package';
+    return this.locale.pick(item.name, item.nameAr) || this.locale.t('noun.package');
   }
 
   names(items: { name: string | null; nameAr: string | null }[] | null): string {
-    return (items ?? []).map((item) => this.locale.pick(item.name, item.nameAr) || 'Item').join(', ');
+    return (items ?? []).map((item) => this.locale.pick(item.name, item.nameAr) || this.locale.t('noun.item')).join(', ');
   }
 }

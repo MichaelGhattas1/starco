@@ -6,6 +6,7 @@ import { ApiService } from '../core/api.service';
 import { AuthService } from '../core/auth.service';
 import { PAYMENT_CURRENCY, CurrencyService } from '../core/currency.service';
 import { paymentLink, toApiDateTime } from '../core/media';
+import { LocaleService } from '../core/locale.service';
 import { BookingRequest, BookingType } from '../core/models';
 
 @Component({
@@ -15,42 +16,42 @@ import { BookingRequest, BookingType } from '../core/models';
   template: `
     <form class="panel grid gap-4 p-5" [formGroup]="form" (ngSubmit)="submit()">
       <div>
-        <p class="kicker">Reserve</p>
+        <p class="kicker">{{ locale.t('reserve.title') }}</p>
         <h2 class="font-display text-4xl leading-none">{{ title() }}</h2>
         @if (price() != null) {
           <p class="mt-2 text-gold-300">{{ currency.display(price()) }}</p>
           @if (currency.applied() !== currency.payment) {
-            <p class="mt-1 text-sm text-gold-200/70">Paymob is charged {{ currency.charge(price()) }}.</p>
+            <p class="mt-1 text-sm text-gold-200/70">{{ locale.t('reserve.paymobCharge', { amount: currency.charge(price()) }) }}</p>
           }
         }
       </div>
       <label class="field">
-        Name
+        {{ locale.t('field.name') }}
         <input formControlName="customerName" autocomplete="name" />
       </label>
       <label class="field">
-        Email
+        {{ locale.t('field.email') }}
         <input type="email" formControlName="customerEmail" autocomplete="email" />
       </label>
       <label class="field">
-        Phone
+        {{ locale.t('field.phone') }}
         <input formControlName="phone" inputmode="numeric" autocomplete="tel" />
       </label>
       <label class="field">
-        Date
+        {{ locale.t('field.date') }}
         <input type="date" formControlName="serviceDate" />
       </label>
       <label class="field">
-        Quantity
+        {{ locale.t('field.quantity') }}
         <input type="number" min="1" max="1000" formControlName="quantity" />
       </label>
       @if (needsParty()) {
         <label class="field">
-          Adults
+          {{ locale.t('field.adults') }}
           <input type="number" min="1" max="50" formControlName="adults" />
         </label>
         <label class="field">
-          Children
+          {{ locale.t('field.children') }}
           <input type="number" min="0" max="50" formControlName="children" />
         </label>
       }
@@ -61,9 +62,9 @@ import { BookingRequest, BookingType } from '../core/models';
         <p class="text-sm text-gold-200" role="status">{{ note() }}</p>
       }
       <button class="btn btn-gold" type="submit" [disabled]="working()">
-        {{ working() ? 'Saving…' : 'Reserve and pay' }}
+        {{ working() ? locale.t('action.saving') : locale.t('action.reservePay') }}
       </button>
-      <a routerLink="/bookings" class="text-sm text-gold-300">View my bookings</a>
+      <a routerLink="/bookings" class="text-sm text-gold-300">{{ locale.t('book.viewMine') }}</a>
     </form>
   `,
 })
@@ -72,6 +73,7 @@ export class ServiceBooking {
   private readonly router = inject(Router);
   readonly auth = inject(AuthService);
   readonly currency = inject(CurrencyService);
+  readonly locale = inject(LocaleService);
 
   readonly kind = input.required<BookingType>();
   readonly itemId = input.required<string>();

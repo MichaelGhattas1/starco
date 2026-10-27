@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { environment } from './environment';
+import { I18nKey } from './i18n';
 import { LocaleService } from './locale.service';
 
 export type CurrencyCode = 'EGP' | 'USD' | 'EUR';
@@ -42,7 +43,11 @@ export class CurrencyService {
   readonly active = signal<CurrencyCode>(readStored());
   readonly rates = signal<Partial<Record<CurrencyCode, number>> | null>(null);
   readonly rateDate = signal<string | null>(null);
-  readonly rateError = signal<string | null>(null);
+  private readonly rateErrorKey = signal<I18nKey | null>(null);
+  readonly rateError = computed(() => {
+    const key = this.rateErrorKey();
+    return key ? this.locale.t(key) : null;
+  });
   readonly ratesLoading = signal(false);
   readonly applied = computed(() => (this.canUse(this.active()) ? this.active() : this.base));
 
@@ -57,26 +62,27 @@ export class CurrencyService {
 
   refreshRates(): void {
     this.ratesLoading.set(true);
-    this.rateError.set(null);
+    this.rateErrorKey.set(null);
     this.http.get<ExchangeRateResponse>(environment.exchangeRateUrl).subscribe({
       next: (body) => {
         const usd = body.rates?.['USD'];
         const eur = body.rates?.['EUR'];
         if (body.result !== 'success' || body.base_code !== this.base || typeof usd !== 'number' || typeof eur !== 'number' || usd <= 0 || eur <= 0) {
-          this.failRates('The rate feed did not return EGP, USD, and EUR. Prices stay in Egyptian pounds.');
+          this.failRates('fx.badFeed');
           return;
         }
         this.rates.set({ EGP: 1, USD: usd, EUR: eur });
         this.rateDate.set(body.time_last_update_utc ?? null);
         this.ratesLoading.set(false);
       },
-      error: () => this.failRates('Exchange rates could not be loaded. Prices stay in Egyptian pounds.'),
+      error: () => this.failRates('fx.loadFail'),
     });
   }
 
   label(code: CurrencyCode): string {
     const option = this.options.find((item) => item.code === code) ?? this.options[0];
-    return `${option.code} — ${option.nameEn} — ${option.nameAr} — ${option.symbol}`;
+    const name = this.locale.isAr() ? option.nameAr : option.nameEn;
+    return `${option.code} — ${name}`;
   }
 
   canUse(code: CurrencyCode): boolean {
@@ -89,13 +95,13 @@ export class CurrencyService {
 
   save(code: CurrencyCode): string | null {
     if (!this.options.some((item) => item.code === code)) {
-      return 'Choose EGP, USD, or EUR.';
+      return this.locale.t('fx.choose');
     }
     if (this.ratesLoading() && code !== this.base) {
-      return 'Exchange rates are still loading.';
+      return this.locale.t('fx.loading');
     }
     if (!this.canUse(code)) {
-      return 'USD and EUR need a live exchange rate. Prices stay in Egyptian pounds until the rate feed responds.';
+      return this.locale.t('fx.needRate');
     }
     this.active.set(code);
     localStorage.setItem(STORAGE_KEY, code);
@@ -137,13 +143,13 @@ export class CurrencyService {
 
   usdInputNote(usd: number | null | undefined): string {
     if (this.ratesLoading()) {
-      return 'Loading the USD rate…';
+      return this.locale.t('fx.usdLoading');
     }
     const egp = this.toEgpAmount(usd);
     if (egp == null) {
-      return 'A live USD rate is required before this price can be saved.';
+      return this.locale.t('fx.usdRequired');
     }
-    return `Payment amount ${this.charge(egp)}.`;
+    return this.locale.t('fx.paymentAmount', { amount: this.charge(egp) });
   }
 
   per(unit: 'night' | 'person' | 'child' | 'trip'): string {
@@ -173,10 +179,10 @@ export class CurrencyService {
     return rate != null && rate > 0 ? rate : null;
   }
 
-  private failRates(message: string): void {
+  private failRates(key: I18nKey): void {
     this.rates.set(null);
     this.rateDate.set(null);
-    this.rateError.set(message);
+    this.rateErrorKey.set(key);
     this.ratesLoading.set(false);
   }
 }

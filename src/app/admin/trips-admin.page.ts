@@ -15,21 +15,21 @@ import { NoticeService } from '../core/notice.service';
   template: `
     <div class="mb-5 flex flex-wrap items-end justify-between gap-4">
       <div>
-        <p class="kicker">Catalog</p>
-        <h1 class="font-display text-5xl">Trips</h1>
+        <p class="kicker">{{ locale.t('admin.catalog') }}</p>
+        <h1 class="font-display text-5xl">{{ locale.t('nav.trips') }}</h1>
       </div>
-      <a class="btn btn-gold" routerLink="/admin/trips/new">New trip</a>
+      <a class="btn btn-gold" routerLink="/admin/trips/new">{{ locale.t('admin.newTrip') }}</a>
     </div>
     <form class="panel mb-4 flex flex-col gap-3 p-4 sm:flex-row" (ngSubmit)="load($event)">
-      <label class="field flex-1">Search <input name="q" [value]="query()" /></label>
-      <button class="btn btn-gold self-end" type="submit">Search</button>
+      <label class="field flex-1">{{ locale.t('field.search') }} <input name="q" [value]="query()" /></label>
+      <button class="btn btn-gold self-end" type="submit">{{ locale.t('action.search') }}</button>
     </form>
     @if (loading()) {
-      <p role="status">Loading trips…</p>
+      <p role="status">{{ locale.t('load.trips') }}</p>
     } @else if (error()) {
       <p class="text-red-200" role="alert">{{ error() }}</p>
     } @else if (!trips().length) {
-      <p>No trips yet.</p>
+      <p>{{ locale.t('empty.trips') }}</p>
     } @else {
       <div class="grid gap-3">
         @for (trip of trips(); track trip.id) {
@@ -38,15 +38,15 @@ import { NoticeService } from '../core/notice.service';
               <h2 class="font-display text-3xl">{{ label(trip) }}</h2>
               <p class="text-sm text-gold-200/80">
                 {{ locale.pick(trip.city, trip.cityAr) }} · {{ money(trip.pricePerPerson) }} ·
-                {{ trip.isActive ? 'Active' : 'Hidden' }}
+                {{ trip.isActive ? locale.t('field.active') : locale.t('field.hidden') }}
               </p>
             </div>
             <div class="flex flex-wrap gap-2">
               @if (trip.id) {
-                <a class="btn btn-line" [routerLink]="['/trips', trip.id]">View</a>
+                <a class="btn btn-line" [routerLink]="['/trips', trip.id]">{{ locale.t('action.view') }}</a>
               }
-              <a class="btn btn-line" [routerLink]="['/admin/trips', trip.id]">Edit</a>
-              <button type="button" class="btn btn-danger" (click)="remove(trip)">Delete</button>
+              <a class="btn btn-line" [routerLink]="['/admin/trips', trip.id]">{{ locale.t('action.edit') }}</a>
+              <button type="button" class="btn btn-danger" (click)="remove(trip)">{{ locale.t('action.delete') }}</button>
             </div>
           </article>
         }
@@ -96,12 +96,12 @@ export class TripsAdminPage {
   }
 
   remove(trip: Trip): void {
-    if (!trip.id || !confirm(`Delete ${this.label(trip)}?`)) {
+    if (!trip.id || !confirm(this.locale.t('action.deleteAsk', { name: this.label(trip) }))) {
       return;
     }
     this.api.deleteTrip(trip.id).subscribe({
       next: () => {
-        this.notice.success('Trip deleted.');
+        this.notice.success(this.locale.t('toast.deleted', { name: this.locale.t('noun.trip') }));
         this.load();
       },
       error: (error) => this.notice.error(errorMessage(error)),

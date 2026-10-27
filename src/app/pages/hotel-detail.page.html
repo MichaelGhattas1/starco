@@ -1,5 +1,5 @@
 @if (loading()) {
-  <p role="status">Loading hotel…</p>
+  <p role="status">{{ locale.t('load.hotel') }}</p>
 } @else if (error()) {
   <p class="panel p-4 text-red-200" role="alert">{{ error() }}</p>
 } @else if (hotel(); as stay) {
@@ -15,7 +15,7 @@
       @if (gallery().length > 1) {
         <div class="mt-3 flex gap-2 overflow-auto">
           @for (image of gallery(); track image.id; let index = $index) {
-            <button type="button" class="shrink-0" (click)="activeImage.set(index)" [attr.aria-label]="'Photo ' + (index + 1)">
+            <button type="button" class="shrink-0" (click)="activeImage.set(index)" [attr.aria-label]="locale.t('action.photo', { n: index + 1 })">
               <img [src]="mediaUrl(image.url)" alt="" class="h-16 w-24 rounded-xl object-cover" [class.ring-2]="activeImage() === index" [class.ring-gold-300]="activeImage() === index" />
             </button>
           }
@@ -23,19 +23,19 @@
       }
     </div>
     <aside class="panel h-fit p-5">
-      <p class="kicker">Stay facts</p>
+      <p class="kicker">{{ locale.t('hotel.facts') }}</p>
       <dl class="mt-3 grid gap-2 text-sm">
-        <div><dt class="text-gold-300">Address</dt><dd>{{ address() }}</dd></div>
-        <div><dt class="text-gold-300">Phone</dt><dd><a [href]="'tel:' + stay.phone">{{ stay.phone }}</a></dd></div>
-        <div><dt class="text-gold-300">Email</dt><dd><a [href]="'mailto:' + stay.email">{{ stay.email }}</a></dd></div>
-        <div><dt class="text-gold-300">Rooms open</dt><dd>{{ stay.numOfAvailableRoomsToReserve }}</dd></div>
-        <div><dt class="text-gold-300">Suites open</dt><dd>{{ stay.numOfAvailableSuitesToReserve }}</dd></div>
+        <div><dt class="text-gold-300">{{ locale.t('field.address') }}</dt><dd>{{ address() }}</dd></div>
+        <div><dt class="text-gold-300">{{ locale.t('field.phone') }}</dt><dd><a [href]="'tel:' + stay.phone">{{ stay.phone }}</a></dd></div>
+        <div><dt class="text-gold-300">{{ locale.t('field.email') }}</dt><dd><a [href]="'mailto:' + stay.email">{{ stay.email }}</a></dd></div>
+        <div><dt class="text-gold-300">{{ locale.t('hotel.roomsOpen') }}</dt><dd>{{ stay.numOfAvailableRoomsToReserve }}</dd></div>
+        <div><dt class="text-gold-300">{{ locale.t('hotel.suitesOpen') }}</dt><dd>{{ stay.numOfAvailableSuitesToReserve }}</dd></div>
       </dl>
       @if (mapEmbed(); as map) {
         <iframe
           class="mt-4 h-64 w-full rounded-2xl border border-gold-300/20"
           [src]="map"
-          title="Hotel map"
+          [title]="locale.t('hotel.map')"
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
         ></iframe>
@@ -45,11 +45,11 @@
 
   @if (facilities().length) {
     <section class="mt-8">
-      <h2 class="font-display text-4xl">Facilities</h2>
+      <h2 class="font-display text-4xl">{{ locale.t('hotel.facilities') }}</h2>
       <ul class="mt-3 flex flex-wrap gap-2">
         @for (item of facilities(); track item[0]) {
           <li class="rounded-full border border-gold-300/30 px-3 py-1 text-sm" [class.opacity-40]="!item[1]">
-            {{ featureLabel(item[0]) }}{{ item[1] ? '' : ' · off' }}
+            {{ locale.facility(item[0]) }}{{ item[1] ? '' : ' · ' + locale.t('hotel.off') }}
           </li>
         }
       </ul>
@@ -58,19 +58,19 @@
 
   @if (showRestaurant() || showCafe()) {
     <section class="mt-16">
-      <p class="kicker">Dining</p>
-      <h2 class="font-display text-5xl leading-none">Cafe and restaurant</h2>
-      <p class="mt-3 max-w-xl text-sm text-gold-200/80">Meals and drinks served at {{ name() }}.</p>
+      <p class="kicker">{{ locale.t('hotel.dining') }}</p>
+      <h2 class="font-display text-5xl leading-none">{{ locale.t('hotel.cafeRestaurant') }}</h2>
+      <p class="mt-3 max-w-xl text-sm text-gold-200/80">{{ locale.t('hotel.mealsAt', { name: name() }) }}</p>
 
       @if (showRestaurant()) {
         <article class="mt-10 grid items-center gap-8 lg:grid-cols-2">
           @if (restaurantImages().length === 1) {
-            <img [src]="restaurantImages()[0]" [alt]="'Restaurant at ' + name()" class="mx-auto aspect-[4/3] w-full max-w-xl rounded-[2rem] object-cover" />
+            <img [src]="restaurantImages()[0]" [alt]="locale.t('hotel.restaurant') + ' ' + name()" class="mx-auto aspect-[4/3] w-full max-w-xl rounded-[2rem] object-cover" />
           } @else if (restaurantImages().length) {
             <div>
             <div class="relative mx-auto aspect-[4/3] w-full max-w-xl">
               <div class="absolute start-0 top-0 h-[78%] w-[72%] overflow-hidden rounded-[2rem]">
-                <img [src]="restaurantImages()[0]" [alt]="'Restaurant at ' + name()" class="h-full w-full object-cover" />
+                <img [src]="restaurantImages()[0]" [alt]="locale.t('hotel.restaurant') + ' ' + name()" class="h-full w-full object-cover" />
               </div>
               @if (restaurantImages()[1]; as second) {
                 <div class="absolute end-0 top-[18%] z-10 h-[48%] w-[54%] overflow-hidden rounded-[1.6rem] shadow-2xl ring-4 ring-navy-950">
@@ -95,8 +95,8 @@
             </div>
           }
           <div>
-            <p class="kicker">Restaurant</p>
-            <h3 class="mt-3 font-display text-5xl leading-none">The dining room</h3>
+            <p class="kicker">{{ locale.t('hotel.restaurant') }}</p>
+            <h3 class="mt-3 font-display text-5xl leading-none">{{ locale.t('hotel.diningRoom') }}</h3>
             @if (restaurantText()) {
               <p class="mt-4 max-w-md font-display text-3xl leading-snug text-gold-100">{{ restaurantText() }}</p>
             }
@@ -114,8 +114,8 @@
       @if (showCafe()) {
         <article class="mt-16 grid items-center gap-8 lg:grid-cols-2">
           <div class="order-2 lg:order-1">
-            <p class="kicker">Cafe</p>
-            <h3 class="mt-3 font-display text-5xl leading-none">The cafe</h3>
+            <p class="kicker">{{ locale.t('hotel.cafe') }}</p>
+            <h3 class="mt-3 font-display text-5xl leading-none">{{ locale.t('hotel.theCafe') }}</h3>
             @if (cafeText()) {
               <p class="mt-4 max-w-md font-display text-3xl leading-snug text-gold-100">{{ cafeText() }}</p>
             }
@@ -130,7 +130,7 @@
           @if (cafeImages().length) {
             <div class="order-1 lg:order-2">
               <div class="relative mx-auto aspect-[4/3] w-full max-w-xl overflow-hidden rounded-[2rem]">
-                <img [src]="cafeImages()[0]" [alt]="'Cafe at ' + name()" class="h-full w-full object-cover" />
+                <img [src]="cafeImages()[0]" [alt]="locale.t('hotel.cafe') + ' ' + name()" class="h-full w-full object-cover" />
                 @if (cafeImages()[1]; as second) {
                   <div class="absolute bottom-3 end-3 z-10 aspect-[4/3] w-2/5 max-w-48 overflow-hidden rounded-[1.4rem] shadow-2xl ring-4 ring-navy-950">
                     <img [src]="second" alt="" class="h-full w-full object-cover" />
@@ -156,23 +156,23 @@
   <section class="mt-10">
     <div class="mb-4 flex flex-col justify-between gap-4 md:flex-row md:items-end">
       <div>
-        <p class="kicker">Reservation</p>
-        <h2 class="font-display text-4xl">Available rooms</h2>
-        <a routerLink="/cart" class="mt-2 inline-block text-sm text-gold-300">Cart · {{ cart.count() }}</a>
+        <p class="kicker">{{ locale.t('hotel.reservation') }}</p>
+        <h2 class="font-display text-4xl">{{ locale.t('hotel.availableRooms') }}</h2>
+        <a routerLink="/cart" class="mt-2 inline-block text-sm text-gold-300">{{ locale.t('hotel.cartCount', { n: cart.count() }) }}</a>
       </div>
       <form class="grid w-full min-w-0 gap-3 sm:grid-cols-2 lg:w-auto lg:grid-cols-4" [formGroup]="form" (ngSubmit)="loadRooms()">
-        <label class="grid min-w-0 gap-1 text-sm">Check in<input class="field" type="date" formControlName="checkIn" [min]="today" /></label>
-        <label class="grid min-w-0 gap-1 text-sm">Check out<input class="field" type="date" formControlName="checkOut" [min]="minCheckOut()" /></label>
-        <label class="grid min-w-0 gap-1 text-sm">Adults<input class="field" type="number" min="1" max="20" step="1" formControlName="adults" /></label>
-        <button class="btn btn-gold sm:col-span-2 lg:col-span-1" type="submit">Check</button>
+        <label class="grid min-w-0 gap-1 text-sm">{{ locale.t('field.checkIn') }}<input class="field" type="date" formControlName="checkIn" [min]="today" /></label>
+        <label class="grid min-w-0 gap-1 text-sm">{{ locale.t('field.checkOut') }}<input class="field" type="date" formControlName="checkOut" [min]="minCheckOut()" /></label>
+        <label class="grid min-w-0 gap-1 text-sm">{{ locale.t('field.adults') }}<input class="field" type="number" min="1" max="20" step="1" formControlName="adults" /></label>
+        <button class="btn btn-gold sm:col-span-2 lg:col-span-1" type="submit">{{ locale.t('action.check') }}</button>
       </form>
     </div>
     @if (roomsLoading()) {
-      <p role="status">Checking availability…</p>
+      <p role="status">{{ locale.t('load.rooms') }}</p>
     } @else if (roomsError()) {
       <p class="text-red-200" role="alert">{{ roomsError() }}</p>
     } @else if (!rooms().length) {
-      <p>No rooms were returned for these dates.</p>
+      <p>{{ locale.t('empty.rooms') }}</p>
     } @else {
       <div class="grid gap-4 md:grid-cols-2">
         @for (room of rooms(); track room.encodedRoomId) {
@@ -185,17 +185,17 @@
               <p class="mt-1 text-sm text-gold-200/80">
                 {{ currency.display(room.pricePerNight) }} {{ currency.per('night') }} × {{ nights(form.controls.checkIn.value, form.controls.checkOut.value) }}
                 {{ nightWord(nights(form.controls.checkIn.value, form.controls.checkOut.value)) }}
-                · sleeps {{ room.maxSleep || '—' }}
-                · {{ room.isAvailable ? 'Available' : 'Unavailable' }}
+                · {{ locale.t('hotel.sleeps', { n: room.maxSleep || '—' }) }}
+                · {{ room.isAvailable ? locale.t('hotel.available') : locale.t('hotel.unavailable') }}
               </p>
               <app-hotel-price class="mt-3" [base]="stayBase(room)" />
               <div class="mt-4 flex flex-wrap gap-2">
-                <button type="button" class="btn btn-line" (click)="showRoom(room)">Show room</button>
+                <button type="button" class="btn btn-line" (click)="showRoom(room)">{{ locale.t('action.showRoom') }}</button>
                 @if (room.isAvailable && room.encodedRoomId && stay.id) {
                   @if (inCart(room)) {
-                    <a class="btn btn-line" routerLink="/cart">In cart</a>
+                    <a class="btn btn-line" routerLink="/cart">{{ locale.t('action.inCart') }}</a>
                   } @else {
-                    <button type="button" class="btn btn-gold" (click)="addToCart(room)">Add to cart</button>
+                    <button type="button" class="btn btn-gold" (click)="addToCart(room)">{{ locale.t('action.addToCart') }}</button>
                   }
                 }
               </div>
@@ -211,17 +211,17 @@
       <div class="p-5 md:p-6">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p class="kicker">Room</p>
+            <p class="kicker">{{ locale.t('hotel.room') }}</p>
             <h2 id="room-dialog-title" class="mt-1 font-display text-4xl leading-none">{{ roomName(roomRecord() ?? room) }}</h2>
           </div>
-          <button type="button" class="btn btn-line" (click)="closeRoom()">Close</button>
+          <button type="button" class="btn btn-line" (click)="closeRoom()">{{ locale.t('action.close') }}</button>
         </div>
         @if (roomPhotos().length) {
           <img [src]="roomPhotos()[roomPhoto()]" [alt]="roomName(room)" class="mt-4 h-64 w-full rounded-2xl object-cover" />
           @if (roomPhotos().length > 1) {
             <div class="mt-3 flex gap-2 overflow-auto">
               @for (src of roomPhotos(); track src; let index = $index) {
-                <button type="button" class="shrink-0" (click)="roomPhoto.set(index)" [attr.aria-label]="'Room photo ' + (index + 1)">
+                <button type="button" class="shrink-0" (click)="roomPhoto.set(index)" [attr.aria-label]="locale.t('action.roomPhoto', { n: index + 1 })">
                   <img [src]="src" alt="" class="h-16 w-24 rounded-xl object-cover" [class.ring-2]="roomPhoto() === index" [class.ring-gold-300]="roomPhoto() === index" />
                 </button>
               }
@@ -231,32 +231,32 @@
         <p class="mt-4 text-sm text-gold-200/80">
           {{ currency.display(room.pricePerNight) }} {{ currency.per('night') }} × {{ nights(form.controls.checkIn.value, form.controls.checkOut.value) }}
           {{ nightWord(nights(form.controls.checkIn.value, form.controls.checkOut.value)) }}
-          · sleeps {{ room.maxSleep || '—' }}
-          · {{ room.isAvailable ? 'Available' : 'Unavailable' }}
+          · {{ locale.t('hotel.sleeps', { n: room.maxSleep || '—' }) }}
+          · {{ room.isAvailable ? locale.t('hotel.available') : locale.t('hotel.unavailable') }}
           @if (roomRecord(); as detail) {
             · {{ roomTypeLabel(detail.type) }}
           }
         </p>
         <app-hotel-price class="mt-3" [base]="stayBase(room)" />
         @if (roomBusy()) {
-          <p class="mt-3 text-sm" role="status">Loading room…</p>
+          <p class="mt-3 text-sm" role="status">{{ locale.t('load.room') }}</p>
         }
         @if (roomRecord()?.extraBed) {
-          <p class="mt-3 text-sm text-gold-200/80">Extra bed {{ currency.display(roomRecord()?.priceForExtraBed) }}</p>
+          <p class="mt-3 text-sm text-gold-200/80">{{ locale.t('hotel.extraBed', { price: currency.display(roomRecord()?.priceForExtraBed) }) }}</p>
         }
         @if (roomFeatures(roomRecord()).length) {
           <ul class="mt-4 flex flex-wrap gap-2">
             @for (item of roomFeatures(roomRecord()); track item[0]) {
-              <li class="rounded-full border border-gold-300/30 px-3 py-1 text-sm">{{ featureLabel(item[0]) }}</li>
+              <li class="rounded-full border border-gold-300/30 px-3 py-1 text-sm">{{ locale.facility(item[0]) }}</li>
             }
           </ul>
         }
         @if (room.isAvailable && room.encodedRoomId && stay.id) {
           <div class="mt-5">
             @if (inCart(room)) {
-              <a class="btn btn-line" routerLink="/cart" (click)="closeRoom()">In cart</a>
+              <a class="btn btn-line" routerLink="/cart" (click)="closeRoom()">{{ locale.t('action.inCart') }}</a>
             } @else {
-              <button type="button" class="btn btn-gold" (click)="addToCart(room); closeRoom()">Add to cart</button>
+              <button type="button" class="btn btn-gold" (click)="addToCart(room); closeRoom()">{{ locale.t('action.addToCart') }}</button>
             }
           </div>
         }

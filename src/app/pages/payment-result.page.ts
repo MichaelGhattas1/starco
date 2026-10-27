@@ -5,6 +5,7 @@ import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
 import { PAYMENT_CURRENCY } from '../core/currency.service';
 import { UNPAID_KEY, UnpaidStay } from '../core/cart.store';
+import { LocaleService } from '../core/locale.service';
 
 @Component({
   selector: 'app-payment-result-page',
@@ -17,14 +18,16 @@ export class PaymentResultPage {
   private readonly router = inject(Router);
   private readonly params = inject(ActivatedRoute).snapshot.queryParamMap;
 
+  readonly locale = inject(LocaleService);
   readonly loading = signal(false);
-  readonly message = signal('Add the payment reference from Paymob to confirm this reservation.');
+  readonly message = signal('');
   readonly detail = signal('');
   readonly paymentRef = signal(this.params.get('paymentRef') ?? this.params.get('merchant_order_id') ?? '');
   readonly unpaid = signal<UnpaidStay[]>(readUnpaid());
 
   constructor() {
     inject(Title).setTitle('Payment · Plaza Inn');
+    this.message.set(this.locale.t('pay.needRef'));
     const orderId = this.params.get('order') ?? this.params.get('id');
     if (this.paymentRef()) {
       this.confirm();
@@ -39,7 +42,7 @@ export class PaymentResultPage {
 
   payStay(stay: UnpaidStay): void {
     if (!stay.phone) {
-      this.message.set('This stay is missing a phone number for Paymob.');
+      this.message.set(this.locale.t('pay.missingPhone'));
       return;
     }
     this.loading.set(true);
@@ -78,14 +81,14 @@ export class PaymentResultPage {
   confirm(): void {
     const paymentRef = this.paymentRef().trim();
     if (!paymentRef) {
-      this.message.set('Enter the payment reference.');
+      this.message.set(this.locale.t('pay.enterRef'));
       return;
     }
     this.loading.set(true);
     this.api.confirmPayment(paymentRef).subscribe({
       next: (result) => {
         this.loading.set(false);
-        this.message.set('Payment confirmation was sent.');
+        this.message.set(this.locale.t('pay.sent'));
         this.detail.set(typeof result === 'string' ? result : JSON.stringify(result));
       },
       error: (error) => {
@@ -100,7 +103,7 @@ export class PaymentResultPage {
     this.api.checkOrder(orderId).subscribe({
       next: (result) => {
         this.loading.set(false);
-        this.message.set('Paymob order status');
+        this.message.set(this.locale.t('pay.orderStatus'));
         this.detail.set(typeof result === 'string' ? result : JSON.stringify(result));
       },
       error: (error) => {

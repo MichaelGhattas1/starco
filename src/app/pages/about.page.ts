@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { Title } from '@angular/platform-browser';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
+import { LocaleService } from '../core/locale.service';
 import { mediaUrl } from '../core/media';
 import { AboutUs } from '../core/models';
 
@@ -12,6 +13,7 @@ import { AboutUs } from '../core/models';
 })
 export class AboutPage {
   private readonly api = inject(ApiService);
+  readonly locale = inject(LocaleService);
   readonly about = signal<AboutUs | null>(null);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);

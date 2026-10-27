@@ -1,19 +1,19 @@
 @if (loading()) {
-  <p role="status">Loading…</p>
+  <p role="status">{{ locale.t('load.generic') }}</p>
 } @else if (error()) {
   <p class="panel p-4 text-red-200" role="alert">{{ error() }}</p>
 } @else if (about(); as page) {
   <div class="grid items-start gap-10 lg:grid-cols-[1.1fr_0.9fr]">
     <div>
-      <p class="kicker">Our story</p>
-      <h1 class="mt-2 font-display text-4xl leading-none sm:text-5xl lg:text-6xl">{{ page.tittle || 'About Plaza Inn' }}</h1>
+      <p class="kicker">{{ locale.t('home.story') }}</p>
+      <h1 class="mt-2 font-display text-4xl leading-none sm:text-5xl lg:text-6xl">{{ page.tittle || locale.t('home.aboutFallback') }}</h1>
       <p class="mt-4 text-xl text-gold-300">{{ page.subTittle }}</p>
       <p class="mt-4 max-w-xl text-gold-100/90">{{ page.description }}</p>
     </div>
     <div class="relative mx-auto aspect-[4/3] w-full max-w-xl">
       @if (image(page.square1ImageId); as src) {
         <div class="absolute start-0 top-0 h-[78%] w-[72%] overflow-hidden rounded-[2rem]">
-          <img [src]="src" [alt]="page.tittle || 'Plaza Inn'" class="h-full w-full object-cover" />
+          <img [src]="src" [alt]="page.tittle || locale.t('brand.plaza')" class="h-full w-full object-cover" />
         </div>
       }
       @if (image(page.square2ImageId); as src) {

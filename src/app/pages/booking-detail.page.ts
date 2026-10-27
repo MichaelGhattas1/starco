@@ -7,6 +7,7 @@ import { CurrencyService } from '../core/currency.service';
 import { hotelBaseFromTotal, isHotelBooking } from '../core/hotel-charges';
 import { fromApiDateTime } from '../core/media';
 import { BookingResult, BookingStatus, bookingStatusLabel, bookingTypeLabel, pairedName } from '../core/models';
+import { LocaleService } from '../core/locale.service';
 import { NoticeService } from '../core/notice.service';
 import { HotelPrice } from '../shared/hotel-price';
 
@@ -23,16 +24,16 @@ interface BookingFact {
   imports: [RouterLink, HotelPrice],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <a [routerLink]="backLink()" class="text-sm text-gold-300">All bookings</a>
+    <a [routerLink]="backLink()" class="text-sm text-gold-300">{{ locale.t('list.allBookings') }}</a>
     @if (loading()) {
-      <p class="mt-6" role="status">Loading booking…</p>
+      <p class="mt-6" role="status">{{ locale.t('load.booking') }}</p>
     } @else if (error()) {
       <p class="mt-6 text-red-200" role="alert">{{ error() }}</p>
     } @else if (item(); as booking) {
       <article class="panel mt-4 grid gap-6 p-6">
         <div>
-          <p class="kicker">{{ typeLabel(booking.bookingType) }} · {{ statusLabel(booking.status) }}</p>
-          <h1 class="font-display text-5xl leading-none">{{ booking.customerName || 'Booking' }}</h1>
+          <p class="kicker">{{ locale.label(typeLabel(booking.bookingType)) }} · {{ locale.label(statusLabel(booking.status)) }}</p>
+          <h1 class="font-display text-5xl leading-none">{{ booking.customerName || locale.t('noun.booking') }}</h1>
         </div>
         @if (isHotel(booking)) {
           <app-hotel-price [base]="hotelBase(booking)" [quote]="booking.totalPrice" mode="charge" />
@@ -55,7 +56,7 @@ interface BookingFact {
         </dl>
         @if (booking.encodedId && !cancelled(booking)) {
           <button type="button" class="btn btn-danger w-fit" [disabled]="busy()" (click)="cancel(booking)">
-            Cancel booking
+            {{ locale.t('book.cancelBooking') }}
           </button>
         }
       </article>
@@ -68,6 +69,7 @@ export class BookingDetailPage {
   private readonly router = inject(Router);
   private readonly notice = inject(NoticeService);
   private readonly currency = inject(CurrencyService);
+  readonly locale = inject(LocaleService);
 
   readonly typeLabel = bookingTypeLabel;
   readonly statusLabel = bookingStatusLabel;
@@ -86,40 +88,40 @@ export class BookingDetailPage {
     const room = pairedName(booking.roomName, booking.roomNameAr);
     const reserved = pairedName(booking.itemName, booking.itemNameAr);
     const rows: BookingFact[] = [
-      { label: 'Payment', value: booking.isPaid ? 'Paid' : 'Unpaid' },
-      { label: 'Payment reference', value: booking.paymentReference || '—', wide: true },
-      { label: 'Email', value: booking.customerEmail || '—', href: mail(booking.customerEmail) },
-      { label: 'Phone', value: booking.customerPhone || '—', href: phone(booking.customerPhone) },
-      { label: 'Booked', value: fromApiDateTime(booking.createdAt) || '—' },
-      { label: 'Check-in', value: fromApiDateTime(booking.checkIn) || '—' },
-      { label: 'Check-out', value: fromApiDateTime(booking.checkOut) || '—' },
+      { label: this.locale.t('book.payment'), value: booking.isPaid ? this.locale.t('pay.paid') : this.locale.t('pay.unpaid') },
+      { label: this.locale.t('field.paymentRef'), value: booking.paymentReference || '—', wide: true },
+      { label: this.locale.t('field.email'), value: booking.customerEmail || '—', href: mail(booking.customerEmail) },
+      { label: this.locale.t('field.phone'), value: booking.customerPhone || '—', href: phone(booking.customerPhone) },
+      { label: this.locale.t('book.booked'), value: fromApiDateTime(booking.createdAt) || '—' },
+      { label: this.locale.t('field.checkIn'), value: fromApiDateTime(booking.checkIn) || '—' },
+      { label: this.locale.t('field.checkOut'), value: fromApiDateTime(booking.checkOut) || '—' },
     ];
     const serviceDate = fromApiDateTime(booking.serviceDate);
     if (!isHotelBooking(booking)) {
-      rows.unshift({ label: 'Total', value: this.currency.charge(booking.totalPrice) });
+      rows.unshift({ label: this.locale.t('book.total'), value: this.currency.charge(booking.totalPrice) });
     }
     if (serviceDate) {
-      rows.push({ label: 'Service date', value: serviceDate });
+      rows.push({ label: this.locale.t('book.serviceDate'), value: serviceDate });
     }
     if (hotel) {
       rows.push({
-        label: 'Hotel',
+        label: this.locale.t('field.hotel'),
         value: hotel,
         link: booking.encodedHotelId ? ['/hotels', booking.encodedHotelId] : undefined,
       });
     }
     if (room) {
-      rows.push({ label: 'Room', value: room });
+      rows.push({ label: this.locale.t('noun.room'), value: room });
     }
     if (reserved && reserved !== hotel && reserved !== room) {
-      rows.push({ label: 'Reserved item', value: reserved, link: this.serviceLink(booking), wide: true });
+      rows.push({ label: this.locale.t('book.reservedItem'), value: reserved, link: this.serviceLink(booking), wide: true });
     }
     rows.push(
-      { label: 'Adults', value: String(booking.adults ?? 0) },
-      { label: 'Children', value: String(booking.children ?? 0) },
-      { label: 'Rooms booked', value: String(booking.roomsBooked ?? 0) },
-      { label: 'Quantity', value: String(booking.quantity ?? 0) },
-      { label: 'Extra bed', value: booking.extraBed ? 'Yes' : 'No' },
+      { label: this.locale.t('field.adults'), value: String(booking.adults ?? 0) },
+      { label: this.locale.t('field.children'), value: String(booking.children ?? 0) },
+      { label: this.locale.t('book.roomsBooked'), value: String(booking.roomsBooked ?? 0) },
+      { label: this.locale.t('field.quantity'), value: String(booking.quantity ?? 0) },
+      { label: this.locale.t('book.extraBed'), value: booking.extraBed ? this.locale.t('book.yes') : this.locale.t('book.no') },
     );
     return rows;
   }
@@ -175,14 +177,14 @@ export class BookingDetailPage {
 
   cancel(booking: BookingResult): void {
     const id = booking.encodedId;
-    if (!id || !confirm('Cancel this booking?')) {
+    if (!id || !confirm(this.locale.t('book.cancelAsk'))) {
       return;
     }
     this.busy.set(true);
     this.api.cancelBooking(id).subscribe({
       next: () => {
         this.busy.set(false);
-        this.notice.success('Booking cancelled.');
+        this.notice.success(this.locale.t('book.cancelled'));
         this.load();
       },
       error: (error) => {

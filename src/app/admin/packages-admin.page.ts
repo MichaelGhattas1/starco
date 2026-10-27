@@ -15,21 +15,21 @@ import { NoticeService } from '../core/notice.service';
   template: `
     <div class="mb-5 flex flex-wrap items-end justify-between gap-4">
       <div>
-        <p class="kicker">Catalog</p>
-        <h1 class="font-display text-5xl">Packages</h1>
+        <p class="kicker">{{ locale.t('admin.catalog') }}</p>
+        <h1 class="font-display text-5xl">{{ locale.t('home.packages') }}</h1>
       </div>
-      <a class="btn btn-gold" routerLink="/admin/packages/new">New package</a>
+      <a class="btn btn-gold" routerLink="/admin/packages/new">{{ locale.t('admin.newPackage') }}</a>
     </div>
     <form class="panel mb-4 flex flex-col gap-3 p-4 sm:flex-row" (ngSubmit)="load($event)">
-      <label class="field flex-1">Search <input name="q" [value]="query()" /></label>
-      <button class="btn btn-gold self-end" type="submit">Search</button>
+      <label class="field flex-1">{{ locale.t('field.search') }} <input name="q" [value]="query()" /></label>
+      <button class="btn btn-gold self-end" type="submit">{{ locale.t('action.search') }}</button>
     </form>
     @if (loading()) {
-      <p role="status">Loading packages…</p>
+      <p role="status">{{ locale.t('load.packages') }}</p>
     } @else if (error()) {
       <p class="text-red-200" role="alert">{{ error() }}</p>
     } @else if (!items().length) {
-      <p>No packages yet.</p>
+      <p>{{ locale.t('empty.packagesSearch') }}</p>
     } @else {
       <div class="grid gap-3">
         @for (item of items(); track item.id) {
@@ -37,16 +37,16 @@ import { NoticeService } from '../core/notice.service';
             <div>
               <h2 class="font-display text-3xl">{{ label(item) }}</h2>
               <p class="text-sm text-gold-200/80">
-                {{ item.durationDays }} days · {{ money(item.packagePrice) }} ·
-                {{ item.isActive ? 'Active' : 'Hidden' }}
+                {{ locale.t('noun.days', { n: item.durationDays }) }} · {{ money(item.packagePrice) }} ·
+                {{ item.isActive ? locale.t('field.active') : locale.t('field.hidden') }}
               </p>
             </div>
             <div class="flex flex-wrap gap-2">
               @if (item.id) {
-                <a class="btn btn-line" [routerLink]="['/packages', item.id]">View</a>
+                <a class="btn btn-line" [routerLink]="['/packages', item.id]">{{ locale.t('action.view') }}</a>
               }
-              <a class="btn btn-line" [routerLink]="['/admin/packages', item.id]">Edit</a>
-              <button type="button" class="btn btn-danger" (click)="remove(item)">Delete</button>
+              <a class="btn btn-line" [routerLink]="['/admin/packages', item.id]">{{ locale.t('action.edit') }}</a>
+              <button type="button" class="btn btn-danger" (click)="remove(item)">{{ locale.t('action.delete') }}</button>
             </div>
           </article>
         }
@@ -96,12 +96,12 @@ export class PackagesAdminPage {
   }
 
   remove(item: TravelPackage): void {
-    if (!item.id || !confirm(`Delete ${this.label(item)}?`)) {
+    if (!item.id || !confirm(this.locale.t('action.deleteAsk', { name: this.label(item) }))) {
       return;
     }
     this.api.deletePackage(item.id).subscribe({
       next: () => {
-        this.notice.success('Package deleted.');
+        this.notice.success(this.locale.t('toast.deleted', { name: this.locale.t('noun.package') }));
         this.load();
       },
       error: (error) => this.notice.error(errorMessage(error)),

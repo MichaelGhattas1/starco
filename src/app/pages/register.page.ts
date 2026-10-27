@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
 import { safeReturnUrl } from '../core/auth.guard';
 import { ApiService } from '../core/api.service';
+import { LocaleService } from '../core/locale.service';
 import { NoticeService } from '../core/notice.service';
 
 @Component({
@@ -17,6 +18,7 @@ export class RegisterPage {
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
   private readonly notice = inject(NoticeService);
+  readonly locale = inject(LocaleService);
   readonly returnUrl = safeReturnUrl(inject(ActivatedRoute).snapshot.queryParamMap.get('returnUrl'));
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
@@ -39,14 +41,14 @@ export class RegisterPage {
     const value = this.form.getRawValue();
     if (this.form.invalid || value.password !== value.passwordConfirm) {
       this.form.markAllAsTouched();
-      this.error.set(value.password !== value.passwordConfirm ? 'Passwords do not match.' : null);
+      this.error.set(value.password !== value.passwordConfirm ? this.locale.t('auth.passwordMismatch') : null);
       return;
     }
     this.saving.set(true);
     this.error.set(null);
     this.api.register(value).subscribe({
       next: () => {
-        this.notice.success('Account created. Sign in to continue.');
+        this.notice.success(this.locale.t('auth.created'));
         void this.router.navigate(['/login'], {
           queryParams: this.returnUrl ? { returnUrl: this.returnUrl } : {},
         });

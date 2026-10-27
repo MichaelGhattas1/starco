@@ -1,24 +1,24 @@
 <section class="panel mx-auto max-w-xl p-6">
-  <p class="kicker">Paymob</p>
-  <h1 class="font-display text-5xl">Payment result</h1>
-  <p class="mt-3" role="status">{{ loading() ? 'Checking payment…' : message() }}</p>
+  <p class="kicker">{{ locale.t('pay.kicker') }}</p>
+  <h1 class="font-display text-5xl">{{ locale.t('pay.title') }}</h1>
+  <p class="mt-3" role="status">{{ loading() ? locale.t('load.payment') : message() }}</p>
   @if (detail()) {
     <pre class="mt-4 overflow-auto rounded-2xl bg-navy-950 p-4 text-xs text-gold-200">{{ detail() }}</pre>
   }
   <label class="mt-5 grid gap-1 text-sm">
-    Payment reference
+    {{ locale.t('field.paymentRef') }}
     <input class="field" [value]="paymentRef()" (input)="onRef($event)" />
   </label>
   @if (unpaid().length) {
     <div class="mt-5 grid gap-2">
-      <p class="text-sm text-gold-200">Other stays from your cart are reserved and still need payment.</p>
+      <p class="text-sm text-gold-200">{{ locale.t('pay.other') }}</p>
       @for (stay of unpaid(); track stay.encodedId) {
         <button type="button" class="btn btn-line" (click)="payStay(stay)" [disabled]="loading()">
-          Pay {{ stay.label }}
+          {{ locale.t('action.pay', { label: stay.label }) }}
         </button>
       }
     </div>
   }
-  <button type="button" class="btn btn-gold mt-4" (click)="confirm()" [disabled]="loading()">Confirm payment</button>
-  <a class="btn btn-line mt-3" routerLink="/hotels">Back to hotels</a>
+  <button type="button" class="btn btn-gold mt-4" (click)="confirm()" [disabled]="loading()">{{ locale.t('action.confirmPayment') }}</button>
+  <a class="btn btn-line mt-3" routerLink="/hotels">{{ locale.t('action.backHotels') }}</a>
 </section>

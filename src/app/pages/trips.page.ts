@@ -16,23 +16,23 @@ import { plainText } from '../shared/plain-text';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mb-6">
-      <p class="kicker">Departures</p>
-      <h1 class="font-display text-5xl">Trips</h1>
+      <p class="kicker">{{ locale.t('home.departures') }}</p>
+      <h1 class="font-display text-5xl">{{ locale.t('nav.trips') }}</h1>
     </div>
     <form class="panel filters filters-5 mb-6 p-4" [formGroup]="form" (ngSubmit)="load()">
-      <label class="field">Search <input formControlName="Search" /></label>
-      <label class="field">City <input formControlName="City" /></label>
-      <label class="field">Date <input type="date" formControlName="Date" /></label>
-      <label class="field">Min price ({{ currency.base }}) <input type="number" min="0" step="0.01" formControlName="MinPrice" /></label>
-      <label class="field">Max price ({{ currency.base }}) <input type="number" min="0" step="0.01" formControlName="MaxPrice" /></label>
-      <button class="btn btn-gold" type="submit">Search</button>
+      <label class="field">{{ locale.t('field.search') }} <input formControlName="Search" /></label>
+      <label class="field">{{ locale.t('field.city') }} <input formControlName="City" /></label>
+      <label class="field">{{ locale.t('field.date') }} <input type="date" formControlName="Date" /></label>
+      <label class="field">{{ locale.t('field.minPrice', { code: currency.base }) }} <input type="number" min="0" step="0.01" formControlName="MinPrice" /></label>
+      <label class="field">{{ locale.t('field.maxPrice', { code: currency.base }) }} <input type="number" min="0" step="0.01" formControlName="MaxPrice" /></label>
+      <button class="btn btn-gold" type="submit">{{ locale.t('action.search') }}</button>
     </form>
     @if (loading()) {
-      <p role="status">Loading trips…</p>
+      <p role="status">{{ locale.t('load.trips') }}</p>
     } @else if (error()) {
       <p class="text-red-200" role="alert">{{ error() }}</p>
     } @else if (!trips().length) {
-      <p>No trips match this search.</p>
+      <p>{{ locale.t('empty.tripsSearch') }}</p>
     } @else {
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         @for (trip of trips(); track trip.id) {
@@ -74,7 +74,7 @@ export class TripsPage {
   }
 
   label(trip: Trip): string {
-    return this.locale.pick(trip.name, trip.nameAr) || 'Trip';
+    return this.locale.pick(trip.name, trip.nameAr) || this.locale.t('noun.trip');
   }
 
   load(): void {

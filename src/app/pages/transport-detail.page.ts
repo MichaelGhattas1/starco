@@ -14,9 +14,9 @@ import { ServiceBooking } from '../shared/service-booking';
   imports: [RouterLink, ServiceBooking],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <a routerLink="/transport" class="text-sm text-gold-300">All transport</a>
+    <a routerLink="/transport" class="text-sm text-gold-300">{{ locale.t('list.allTransport') }}</a>
     @if (loading()) {
-      <p class="mt-6" role="status">Loading transport…</p>
+      <p class="mt-6" role="status">{{ locale.t('load.transport') }}</p>
     } @else if (error()) {
       <p class="mt-6 text-red-200" role="alert">{{ error() }}</p>
     } @else if (item(); as offer) {
@@ -32,7 +32,7 @@ import { ServiceBooking } from '../shared/service-booking';
             →
             {{ locale.pick(offer.dropoffLocation, offer.dropoffLocationAr) }}
           </p>
-          <p>{{ offer.maxPassengers }} passengers · {{ offer.maxLuggage }} bags · {{ offer.availableVehicles }} vehicles</p>
+          <p>{{ locale.t('noun.passengers', { n: offer.maxPassengers }) }} · {{ locale.t('noun.bags', { n: offer.maxLuggage }) }} · {{ locale.t('noun.vehicles', { n: offer.availableVehicles }) }}</p>
           <p class="text-gold-300">{{ currency.display(offer.pricePerTrip) }} {{ currency.per('trip') }}</p>
           <div class="rich-text text-gold-100/90" [innerHTML]="locale.pick(offer.description, offer.descriptionAr)"></div>
         </article>
@@ -69,6 +69,6 @@ export class TransportDetailPage {
   }
 
   label(item: TransportOffer): string {
-    return this.locale.pick(item.name, item.nameAr) || 'Transport';
+    return this.locale.pick(item.name, item.nameAr) || this.locale.t('noun.transport');
   }
 }

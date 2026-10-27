@@ -4,11 +4,13 @@ import {
   ElementRef,
   afterNextRender,
   forwardRef,
+  inject,
   signal,
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { LocaleService } from '../core/locale.service';
 import { fromEvent } from 'rxjs';
 
 export function richTextLength(html: string): number {
@@ -30,6 +32,7 @@ export function richTextLength(html: string): number {
   host: { class: 'grid gap-2' },
 })
 export class RichText implements ControlValueAccessor {
+  readonly locale = inject(LocaleService);
   private readonly editor = viewChild<ElementRef<HTMLDivElement>>('editor');
   private readonly linkInput = viewChild<ElementRef<HTMLInputElement>>('linkInput');
   private onChange: (value: string) => void = () => {};
@@ -115,7 +118,7 @@ export class RichText implements ControlValueAccessor {
   applyLink(): void {
     const url = normalizeUrl(this.linkUrl());
     if (!url) {
-      this.linkError.set('Enter a web or email address.');
+      this.linkError.set(this.locale.t('rich.badLink'));
       return;
     }
     const element = this.editor()?.nativeElement;

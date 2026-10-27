@@ -1,4 +1,4 @@
-<div class="flex flex-wrap gap-1" role="toolbar" aria-label="Message formatting">
+<div class="flex flex-wrap gap-1" role="toolbar" [attr.aria-label]="locale.t('rich.formatting')">
   <button
     type="button"
     class="rounded-lg border px-2.5 py-1 text-sm font-bold"
@@ -10,7 +10,7 @@
     (mousedown)="keepSelection($event)"
     (click)="format('bold')"
   >
-    Bold
+    {{ locale.t('rich.bold') }}
   </button>
   <button
     type="button"
@@ -23,7 +23,7 @@
     (mousedown)="keepSelection($event)"
     (click)="format('italic')"
   >
-    Italic
+    {{ locale.t('rich.italic') }}
   </button>
   <button
     type="button"
@@ -36,7 +36,7 @@
     (mousedown)="keepSelection($event)"
     (click)="format('underline')"
   >
-    Underline
+    {{ locale.t('rich.underline') }}
   </button>
   <button
     type="button"
@@ -45,7 +45,7 @@
     (mousedown)="keepSelection($event)"
     (click)="format('insertUnorderedList')"
   >
-    Bullets
+    {{ locale.t('rich.bullets') }}
   </button>
   <button
     type="button"
@@ -54,7 +54,7 @@
     (mousedown)="keepSelection($event)"
     (click)="format('insertOrderedList')"
   >
-    Numbers
+    {{ locale.t('rich.numbers') }}
   </button>
   <button
     type="button"
@@ -64,13 +64,13 @@
     (mousedown)="keepSelection($event)"
     (click)="openLink()"
   >
-    Link
+    {{ locale.t('rich.link') }}
   </button>
 </div>
 
 @if (linkOpen()) {
   <div class="flex flex-wrap items-center gap-2">
-    <label class="sr-only" for="rich-link">Link address</label>
+    <label class="sr-only" for="rich-link">{{ locale.t('field.linkAddress') }}</label>
     <input
       #linkInput
       id="rich-link"
@@ -80,8 +80,8 @@
       (input)="linkUrl.set($any($event.target).value)"
       (keydown.enter)="$event.preventDefault(); applyLink()"
     />
-    <button type="button" class="btn btn-gold" (click)="applyLink()">Add link</button>
-    <button type="button" class="btn btn-line" (click)="cancelLink()">Cancel</button>
+    <button type="button" class="btn btn-gold" (click)="applyLink()">{{ locale.t('action.addLink') }}</button>
+    <button type="button" class="btn btn-line" (click)="cancelLink()">{{ locale.t('action.cancel') }}</button>
   </div>
   @if (linkError()) {
     <p class="text-sm text-red-200" role="alert">{{ linkError() }}</p>
@@ -93,7 +93,7 @@
   class="field rich-text min-h-48"
   role="textbox"
   aria-multiline="true"
-  aria-label="Message"
+  [attr.aria-label]="locale.t('field.message')"
   [attr.contenteditable]="disabled() ? 'false' : 'true'"
   (input)="onInput()"
   (blur)="onBlur()"

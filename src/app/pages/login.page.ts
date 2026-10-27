@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
 import { safeReturnUrl } from '../core/auth.guard';
 import { AuthService } from '../core/auth.service';
+import { LocaleService } from '../core/locale.service';
 
 @Component({
   selector: 'app-login-page',
@@ -14,6 +15,7 @@ import { AuthService } from '../core/auth.service';
 })
 export class LoginPage {
   private readonly auth = inject(AuthService);
+  readonly locale = inject(LocaleService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   readonly saving = signal(false);

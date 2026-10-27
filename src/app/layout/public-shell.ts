@@ -29,12 +29,12 @@ export class PublicShell {
   constructor() {
     if (sessionStorage.getItem('plaza_expired') === '1') {
       sessionStorage.removeItem('plaza_expired');
-      this.notice.error('Your session expired. Sign in again.');
+      this.notice.error(this.locale.t('session.expired'));
     }
     this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
       const notice = params.get('notice');
       if (notice) {
-        this.notice.error(notice);
+        this.notice.error(this.locale.phrase(notice));
       }
     });
 

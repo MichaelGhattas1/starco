@@ -14,9 +14,9 @@ import { ServiceBooking } from '../shared/service-booking';
   imports: [RouterLink, ServiceBooking],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <a routerLink="/events" class="text-sm text-gold-300">All events</a>
+    <a routerLink="/events" class="text-sm text-gold-300">{{ locale.t('list.allEvents') }}</a>
     @if (loading()) {
-      <p class="mt-6" role="status">Loading event…</p>
+      <p class="mt-6" role="status">{{ locale.t('load.event') }}</p>
     } @else if (error()) {
       <p class="mt-6 text-red-200" role="alert">{{ error() }}</p>
     } @else if (item(); as event) {
@@ -28,7 +28,7 @@ import { ServiceBooking } from '../shared/service-booking';
           <p class="kicker">{{ locale.pick(event.location, event.locationAr) }}</p>
           <h1 class="font-display text-5xl leading-none">{{ label(event) }}</h1>
           <p>{{ fromApiDate(event.eventDate) }}@if (event.endDate) { – {{ fromApiDate(event.endDate) }} }</p>
-          <p>{{ event.totalTickets }} tickets</p>
+          <p>{{ locale.t('noun.tickets', { n: event.totalTickets }) }}</p>
           <p class="text-gold-300">{{ currency.display(event.ticketPrice) }}</p>
           <div class="rich-text text-gold-100/90" [innerHTML]="locale.pick(event.description, event.descriptionAr)"></div>
         </article>
@@ -66,6 +66,6 @@ export class EventDetailPage {
   }
 
   label(item: PlazaEvent): string {
-    return this.locale.pick(item.name, item.nameAr) || 'Event';
+    return this.locale.pick(item.name, item.nameAr) || this.locale.t('noun.event');
   }
 }

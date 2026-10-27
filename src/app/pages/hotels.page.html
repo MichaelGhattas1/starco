@@ -1,28 +1,28 @@
 <section class="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
   <div>
-    <p class="kicker">Reservations</p>
-    <h1 class="font-display text-5xl">Hotels</h1>
+    <p class="kicker">{{ locale.t('home.reservations') }}</p>
+    <h1 class="font-display text-5xl">{{ locale.t('nav.hotels') }}</h1>
   </div>
   <label class="grid w-full min-w-0 gap-1 text-sm md:max-w-xs">
-    Search
-    <input class="field" [value]="query()" (input)="onQuery($event)" placeholder="Name or city" />
+    {{ locale.t('field.search') }}
+    <input class="field" [value]="query()" (input)="onQuery($event)" [placeholder]="locale.t('field.nameOrCity')" />
   </label>
 </section>
 
 @if (city() || checkIn()) {
   <p class="mb-4 text-sm text-gold-300">
-    @if (city()) { City: {{ city() }} }
+    @if (city()) { {{ locale.t('noun.cityLine', { city: city() }) }} }
     @if (checkIn() && checkOut()) { · {{ checkIn() }} to {{ checkOut() }} }
-    @if (adults()) { · {{ adults() }} {{ adults() === '1' ? 'adult' : 'adults' }} }
+    @if (adults()) { · {{ adults() }} {{ adults() === '1' ? locale.t('field.adult') : locale.t('field.adultsWord') }} }
   </p>
 }
 
 @if (loading()) {
-  <p role="status">Loading hotels…</p>
+  <p role="status">{{ locale.t('load.hotels') }}</p>
 } @else if (error()) {
   <p class="panel p-4 text-red-200" role="alert">{{ error() }}</p>
 } @else if (!filtered().length) {
-  <p class="panel p-6">No hotels match this search.</p>
+  <p class="panel p-6">{{ locale.t('empty.hotelsSearch') }}</p>
 } @else {
   <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
     @for (hotel of filtered(); track hotel.id) {

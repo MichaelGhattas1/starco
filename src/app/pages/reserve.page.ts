@@ -9,16 +9,18 @@ import { LocaleService } from '../core/locale.service';
 @Component({
   selector: 'app-reserve-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<p role="status">Adding this stay to your cart…</p>`,
+  template: `<p role="status">{{ locale.t('load.cart') }}</p>`,
 })
 export class ReservePage {
+  readonly locale = inject(LocaleService);
+
   constructor() {
     inject(Title).setTitle('Cart · Plaza Inn');
     const route = inject(ActivatedRoute);
     const router = inject(Router);
     const api = inject(ApiService);
     const cart = inject(CartStore);
-    const locale = inject(LocaleService);
+    const locale = this.locale;
     const hotelId = route.snapshot.paramMap.get('hotelId') ?? '';
     const roomId = route.snapshot.paramMap.get('roomId') ?? '';
     const checkIn = route.snapshot.queryParamMap.get('checkIn') ?? '';
@@ -34,7 +36,7 @@ export class ReservePage {
 
     api.hotel(hotelId).subscribe({
       next: (hotel) => {
-        const hotelName = locale.pick(hotel.name, hotel.nameAr) || 'Hotel';
+        const hotelName = locale.pick(hotel.name, hotel.nameAr) || locale.t('noun.hotel');
         api.availability(hotelId, toApiDateTime(checkIn, 12), toApiDateTime(checkOut, 12)).subscribe({
           next: (rooms) => {
             const room = rooms.find((item) => item.encodedRoomId === roomId);
@@ -42,7 +44,7 @@ export class ReservePage {
               hotelId,
               hotelName,
               roomId,
-              roomName: locale.pick(room?.name, room?.nameAr) || 'Room',
+              roomName: locale.pick(room?.name, room?.nameAr) || locale.t('noun.room'),
               checkIn,
               checkOut,
               adults: guestCount,
@@ -56,7 +58,7 @@ export class ReservePage {
               hotelId,
               hotelName,
               roomId,
-              roomName: 'Room',
+              roomName: locale.t('noun.room'),
               checkIn,
               checkOut,
               adults: guestCount,

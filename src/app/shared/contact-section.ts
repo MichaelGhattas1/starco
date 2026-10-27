@@ -3,7 +3,8 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
 import { AuthService } from '../core/auth.service';
-import { ContactUs, WEEKDAYS } from '../core/models';
+import { LocaleService } from '../core/locale.service';
+import { ContactUs } from '../core/models';
 
 @Component({
   selector: 'app-contact-section',
@@ -14,6 +15,7 @@ import { ContactUs, WEEKDAYS } from '../core/models';
 export class ContactSection {
   private readonly api = inject(ApiService);
   private readonly auth = inject(AuthService);
+  readonly locale = inject(LocaleService);
 
   readonly page = input(false);
   readonly contact = signal<ContactUs | null>(null);
@@ -21,7 +23,6 @@ export class ContactSection {
   readonly error = signal<string | null>(null);
   readonly formError = signal<string | null>(null);
   readonly sent = signal<string | null>(null);
-  readonly weekdays = WEEKDAYS;
   readonly form = inject(FormBuilder).nonNullable.group({
     name: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
@@ -51,7 +52,9 @@ export class ContactSection {
   }
 
   day(index: number): string {
-    return this.weekdays[index] ?? 'Day';
+    const keys = ['day.0', 'day.1', 'day.2', 'day.3', 'day.4', 'day.5', 'day.6'] as const;
+    const key = keys[index];
+    return key ? this.locale.t(key) : this.locale.t('day.unknown');
   }
 
   link(label: string, value: string): string {
@@ -76,19 +79,19 @@ export class ContactSection {
     this.sent.set(null);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.formError.set('Enter your name, a valid email, and a message of at least 10 characters.');
+      this.formError.set(this.locale.t('contact.invalid'));
       return;
     }
     const desk = this.contact()?.email;
     if (!desk) {
-      this.formError.set('The desk email is not published yet.');
+      this.formError.set(this.locale.t('contact.noDesk'));
       return;
     }
     const value = this.form.getRawValue();
     const body = [value.message, '', value.name, value.email, value.phone].filter((line) => line.trim()).join('\n');
     const href = `mailto:${desk}?subject=${encodeURIComponent(`Plaza Inn message from ${value.name}`)}&body=${encodeURIComponent(body)}`;
     this.formError.set(null);
-    this.sent.set(`Your email app is opening with this message to ${desk}.`);
+    this.sent.set(this.locale.t('contact.sent', { email: desk }));
     window.location.href = href;
   }
 }
