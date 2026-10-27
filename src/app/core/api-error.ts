@@ -1,4 +1,16 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { I18N, I18nKey } from './i18n';
+
+function t(key: I18nKey, vars?: Record<string, string | number>): string {
+  const lang = typeof document !== 'undefined' && document.documentElement.lang === 'ar' ? 'ar' : 'en';
+  let text: string = I18N[key][lang];
+  if (vars) {
+    for (const [name, value] of Object.entries(vars)) {
+      text = text.replaceAll(`{${name}}`, String(value));
+    }
+  }
+  return text;
+}
 
 export function errorMessage(error: unknown): string {
   if (error instanceof HttpErrorResponse) {
@@ -31,15 +43,15 @@ export function errorMessage(error: unknown): string {
       }
     }
     if (error.status === 401) {
-      return 'Your session expired. Sign in again.';
+      return t('session.expired');
     }
     if (error.status === 403) {
-      return 'You do not have permission for this action.';
+      return t('session.forbidden');
     }
-    return error.status ? `Request failed (${error.status})` : 'Network error';
+    return error.status ? t('session.failed', { status: error.status }) : t('session.network');
   }
   if (error instanceof Error && error.message) {
     return error.message;
   }
-  return 'Something went wrong';
+  return t('session.wrong');
 }

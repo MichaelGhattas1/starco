@@ -11,40 +11,30 @@ import { NoticeService } from '../core/notice.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mb-5">
-      <p class="kicker">Desk</p>
-      <h1 class="font-display text-5xl">Currency settings</h1>
-      @if (locale.isAr()) {
-        <p class="mt-2 max-w-2xl text-sm text-gold-200/80">
-          العملة المختارة تغيّر عرض الأسعار في هذا المتصفح فقط. بلازا لا يحفظ عملة للموقع.
-          أسعار الغرف والرحلات والمبالغ المرسلة إلى الدفع تبقى بالجنيه المصري. الدولار واليورو للعرض بعد تحويل سعر اليوم، وليسا مبلغ الدفع.
-        </p>
-      } @else {
-        <p class="mt-2 max-w-2xl text-sm text-gold-200/80">
-          The selected currency changes how catalog prices are shown in this browser. Plaza does not store a site-wide currency.
-          Room, trip, and Paymob amounts stay in Egyptian pounds. USD and EUR figures are converted for display from the latest rate and are not the payment amount.
-        </p>
-      }
+      <p class="kicker">{{ locale.t('admin.desk') }}</p>
+      <h1 class="font-display text-5xl">{{ locale.t('fx.adminTitle') }}</h1>
+      <p class="mt-2 max-w-2xl text-sm text-gold-200/80">{{ locale.t('fx.adminLead') }}</p>
     </div>
 
     <section class="panel grid max-w-xl gap-4 p-5">
       <p>
-        <span class="kicker">Active display</span>
+        <span class="kicker">{{ locale.t('fx.activeDisplay') }}</span>
         <span class="mt-1 block font-display text-3xl">{{ currency.label(currency.applied()) }}</span>
       </p>
       @if (currency.ratesLoading()) {
-        <p role="status">Loading exchange rates…</p>
+        <p role="status">{{ locale.t('fx.loadingRates') }}</p>
       } @else if (currency.rateDate()) {
-        <p class="text-sm text-gold-200/80">Rates updated {{ currency.rateDate() }}. Base currency is {{ currency.base }}.</p>
+        <p class="text-sm text-gold-200/80">{{ locale.t('fx.updated', { date: currency.rateDate() || '', code: currency.base }) }}</p>
       }
       @if (currency.rateError()) {
         <p class="text-red-200" role="alert">{{ currency.rateError() }}</p>
         <button type="button" class="btn btn-line w-fit" [disabled]="currency.ratesLoading()" (click)="currency.refreshRates()">
-          Try rates again
+          {{ locale.t('action.tryRates') }}
         </button>
       }
       <form class="grid gap-4" [formGroup]="form" (ngSubmit)="save()">
         <label class="field">
-          Website currency
+          {{ locale.t('field.websiteCurrency') }}
           <select formControlName="currency">
             @for (option of currency.options; track option.code) {
               <option [value]="option.code">{{ currency.label(option.code) }}</option>
@@ -52,7 +42,7 @@ import { NoticeService } from '../core/notice.service';
           </select>
         </label>
         <button class="btn btn-gold w-fit" type="submit" [disabled]="saving()">
-          {{ saving() ? 'Saving…' : 'Save changes' }}
+          {{ saving() ? locale.t('action.saving') : locale.t('action.saveChanges') }}
         </button>
       </form>
     </section>
@@ -80,6 +70,6 @@ export class CurrencyAdminPage {
       this.notice.error(problem);
       return;
     }
-    this.notice.success(`${this.currency.label(code)} is the display currency in this browser.`);
+    this.notice.success(this.locale.t('fx.displaySet', { label: this.currency.label(code) }));
   }
 }

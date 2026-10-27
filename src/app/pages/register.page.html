@@ -1,14 +1,14 @@
 <section class="panel mx-auto grid max-w-md gap-4 p-6">
-  <p class="kicker">Account</p>
-  <h1 class="font-display text-5xl">Register</h1>
-  <p class="text-sm text-gold-200/80">An account is required before you can reserve a room.</p>
+  <p class="kicker">{{ locale.t('auth.account') }}</p>
+  <h1 class="font-display text-5xl">{{ locale.t('auth.register') }}</h1>
+  <p class="text-sm text-gold-200/80">{{ locale.t('auth.registerLead') }}</p>
   <form class="grid gap-4" [formGroup]="form" (ngSubmit)="submit()">
-    <label class="grid gap-1 text-sm">Name<input class="field" formControlName="userName" autocomplete="name" /></label>
-    <label class="grid gap-1 text-sm">Email<input class="field" type="email" formControlName="email" autocomplete="email" /></label>
-    <label class="grid gap-1 text-sm">Password<input class="field" type="password" formControlName="password" autocomplete="new-password" /></label>
-    <label class="grid gap-1 text-sm">Confirm password<input class="field" type="password" formControlName="passwordConfirm" autocomplete="new-password" /></label>
+    <label class="grid gap-1 text-sm">{{ locale.t('field.name') }}<input class="field" formControlName="userName" autocomplete="name" /></label>
+    <label class="grid gap-1 text-sm">{{ locale.t('field.email') }}<input class="field" type="email" formControlName="email" autocomplete="email" /></label>
+    <label class="grid gap-1 text-sm">{{ locale.t('field.password') }}<input class="field" type="password" formControlName="password" autocomplete="new-password" /></label>
+    <label class="grid gap-1 text-sm">{{ locale.t('field.confirmPassword') }}<input class="field" type="password" formControlName="passwordConfirm" autocomplete="new-password" /></label>
     @if (error()) { <p class="text-red-200" role="alert">{{ error() }}</p> }
-    <button class="btn btn-gold" type="submit" [disabled]="saving()">Create account</button>
+    <button class="btn btn-gold" type="submit" [disabled]="saving()">{{ locale.t('action.createAccount') }}</button>
   </form>
-  <a class="text-sm underline" routerLink="/login" [queryParams]="accountQuery()">Already registered</a>
+  <a class="text-sm underline" routerLink="/login" [queryParams]="accountQuery()">{{ locale.t('action.alreadyRegistered') }}</a>
 </section>

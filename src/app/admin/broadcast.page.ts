@@ -63,7 +63,7 @@ export class BroadcastPage {
   }
 
   hotelLabel(hotel: HotelLookup): string {
-    return this.locale.pick(hotel.name, hotel.nameAr) || 'Hotel';
+    return this.locale.pick(hotel.name, hotel.nameAr) || this.locale.t('noun.hotel');
   }
 
   recipients(): Partner[] {

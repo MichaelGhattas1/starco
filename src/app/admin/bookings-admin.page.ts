@@ -8,6 +8,8 @@ import { CurrencyService } from '../core/currency.service';
 import { hotelBaseFromTotal, isHotelBooking } from '../core/hotel-charges';
 import { fromApiDateTime, toApiDateTime } from '../core/media';
 import { BookingResult, BookingStatus, BookingType, HotelLookup, bookingStatusLabel, bookingTypeLabel, pairedName } from '../core/models';
+import { I18nKey } from '../core/i18n';
+import { LocaleService } from '../core/locale.service';
 import { NoticeService } from '../core/notice.service';
 import { HotelPrice } from '../shared/hotel-price';
 
@@ -17,14 +19,14 @@ import { HotelPrice } from '../shared/hotel-price';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mb-5">
-      <p class="kicker">Desk</p>
-      <h1 class="font-display text-5xl">Bookings</h1>
+      <p class="kicker">{{ locale.t('admin.desk') }}</p>
+      <h1 class="font-display text-5xl">{{ locale.t('nav.bookings') }}</h1>
     </div>
     <form class="panel filters filters-3 mb-6 p-4" [formGroup]="form" (ngSubmit)="load()">
       <label class="field">
-        Hotel
+        {{ locale.t('field.hotel') }}
         <select formControlName="hotelId">
-          <option value="">Any hotel</option>
+          <option value="">{{ locale.t('list.anyHotel') }}</option>
           @for (hotel of hotels(); track hotel.id) {
             <option [value]="hotel.id">{{ hotelLabel(hotel) }}</option>
           }
@@ -34,41 +36,41 @@ import { HotelPrice } from '../shared/hotel-price';
         <p class="span-all text-sm text-red-200" role="alert">{{ hotelsError() }}</p>
       }
       <label class="field">
-        Type
+        {{ locale.t('field.type') }}
         <select formControlName="bookingType">
-          <option value="">Any</option>
+          <option value="">{{ locale.t('field.any') }}</option>
           @for (option of types; track option.value) {
-            <option [value]="option.value">{{ option.label }}</option>
+            <option [value]="option.value">{{ locale.t(option.key) }}</option>
           }
         </select>
       </label>
       <label class="field">
-        Status
+        {{ locale.t('field.status') }}
         <select formControlName="status">
-          <option value="">Any</option>
+          <option value="">{{ locale.t('field.any') }}</option>
           @for (option of statuses; track option.value) {
-            <option [value]="option.value">{{ option.label }}</option>
+            <option [value]="option.value">{{ locale.t(option.key) }}</option>
           }
         </select>
       </label>
-      <label class="field">From <input type="date" formControlName="from" /></label>
-      <label class="field">To <input type="date" formControlName="to" /></label>
-      <button class="btn btn-gold self-end" type="submit">Filter</button>
+      <label class="field">{{ locale.t('field.from') }} <input type="date" formControlName="from" /></label>
+      <label class="field">{{ locale.t('field.to') }} <input type="date" formControlName="to" /></label>
+      <button class="btn btn-gold self-end" type="submit">{{ locale.t('action.filter') }}</button>
     </form>
     @if (loading()) {
-      <p role="status">Loading bookings…</p>
+      <p role="status">{{ locale.t('load.bookings') }}</p>
     } @else if (error()) {
       <p class="text-red-200" role="alert">{{ error() }}</p>
     } @else if (!items().length) {
-      <p>No bookings match this filter.</p>
+      <p>{{ locale.t('empty.bookings') }}</p>
     } @else {
       <div class="grid gap-3">
         @for (item of items(); track item.encodedId) {
           <article class="panel grid gap-3 p-4">
             <div class="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p class="kicker">{{ typeLabel(item.bookingType) }} · {{ statusLabel(item.status) }}</p>
-                <h2 class="font-display text-3xl">{{ item.customerName || 'Booking' }}</h2>
+                <p class="kicker">{{ locale.label(typeLabel(item.bookingType)) }} · {{ locale.label(statusLabel(item.status)) }}</p>
+                <h2 class="font-display text-3xl">{{ item.customerName || locale.t('noun.booking') }}</h2>
                 <p class="text-sm text-gold-200/80">{{ stayTitle(item) }}</p>
               </div>
               <div class="w-full max-w-md sm:ms-auto">
@@ -77,49 +79,49 @@ import { HotelPrice } from '../shared/hotel-price';
                 } @else {
                   <span class="block text-end font-display text-2xl">{{ money(item.totalPrice) }}</span>
                 }
-                <span class="mt-1 block text-end text-sm">{{ item.isPaid ? 'Paid' : 'Unpaid' }}</span>
+                <span class="mt-1 block text-end text-sm">{{ item.isPaid ? locale.t('pay.paid') : locale.t('pay.unpaid') }}</span>
               </div>
             </div>
             <dl class="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
               <div>
-                <dt class="text-gold-200/70">Email</dt>
+                <dt class="text-gold-200/70">{{ locale.t('field.email') }}</dt>
                 <dd>{{ item.customerEmail || '—' }}</dd>
               </div>
               <div>
-                <dt class="text-gold-200/70">Phone</dt>
+                <dt class="text-gold-200/70">{{ locale.t('field.phone') }}</dt>
                 <dd>{{ item.customerPhone || '—' }}</dd>
               </div>
               <div>
-                <dt class="text-gold-200/70">Booked</dt>
+                <dt class="text-gold-200/70">{{ locale.t('book.booked') }}</dt>
                 <dd>{{ when(item.createdAt) || '—' }}</dd>
               </div>
               <div>
-                <dt class="text-gold-200/70">Check-in</dt>
+                <dt class="text-gold-200/70">{{ locale.t('field.checkIn') }}</dt>
                 <dd>{{ when(item.checkIn) || '—' }}</dd>
               </div>
               <div>
-                <dt class="text-gold-200/70">Check-out</dt>
+                <dt class="text-gold-200/70">{{ locale.t('field.checkOut') }}</dt>
                 <dd>{{ when(item.checkOut) || '—' }}</dd>
               </div>
               <div>
-                <dt class="text-gold-200/70">Service date</dt>
+                <dt class="text-gold-200/70">{{ locale.t('book.serviceDate') }}</dt>
                 <dd>{{ when(item.serviceDate) || '—' }}</dd>
               </div>
               <div class="sm:col-span-2 lg:col-span-3">
-                <dt class="text-gold-200/70">Party</dt>
+                <dt class="text-gold-200/70">{{ locale.t('book.party') }}</dt>
                 <dd>{{ party(item) }}</dd>
               </div>
               @if (item.paymentReference) {
                 <div class="sm:col-span-2 lg:col-span-3">
-                  <dt class="text-gold-200/70">Payment reference</dt>
+                  <dt class="text-gold-200/70">{{ locale.t('field.paymentRef') }}</dt>
                   <dd class="break-all">{{ item.paymentReference }}</dd>
                 </div>
               }
             </dl>
             @if (item.encodedId) {
               <div class="flex flex-wrap gap-2">
-                <a class="btn btn-line w-fit" [routerLink]="['/admin/bookings', item.encodedId]">View</a>
-                <button type="button" class="btn btn-danger w-fit" [disabled]="busy()" (click)="cancel(item)">Cancel</button>
+                <a class="btn btn-line w-fit" [routerLink]="['/admin/bookings', item.encodedId]">{{ locale.t('action.view') }}</a>
+                <button type="button" class="btn btn-danger w-fit" [disabled]="busy()" (click)="cancel(item)">{{ locale.t('action.cancel') }}</button>
               </div>
             }
           </article>
@@ -132,6 +134,7 @@ export class BookingsAdminPage {
   private readonly api = inject(ApiService);
   private readonly notice = inject(NoticeService);
   private readonly currency = inject(CurrencyService);
+  readonly locale = inject(LocaleService);
   readonly money = (value: number | null | undefined) => this.currency.charge(value);
   readonly when = fromApiDateTime;
   readonly typeLabel = bookingTypeLabel;
@@ -142,17 +145,17 @@ export class BookingsAdminPage {
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly busy = signal(false);
-  readonly types = [
-    { value: BookingType.Hotel, label: 'Hotel' },
-    { value: BookingType.Trip, label: 'Trip' },
-    { value: BookingType.Transport, label: 'Transport' },
-    { value: BookingType.Event, label: 'Event' },
-    { value: BookingType.Package, label: 'Package' },
+  readonly types: { value: BookingType; key: I18nKey }[] = [
+    { value: BookingType.Hotel, key: 'noun.hotel' },
+    { value: BookingType.Trip, key: 'noun.trip' },
+    { value: BookingType.Transport, key: 'noun.transport' },
+    { value: BookingType.Event, key: 'noun.event' },
+    { value: BookingType.Package, key: 'noun.package' },
   ];
   readonly statuses = [
-    { value: BookingStatus.Pending, label: 'Pending' },
-    { value: BookingStatus.Confirmed, label: 'Confirmed' },
-    { value: BookingStatus.Cancelled, label: 'Cancelled' },
+    { value: BookingStatus.Pending, key: 'pay.pending' as const },
+    { value: BookingStatus.Confirmed, key: 'pay.confirmed' as const },
+    { value: BookingStatus.Cancelled, key: 'pay.cancelled' as const },
   ];
   readonly form = inject(FormBuilder).nonNullable.group({
     hotelId: '',
@@ -189,7 +192,7 @@ export class BookingsAdminPage {
     if (place && reserved && !place.includes(reserved)) {
       return `${place} · ${reserved}`;
     }
-    return place || reserved || 'Reservation';
+    return place || reserved || this.locale.t('noun.reservation');
   }
 
   party(item: BookingResult): string {
@@ -197,13 +200,13 @@ export class BookingsAdminPage {
     const children = item.children ?? 0;
     const rooms = item.roomsBooked ?? 0;
     const parts = [
-      `${adults} ${adults === 1 ? 'adult' : 'adults'}`,
-      `${children} ${children === 1 ? 'child' : 'children'}`,
-      `${rooms} ${rooms === 1 ? 'room' : 'rooms'}`,
-      item.extraBed ? 'Extra bed' : 'No extra bed',
+      `${adults} ${adults === 1 ? this.locale.t('field.adult') : this.locale.t('field.adultsWord')}`,
+      `${children} ${children === 1 ? this.locale.t('field.child') : this.locale.t('field.childrenWord')}`,
+      `${rooms} ${rooms === 1 ? this.locale.t('noun.roomWord') : this.locale.t('noun.roomsWord')}`,
+      item.extraBed ? this.locale.t('book.extraBed') : this.locale.t('book.noExtraBed'),
     ];
     if (item.quantity != null) {
-      parts.push(`Qty ${item.quantity}`);
+      parts.push(this.locale.t('book.qty', { n: item.quantity }));
     }
     return parts.join(' · ');
   }
@@ -240,14 +243,14 @@ export class BookingsAdminPage {
 
   cancel(item: BookingResult): void {
     const id = item.encodedId;
-    if (!id || !confirm('Cancel this booking?')) {
+    if (!id || !confirm(this.locale.t('book.cancelAsk'))) {
       return;
     }
     this.busy.set(true);
     this.api.cancelBooking(id).subscribe({
       next: () => {
         this.busy.set(false);
-        this.notice.success('Booking cancelled.');
+        this.notice.success(this.locale.t('book.cancelled'));
         this.load();
       },
       error: (error) => {

@@ -3,30 +3,30 @@
     <a routerLink="/" class="logo-mark" aria-label="Starco">
       <img src="assets/logo.png" alt="" />
     </a>
-    <p class="kicker mt-4">Admin</p>
-    <p class="mt-2 font-display text-3xl">{{ auth.name() || 'Plaza desk' }}</p>
+    <p class="kicker mt-4">{{ locale.t('nav.admin') }}</p>
+    <p class="mt-2 font-display text-3xl">{{ auth.name() || locale.t('admin.desk') }}</p>
     <p class="text-sm text-gold-300">{{ roleLabel() }}</p>
     <nav class="admin-nav mt-4 text-sm">
-      <a routerLink="/admin" routerLinkActive="bg-gold-400/15" [routerLinkActiveOptions]="{ exact: true }" class="rounded-xl px-3 py-2">Dashboard</a>
-      <a routerLink="/admin/currency" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Currency</a>
-      <a routerLink="/admin/hotels" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Hotels</a>
-      <a routerLink="/admin/rooms" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Rooms</a>
-      <a routerLink="/admin/insight" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Dining</a>
-      <a routerLink="/admin/sliders" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Homepage</a>
-      <a routerLink="/admin/about" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">About</a>
-      <a routerLink="/admin/contact" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Contact</a>
-      <a routerLink="/admin/partners" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Partners</a>
-      <a routerLink="/admin/broadcast" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Broadcast</a>
-      <a routerLink="/admin/users" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Users</a>
-      <a routerLink="/admin/trips" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Trips</a>
-      <a routerLink="/admin/transport" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Transport</a>
-      <a routerLink="/admin/events" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Events</a>
-      <a routerLink="/admin/packages" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Packages</a>
-      <a routerLink="/admin/bookings" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Bookings</a>
-      <a routerLink="/admin/section-images" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">Section photos</a>
+      <a routerLink="/admin" routerLinkActive="bg-gold-400/15" [routerLinkActiveOptions]="{ exact: true }" class="rounded-xl px-3 py-2">{{ locale.t('admin.dashboard') }}</a>
+      <a routerLink="/admin/currency" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">{{ locale.t('admin.currency') }}</a>
+      <a routerLink="/admin/hotels" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">{{ locale.t('nav.hotels') }}</a>
+      <a routerLink="/admin/rooms" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">{{ locale.t('admin.rooms') }}</a>
+      <a routerLink="/admin/insight" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">{{ locale.t('admin.dining') }}</a>
+      <a routerLink="/admin/sliders" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">{{ locale.t('admin.homepage') }}</a>
+      <a routerLink="/admin/about" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">{{ locale.t('nav.about') }}</a>
+      <a routerLink="/admin/contact" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">{{ locale.t('nav.contact') }}</a>
+      <a routerLink="/admin/partners" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">{{ locale.t('admin.partners') }}</a>
+      <a routerLink="/admin/broadcast" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">{{ locale.t('admin.broadcast') }}</a>
+      <a routerLink="/admin/users" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">{{ locale.t('admin.users') }}</a>
+      <a routerLink="/admin/trips" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">{{ locale.t('nav.trips') }}</a>
+      <a routerLink="/admin/transport" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">{{ locale.t('nav.transport') }}</a>
+      <a routerLink="/admin/events" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">{{ locale.t('nav.events') }}</a>
+      <a routerLink="/admin/packages" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">{{ locale.t('home.packages') }}</a>
+      <a routerLink="/admin/bookings" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">{{ locale.t('nav.bookings') }}</a>
+      <a routerLink="/admin/section-images" routerLinkActive="bg-gold-400/15" class="rounded-xl px-3 py-2">{{ locale.t('admin.sectionPhotos') }}</a>
     </nav>
-    <a routerLink="/" class="btn btn-line mt-4 w-full">View site</a>
-    <button type="button" class="btn btn-danger mt-2 w-full" (click)="logout()">Sign out</button>
+    <a routerLink="/" class="btn btn-line mt-4 w-full">{{ locale.t('admin.viewSite') }}</a>
+    <button type="button" class="btn btn-danger mt-2 w-full" (click)="logout()">{{ locale.t('nav.signOut') }}</button>
   </aside>
   <section>
     <router-outlet />

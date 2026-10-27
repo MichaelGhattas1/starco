@@ -16,31 +16,31 @@ import { plainText } from '../shared/plain-text';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mb-6">
-      <p class="kicker">Offers</p>
-      <h1 class="font-display text-5xl">Packages</h1>
+      <p class="kicker">{{ locale.t('home.offers') }}</p>
+      <h1 class="font-display text-5xl">{{ locale.t('home.packages') }}</h1>
     </div>
     <form class="panel filters filters-3 mb-6 p-4" [formGroup]="form" (ngSubmit)="load()">
-      <label class="field">Search <input formControlName="Search" /></label>
-      <label class="field">Date <input type="date" formControlName="Date" /></label>
-      <label class="field">Days <input type="number" min="1" max="365" formControlName="DurationDays" /></label>
-      <label class="field">Min price ({{ currency.base }}) <input type="number" min="0" step="0.01" formControlName="MinPrice" /></label>
-      <label class="field">Max price ({{ currency.base }}) <input type="number" min="0" step="0.01" formControlName="MaxPrice" /></label>
+      <label class="field">{{ locale.t('field.search') }} <input formControlName="Search" /></label>
+      <label class="field">{{ locale.t('field.date') }} <input type="date" formControlName="Date" /></label>
+      <label class="field">{{ locale.t('field.days') }} <input type="number" min="1" max="365" formControlName="DurationDays" /></label>
+      <label class="field">{{ locale.t('field.minPrice', { code: currency.base }) }} <input type="number" min="0" step="0.01" formControlName="MinPrice" /></label>
+      <label class="field">{{ locale.t('field.maxPrice', { code: currency.base }) }} <input type="number" min="0" step="0.01" formControlName="MaxPrice" /></label>
       <label class="field">
-        Hotel
+        {{ locale.t('field.hotel') }}
         <select formControlName="IncludesHotel">
-          <option value="">Any</option>
-          <option value="true">Includes a hotel</option>
-          <option value="false">No hotel</option>
+          <option value="">{{ locale.t('field.any') }}</option>
+          <option value="true">{{ locale.t('list.includesHotel') }}</option>
+          <option value="false">{{ locale.t('list.noHotel') }}</option>
         </select>
       </label>
-      <button class="btn btn-gold" type="submit">Search</button>
+      <button class="btn btn-gold" type="submit">{{ locale.t('action.search') }}</button>
     </form>
     @if (loading()) {
-      <p role="status">Loading packages…</p>
+      <p role="status">{{ locale.t('load.packages') }}</p>
     } @else if (error()) {
       <p class="text-red-200" role="alert">{{ error() }}</p>
     } @else if (!items().length) {
-      <p>No packages match this search.</p>
+      <p>{{ locale.t('empty.packagesSearch') }}</p>
     } @else {
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         @for (item of items(); track item.id) {
@@ -83,7 +83,7 @@ export class PackagesPage {
   }
 
   label(item: TravelPackage): string {
-    return this.locale.pick(item.name, item.nameAr) || 'Package';
+    return this.locale.pick(item.name, item.nameAr) || this.locale.t('noun.package');
   }
 
   load(): void {

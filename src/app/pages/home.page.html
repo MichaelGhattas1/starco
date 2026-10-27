@@ -2,16 +2,16 @@
   <div class="grid lg:grid-cols-[1.35fr_0.65fr]">
     <div class="relative min-h-80 sm:min-h-[28rem] lg:min-h-[32rem]">
       @if (heroImage()) {
-        <img [src]="heroImage()" [alt]="slide()?.tittle || 'Plaza Inn'" class="absolute inset-0 h-full w-full object-cover" />
+        <img [src]="heroImage()" [alt]="slide()?.tittle || locale.t('brand.plaza')" class="absolute inset-0 h-full w-full object-cover" />
       }
       <div class="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/55 to-navy-950/10"></div>
       <div class="relative flex h-full min-h-80 flex-col justify-end gap-5 p-5 sm:min-h-[28rem] sm:p-8 lg:min-h-[32rem] lg:p-10">
-        <p class="kicker">Navy nights, gold service</p>
+        <p class="kicker">{{ locale.t('home.kicker') }}</p>
         <h1 class="max-w-xl font-display text-4xl leading-[0.95] sm:text-6xl lg:text-7xl">
-          {{ slide()?.tittle || 'Stay with Plaza Inn' }}
+          {{ slide()?.tittle || locale.t('home.stay') }}
         </h1>
         <p class="max-w-lg text-lg text-gold-100/90">
-          {{ slide()?.subTittle || 'Reserve a room, review the price, and continue to Paymob.' }}
+          {{ slide()?.subTittle || locale.t('home.reserve') }}
         </p>
         <div class="flex flex-wrap items-center gap-3">
           @if (slide()?.buttonText) {
@@ -21,17 +21,17 @@
               <a class="btn btn-gold" [routerLink]="slide()?.buttonLink || '/hotels'">{{ slide()?.buttonText }}</a>
             }
           } @else {
-            <a class="btn btn-gold" routerLink="/hotels">Browse hotels</a>
+            <a class="btn btn-gold" routerLink="/hotels">{{ locale.t('action.browseHotels') }}</a>
           }
           @if (sliders().length > 1) {
             <div class="ms-auto flex items-center gap-2">
-              <button type="button" class="grid h-11 w-11 place-items-center rounded-full border border-gold-200/50 text-2xl leading-none text-gold-100" (click)="previous()" aria-label="Previous slide">‹</button>
-              <button type="button" class="grid h-11 w-11 place-items-center rounded-full border border-gold-200/50 text-2xl leading-none text-gold-100" (click)="next()" aria-label="Next slide">›</button>
+              <button type="button" class="grid h-11 w-11 place-items-center rounded-full border border-gold-200/50 text-2xl leading-none text-gold-100" (click)="previous()" [attr.aria-label]="locale.t('action.prevSlide')">‹</button>
+              <button type="button" class="grid h-11 w-11 place-items-center rounded-full border border-gold-200/50 text-2xl leading-none text-gold-100" (click)="next()" [attr.aria-label]="locale.t('action.nextSlide')">›</button>
             </div>
           }
         </div>
         @if (sliders().length > 1) {
-          <div class="flex gap-2" role="tablist" aria-label="Homepage slides">
+          <div class="flex gap-2" role="tablist" [attr.aria-label]="locale.t('action.slides')">
             @for (item of sliders(); track item.id; let index = $index) {
               <button
                 type="button"
@@ -40,7 +40,7 @@
                 [class.bg-gold-400]="slideIndex() === index"
                 [class.w-3]="slideIndex() !== index"
                 (click)="go(index)"
-                [attr.aria-label]="'Show slide ' + (index + 1)"
+                [attr.aria-label]="locale.t('action.showSlide', { n: index + 1 })"
                 [attr.aria-current]="slideIndex() === index ? 'true' : null"
               ></button>
             }
@@ -49,30 +49,30 @@
       </div>
     </div>
     <form class="grid content-center gap-4 border-t border-gold-300/15 p-6 md:p-8 lg:border-s lg:border-t-0" [formGroup]="form" (ngSubmit)="search()">
-      <p class="kicker">Find a room</p>
-      <h2 class="font-display text-4xl leading-none">Plan the stay</h2>
+      <p class="kicker">{{ locale.t('home.findRoom') }}</p>
+      <h2 class="font-display text-4xl leading-none">{{ locale.t('home.plan') }}</h2>
       <label class="grid gap-1 text-sm">
-        City
-        <input class="field" formControlName="city" placeholder="Cairo" />
+        {{ locale.t('field.city') }}
+        <input class="field" formControlName="city" [placeholder]="locale.t('field.cairo')" />
       </label>
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
         <label class="grid gap-1 text-sm">
-          Check in
+          {{ locale.t('field.checkIn') }}
           <input class="field" type="date" formControlName="checkIn" [min]="today" />
         </label>
         <label class="grid gap-1 text-sm">
-          Check out
+          {{ locale.t('field.checkOut') }}
           <input class="field" type="date" formControlName="checkOut" [min]="minCheckOut()" />
         </label>
       </div>
       <label class="grid gap-1 text-sm">
-        Adults
+        {{ locale.t('field.adults') }}
         <input class="field" type="number" min="1" max="20" step="1" formControlName="adults" />
       </label>
       @if (searchError()) {
         <p class="text-red-200" role="alert">{{ searchError() }}</p>
       }
-      <button class="btn btn-gold" type="submit">Search hotels</button>
+      <button class="btn btn-gold" type="submit">{{ locale.t('action.searchHotels') }}</button>
     </form>
   </div>
 </section>
@@ -80,20 +80,20 @@
 @if (about(); as page) {
   <section class="mt-16 grid items-start gap-10 lg:grid-cols-2">
     <div>
-      <p class="kicker">Our story</p>
-      <h2 class="mt-2 font-display text-5xl leading-none md:text-6xl">{{ page.tittle || 'About Plaza Inn' }}</h2>
+      <p class="kicker">{{ locale.t('home.story') }}</p>
+      <h2 class="mt-2 font-display text-5xl leading-none md:text-6xl">{{ page.tittle || locale.t('home.aboutFallback') }}</h2>
       @if (page.subTittle) {
         <p class="mt-4 text-xl text-gold-300">{{ page.subTittle }}</p>
       }
       @if (page.description) {
         <p class="mt-4 max-w-xl text-gold-100/90">{{ page.description }}</p>
       }
-      <a routerLink="/about" class="btn btn-line mt-6">Read the story</a>
+      <a routerLink="/about" class="btn btn-line mt-6">{{ locale.t('action.readStory') }}</a>
     </div>
     <div class="relative mx-auto aspect-[4/3] w-full max-w-xl">
       @if (image(page.square1ImageId); as src) {
         <div class="absolute start-0 top-0 h-[78%] w-[72%] overflow-hidden rounded-[2rem]">
-          <img [src]="src" [alt]="page.tittle || 'Plaza Inn'" class="h-full w-full object-cover" />
+          <img [src]="src" [alt]="page.tittle || locale.t('brand.plaza')" class="h-full w-full object-cover" />
         </div>
       }
       @if (image(page.square2ImageId); as src) {
@@ -131,24 +131,24 @@
 <section id="packages" class="mt-16">
   <div class="section-head">
     <div>
-      <p class="kicker">Packages</p>
-      <h2 class="font-display text-5xl leading-none">Offers</h2>
+      <p class="kicker">{{ locale.t('home.packages') }}</p>
+      <h2 class="font-display text-5xl leading-none">{{ locale.t('home.offers') }}</h2>
     </div>
-    <a routerLink="/packages" class="btn btn-line">See all</a>
+    <a routerLink="/packages" class="btn btn-line">{{ locale.t('action.seeAll') }}</a>
   </div>
   @if (loading()) {
-    <p role="status">Loading offers…</p>
+    <p role="status">{{ locale.t('load.offers') }}</p>
   } @else if (offersError()) {
     <p class="panel p-4 text-red-200" role="alert">{{ offersError() }}</p>
   } @else if (!offers().length) {
-    <p>No offers are listed yet.</p>
+    <p>{{ locale.t('empty.offers') }}</p>
   } @else {
     <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       @for (item of offers(); track item.id) {
         @if (item.id) {
           <app-catalog-card
-            [title]="locale.pick(item.name, item.nameAr) || 'Offer'"
-            [kicker]="item.durationDays + ' days'"
+            [title]="locale.pick(item.name, item.nameAr) || locale.t('noun.offer')"
+            [kicker]="locale.t('noun.days', { n: item.durationDays })"
             [summary]="plain(locale.pick(item.description, item.descriptionAr))"
             [price]="currency.display(item.packagePrice)"
             [image]="firstImage(item.images)"
@@ -164,13 +164,13 @@
 <section class="mt-16">
   <div class="section-head">
     <div>
-      <p class="kicker">Collection</p>
-      <h2 class="font-display text-5xl leading-none">Hotels</h2>
+      <p class="kicker">{{ locale.t('home.collection') }}</p>
+      <h2 class="font-display text-5xl leading-none">{{ locale.t('nav.hotels') }}</h2>
     </div>
-    <a routerLink="/hotels" class="btn btn-line">See all</a>
+    <a routerLink="/hotels" class="btn btn-line">{{ locale.t('action.seeAll') }}</a>
   </div>
   @if (loading()) {
-    <p role="status">Loading hotels…</p>
+    <p role="status">{{ locale.t('load.hotels') }}</p>
   } @else if (error()) {
     <p class="panel p-4 text-red-200" role="alert">{{ error() }}</p>
   } @else {
@@ -185,23 +185,23 @@
 <section class="mt-16">
   <div class="section-head">
     <div>
-      <p class="kicker">Departures</p>
-      <h2 class="font-display text-5xl leading-none">Trips</h2>
+      <p class="kicker">{{ locale.t('home.departures') }}</p>
+      <h2 class="font-display text-5xl leading-none">{{ locale.t('nav.trips') }}</h2>
     </div>
-    <a routerLink="/trips" class="btn btn-line">See all</a>
+    <a routerLink="/trips" class="btn btn-line">{{ locale.t('action.seeAll') }}</a>
   </div>
   @if (loading()) {
-    <p role="status">Loading trips…</p>
+    <p role="status">{{ locale.t('load.trips') }}</p>
   } @else if (tripsError()) {
     <p class="panel p-4 text-red-200" role="alert">{{ tripsError() }}</p>
   } @else if (!trips().length) {
-    <p>No trips are listed yet.</p>
+    <p>{{ locale.t('empty.trips') }}</p>
   } @else {
     <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       @for (trip of trips(); track trip.id) {
         @if (trip.id) {
           <app-catalog-card
-            [title]="locale.pick(trip.name, trip.nameAr) || 'Trip'"
+            [title]="locale.pick(trip.name, trip.nameAr) || locale.t('noun.trip')"
             [kicker]="locale.pick(trip.city, trip.cityAr)"
             [summary]="plain(locale.pick(trip.description, trip.descriptionAr))"
             [price]="currency.display(trip.pricePerPerson) + ' ' + currency.per('person')"
@@ -217,23 +217,23 @@
 <section class="mt-16">
   <div class="section-head">
     <div>
-      <p class="kicker">Transfers</p>
-      <h2 class="font-display text-5xl leading-none">Transport</h2>
+      <p class="kicker">{{ locale.t('home.transfers') }}</p>
+      <h2 class="font-display text-5xl leading-none">{{ locale.t('nav.transport') }}</h2>
     </div>
-    <a routerLink="/transport" class="btn btn-line">See all</a>
+    <a routerLink="/transport" class="btn btn-line">{{ locale.t('action.seeAll') }}</a>
   </div>
   @if (loading()) {
-    <p role="status">Loading transport…</p>
+    <p role="status">{{ locale.t('load.transport') }}</p>
   } @else if (transportError()) {
     <p class="panel p-4 text-red-200" role="alert">{{ transportError() }}</p>
   } @else if (!transports().length) {
-    <p>No transport is listed yet.</p>
+    <p>{{ locale.t('empty.transport') }}</p>
   } @else {
     <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       @for (item of transports(); track item.id) {
         @if (item.id) {
           <app-catalog-card
-            [title]="locale.pick(item.name, item.nameAr) || 'Transport'"
+            [title]="locale.pick(item.name, item.nameAr) || locale.t('noun.transport')"
             [kicker]="locale.pick(item.vehicleType, item.vehicleTypeAr)"
             [summary]="plain(locale.pick(item.description, item.descriptionAr))"
             [price]="currency.display(item.pricePerTrip) + ' ' + currency.per('trip')"

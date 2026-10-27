@@ -29,8 +29,8 @@ import { firstImage } from '../core/media';
         </h3>
         <p class="line-clamp-3 text-sm text-gold-200/80">{{ summary() }}</p>
         <div class="mt-auto flex items-center justify-between gap-3 pt-2 text-sm">
-          <span>{{ hotel().numOfAvailableRoomsToReserve }} rooms</span>
-          <a class="font-bold text-gold-300" [routerLink]="['/hotels', hotel().id]" [queryParams]="query()">View stay</a>
+          <span>{{ locale.t('hotel.rooms', { n: hotel().numOfAvailableRoomsToReserve }) }}</span>
+          <a class="font-bold text-gold-300" [routerLink]="['/hotels', hotel().id]" [queryParams]="query()">{{ locale.t('action.viewStay') }}</a>
         </div>
       </div>
     </article>
@@ -42,10 +42,10 @@ export class HotelCard {
   readonly checkOut = input('');
   readonly adults = input<string | number>('');
 
-  private readonly locale = inject(LocaleService);
+  readonly locale = inject(LocaleService);
 
-  readonly name = computed(() => this.locale.pick(this.hotel().name, this.hotel().nameAr) || 'Hotel');
-  readonly city = computed(() => this.locale.pick(this.hotel().city, this.hotel().cityAr) || 'Egypt');
+  readonly name = computed(() => this.locale.pick(this.hotel().name, this.hotel().nameAr) || this.locale.t('noun.hotel'));
+  readonly city = computed(() => this.locale.pick(this.hotel().city, this.hotel().cityAr) || this.locale.t('noun.egypt'));
   readonly summary = computed(() =>
     this.locale.pick(this.hotel().description, this.hotel().descriptionAr),
   );
@@ -60,8 +60,10 @@ export class HotelCard {
   rating(): string {
     const value = this.hotel().rating;
     if (!value) {
-      return 'New';
+      return this.locale.t('hotel.new');
     }
-    return value <= 5 ? `${value.toFixed(1)} / 5` : `Score ${value}`;
+    return value <= 5
+      ? this.locale.t('hotel.rating', { n: value.toFixed(1) })
+      : this.locale.t('hotel.score', { n: value });
   }
 }

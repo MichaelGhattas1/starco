@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { environment } from './environment';
+import { LocaleService } from './locale.service';
 import { NoticeService } from './notice.service';
 import { SessionStore } from './session.store';
 
@@ -12,6 +13,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const session = inject(SessionStore);
   const router = inject(Router);
   const notice = inject(NoticeService);
+  const locale = inject(LocaleService);
   const token = session.token();
   const authed =
     token && req.url.startsWith(environment.apiUrl)
@@ -28,7 +30,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         !ACCOUNT_AUTH.test(req.url)
       ) {
         session.clear();
-        notice.error('Your session expired. Sign in again.');
+        notice.error(locale.t('session.expired'));
         const returnUrl = router.url.startsWith('/login') ? null : router.url;
         void router.navigate(['/login'], {
           queryParams: returnUrl ? { returnUrl } : {},

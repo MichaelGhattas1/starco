@@ -14,9 +14,9 @@ import { ServiceBooking } from '../shared/service-booking';
   imports: [RouterLink, ServiceBooking],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <a routerLink="/trips" class="text-sm text-gold-300">All trips</a>
+    <a routerLink="/trips" class="text-sm text-gold-300">{{ locale.t('list.allTrips') }}</a>
     @if (loading()) {
-      <p class="mt-6" role="status">Loading trip…</p>
+      <p class="mt-6" role="status">{{ locale.t('load.trip') }}</p>
     } @else if (error()) {
       <p class="mt-6 text-red-200" role="alert">{{ error() }}</p>
     } @else if (trip(); as item) {
@@ -27,7 +27,7 @@ import { ServiceBooking } from '../shared/service-booking';
           }
           <p class="kicker">{{ locale.pick(item.city, item.cityAr) }}</p>
           <h1 class="font-display text-5xl leading-none">{{ label(item) }}</h1>
-          <p>{{ item.durationDays }} days · {{ item.durationHours }} hours · up to {{ item.maxCapacity }} guests</p>
+          <p>{{ locale.t('noun.days', { n: item.durationDays }) }} · {{ locale.t('noun.hours', { n: item.durationHours }) }} · {{ locale.t('noun.guests', { n: item.maxCapacity }) }}</p>
           <p class="text-gold-300">{{ currency.display(item.pricePerPerson) }} {{ currency.per('person') }} · {{ currency.display(item.pricePerChild) }} {{ currency.per('child') }}</p>
           @if (item.startDate || item.endDate) {
             <p class="text-sm text-gold-200/80">{{ fromApiDate(item.startDate) }} – {{ fromApiDate(item.endDate) }}</p>
@@ -82,7 +82,7 @@ export class TripDetailPage {
   }
 
   label(trip: Trip): string {
-    return this.locale.pick(trip.name, trip.nameAr) || 'Trip';
+    return this.locale.pick(trip.name, trip.nameAr) || this.locale.t('noun.trip');
   }
 
   photos(trip: Trip): string[] {

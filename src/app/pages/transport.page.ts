@@ -16,25 +16,25 @@ import { plainText } from '../shared/plain-text';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mb-6">
-      <p class="kicker">Transfers</p>
-      <h1 class="font-display text-5xl">Transport</h1>
+      <p class="kicker">{{ locale.t('home.transfers') }}</p>
+      <h1 class="font-display text-5xl">{{ locale.t('nav.transport') }}</h1>
     </div>
     <form class="panel filters filters-3 mb-6 p-4" [formGroup]="form" (ngSubmit)="load()">
-      <label class="field">Search <input formControlName="Search" /></label>
-      <label class="field">Vehicle <input formControlName="VehicleType" /></label>
-      <label class="field">Passengers <input type="number" min="1" max="1000" formControlName="Passengers" /></label>
-      <label class="field">Pickup <input formControlName="PickupLocation" /></label>
-      <label class="field">Drop-off <input formControlName="DropoffLocation" /></label>
-      <label class="field">Min price ({{ currency.base }}) <input type="number" min="0" step="0.01" formControlName="MinPrice" /></label>
-      <label class="field">Max price ({{ currency.base }}) <input type="number" min="0" step="0.01" formControlName="MaxPrice" /></label>
-      <button class="btn btn-gold" type="submit">Search</button>
+      <label class="field">{{ locale.t('field.search') }} <input formControlName="Search" /></label>
+      <label class="field">{{ locale.t('field.vehicle') }} <input formControlName="VehicleType" /></label>
+      <label class="field">{{ locale.t('field.passengers') }} <input type="number" min="1" max="1000" formControlName="Passengers" /></label>
+      <label class="field">{{ locale.t('field.pickup') }} <input formControlName="PickupLocation" /></label>
+      <label class="field">{{ locale.t('field.dropoff') }} <input formControlName="DropoffLocation" /></label>
+      <label class="field">{{ locale.t('field.minPrice', { code: currency.base }) }} <input type="number" min="0" step="0.01" formControlName="MinPrice" /></label>
+      <label class="field">{{ locale.t('field.maxPrice', { code: currency.base }) }} <input type="number" min="0" step="0.01" formControlName="MaxPrice" /></label>
+      <button class="btn btn-gold" type="submit">{{ locale.t('action.search') }}</button>
     </form>
     @if (loading()) {
-      <p role="status">Loading transport…</p>
+      <p role="status">{{ locale.t('load.transport') }}</p>
     } @else if (error()) {
       <p class="text-red-200" role="alert">{{ error() }}</p>
     } @else if (!items().length) {
-      <p>No transport matches this search.</p>
+      <p>{{ locale.t('empty.transportSearch') }}</p>
     } @else {
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         @for (item of items(); track item.id) {
@@ -78,7 +78,7 @@ export class TransportPage {
   }
 
   label(item: TransportOffer): string {
-    return this.locale.pick(item.name, item.nameAr) || 'Transport';
+    return this.locale.pick(item.name, item.nameAr) || this.locale.t('noun.transport');
   }
 
   load(): void {

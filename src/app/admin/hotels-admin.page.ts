@@ -3,6 +3,7 @@ import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
+import { LocaleService } from '../core/locale.service';
 import { NoticeService } from '../core/notice.service';
 import { Hotel } from '../core/models';
 
@@ -13,21 +14,21 @@ import { Hotel } from '../core/models';
   template: `
     <div class="mb-5 flex flex-wrap items-end justify-between gap-4">
       <div>
-        <p class="kicker">Catalog</p>
-        <h1 class="font-display text-5xl">Hotels</h1>
+        <p class="kicker">{{ locale.t('admin.catalog') }}</p>
+        <h1 class="font-display text-5xl">{{ locale.t('nav.hotels') }}</h1>
       </div>
-      <a class="btn btn-gold" routerLink="/admin/hotels/new">New hotel</a>
+      <a class="btn btn-gold" routerLink="/admin/hotels/new">{{ locale.t('admin.newHotel') }}</a>
     </div>
     <form class="panel mb-4 flex flex-col gap-3 p-4 sm:flex-row" (ngSubmit)="applySearch($event)">
-      <label class="field flex-1">Search <input name="q" [value]="query()" /></label>
-      <button class="btn btn-gold self-end" type="submit">Search</button>
+      <label class="field flex-1">{{ locale.t('field.search') }} <input name="q" [value]="query()" /></label>
+      <button class="btn btn-gold self-end" type="submit">{{ locale.t('action.search') }}</button>
     </form>
     @if (loading()) {
-      <p role="status">Loading hotels…</p>
+      <p role="status">{{ locale.t('load.hotels') }}</p>
     } @else if (error()) {
       <p class="text-red-200" role="alert">{{ error() }}</p>
     } @else if (!visible().length) {
-      <p>No hotels match this search.</p>
+      <p>{{ locale.t('empty.hotelsSearch') }}</p>
     } @else {
       <div class="grid gap-3">
         @for (hotel of visible(); track hotel.id) {
@@ -38,11 +39,11 @@ import { Hotel } from '../core/models';
             </div>
             <div class="flex flex-wrap gap-2">
               @if (hotel.id) {
-                <a class="btn btn-line" [routerLink]="['/hotels', hotel.id]">View</a>
+                <a class="btn btn-line" [routerLink]="['/hotels', hotel.id]">{{ locale.t('action.view') }}</a>
               }
-              <a class="btn btn-line" [routerLink]="['/admin/hotels', hotel.id]">Edit</a>
-              <a class="btn btn-line" [routerLink]="['/admin/insight', hotel.id]">Dining</a>
-              <button type="button" class="btn btn-danger" (click)="remove(hotel)">Delete</button>
+              <a class="btn btn-line" [routerLink]="['/admin/hotels', hotel.id]">{{ locale.t('action.edit') }}</a>
+              <a class="btn btn-line" [routerLink]="['/admin/insight', hotel.id]">{{ locale.t('admin.dining') }}</a>
+              <button type="button" class="btn btn-danger" (click)="remove(hotel)">{{ locale.t('action.delete') }}</button>
             </div>
           </article>
         }
@@ -53,6 +54,7 @@ import { Hotel } from '../core/models';
 export class HotelsAdminPage {
   private readonly api = inject(ApiService);
   private readonly notice = inject(NoticeService);
+  readonly locale = inject(LocaleService);
   readonly hotels = signal<Hotel[]>([]);
   readonly query = signal('');
   readonly visible = computed(() => {
@@ -80,12 +82,12 @@ export class HotelsAdminPage {
   }
 
   remove(hotel: Hotel): void {
-    if (!hotel.id || !confirm(`Delete ${hotel.name ?? 'this hotel'}?`)) {
+    if (!hotel.id || !confirm(this.locale.t('action.deleteAsk', { name: hotel.name || this.locale.t('noun.hotel') }))) {
       return;
     }
     this.api.deleteHotel(hotel.id).subscribe({
       next: () => {
-        this.notice.success('Hotel deleted.');
+        this.notice.success(this.locale.t('toast.deleted', { name: this.locale.t('noun.hotel') }));
         this.load();
       },
       error: (error) => this.notice.error(errorMessage(error)),

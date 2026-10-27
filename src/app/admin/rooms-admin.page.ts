@@ -3,6 +3,7 @@ import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
+import { LocaleService } from '../core/locale.service';
 import { NoticeService } from '../core/notice.service';
 import { HotelPrice } from '../shared/hotel-price';
 import { ROOM_TYPE_OPTIONS, Room } from '../core/models';
@@ -14,33 +15,33 @@ import { ROOM_TYPE_OPTIONS, Room } from '../core/models';
   template: `
     <div class="mb-5 flex flex-wrap items-end justify-between gap-4">
       <div>
-        <p class="kicker">Inventory</p>
-        <h1 class="font-display text-5xl">Rooms</h1>
+        <p class="kicker">{{ locale.t('admin.inventory') }}</p>
+        <h1 class="font-display text-5xl">{{ locale.t('admin.rooms') }}</h1>
       </div>
-      <a class="btn btn-gold" routerLink="/admin/rooms/new">New room</a>
+      <a class="btn btn-gold" routerLink="/admin/rooms/new">{{ locale.t('admin.newRoom') }}</a>
     </div>
     <form class="panel mb-4 flex flex-col gap-3 p-4 sm:flex-row" (ngSubmit)="applySearch($event)">
-      <label class="field flex-1">Search <input name="q" [value]="query()" /></label>
-      <button class="btn btn-gold self-end" type="submit">Search</button>
+      <label class="field flex-1">{{ locale.t('field.search') }} <input name="q" [value]="query()" /></label>
+      <button class="btn btn-gold self-end" type="submit">{{ locale.t('action.search') }}</button>
     </form>
     @if (loading()) {
-      <p role="status">Loading rooms…</p>
+      <p role="status">{{ locale.t('load.roomsAdmin') }}</p>
     } @else if (error()) {
       <p class="text-red-200" role="alert">{{ error() }}</p>
     } @else if (!visible().length) {
-      <p>No rooms match this search.</p>
+      <p>{{ locale.t('empty.roomsSearch') }}</p>
     } @else {
       <div class="grid gap-3">
         @for (room of visible(); track room.id) {
           <article class="panel flex flex-col justify-between gap-3 p-4 md:flex-row md:items-center">
             <div>
-              <h2 class="font-display text-3xl">{{ room.name || 'Untitled room' }}</h2>
+              <h2 class="font-display text-3xl">{{ room.name || locale.t('noun.untitledRoom') }}</h2>
               <p class="text-sm text-gold-200/80">{{ room.hotelName }} · {{ typeLabel(room.type) }}</p>
               <app-hotel-price class="mt-3 max-w-md" [base]="room.pricePerNight || 0" mode="charge" />
             </div>
             <div class="flex gap-2">
-              <a class="btn btn-line" [routerLink]="['/admin/rooms', room.id]">Edit</a>
-              <button type="button" class="btn btn-danger" (click)="remove(room)">Delete</button>
+              <a class="btn btn-line" [routerLink]="['/admin/rooms', room.id]">{{ locale.t('action.edit') }}</a>
+              <button type="button" class="btn btn-danger" (click)="remove(room)">{{ locale.t('action.delete') }}</button>
             </div>
           </article>
         }
@@ -51,6 +52,7 @@ import { ROOM_TYPE_OPTIONS, Room } from '../core/models';
 export class RoomsAdminPage {
   private readonly api = inject(ApiService);
   private readonly notice = inject(NoticeService);
+  readonly locale = inject(LocaleService);
   readonly rooms = signal<Room[]>([]);
   readonly query = signal('');
   readonly visible = computed(() => {
@@ -76,16 +78,26 @@ export class RoomsAdminPage {
   }
 
   typeLabel(type: number): string {
-    return ROOM_TYPE_OPTIONS.find((item) => item.value === type)?.label ?? `Type ${type}`;
+    const label = ROOM_TYPE_OPTIONS.find((item) => item.value === type)?.label;
+    if (label === 'Single') {
+      return this.locale.t('hotel.single');
+    }
+    if (label === 'Double') {
+      return this.locale.t('hotel.double');
+    }
+    if (label === 'Suite') {
+      return this.locale.t('hotel.suite');
+    }
+    return this.locale.t('book.typeN', { n: type });
   }
 
   remove(room: Room): void {
-    if (!room.id || !confirm(`Delete ${room.name ?? 'this room'}?`)) {
+    if (!room.id || !confirm(this.locale.t('action.deleteAsk', { name: room.name || this.locale.t('noun.room') }))) {
       return;
     }
     this.api.deleteRoom(room.id).subscribe({
       next: () => {
-        this.notice.success('Room deleted.');
+        this.notice.success(this.locale.t('toast.deleted', { name: this.locale.t('noun.room') }));
         this.load();
       },
       error: (error) => this.notice.error(errorMessage(error)),

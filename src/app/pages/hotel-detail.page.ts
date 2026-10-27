@@ -10,7 +10,7 @@ import { CartStore, stayNights } from '../core/cart.store';
 import { LocaleService } from '../core/locale.service';
 import { NoticeService } from '../core/notice.service';
 import { CurrencyService } from '../core/currency.service';
-import { featureLabel, firstImage, inputDate, mediaUrl, nextDate, toApiDateTime } from '../core/media';
+import { firstImage, inputDate, mediaUrl, nextDate, toApiDateTime } from '../core/media';
 import { AvailableRoom, FileDto, Hotel, Room, RoomType } from '../core/models';
 import { HotelPrice } from '../shared/hotel-price';
 
@@ -42,7 +42,6 @@ export class HotelDetailPage {
   readonly error = signal<string | null>(null);
   readonly roomsError = signal<string | null>(null);
   readonly activeImage = signal(0);
-  readonly featureLabel = featureLabel;
   readonly mediaUrl = mediaUrl;
   readonly nights = stayNights;
 
@@ -54,7 +53,7 @@ export class HotelDetailPage {
     checkOut: [inputDate(3)],
   });
 
-  readonly name = computed(() => this.locale.pick(this.hotel()?.name, this.hotel()?.nameAr) || 'Hotel');
+  readonly name = computed(() => this.locale.pick(this.hotel()?.name, this.hotel()?.nameAr) || this.locale.t('noun.hotel'));
   readonly city = computed(() => this.locale.pick(this.hotel()?.city, this.hotel()?.cityAr));
   readonly description = computed(() =>
     this.locale.pick(this.hotel()?.description, this.hotel()?.descriptionAr),
@@ -116,7 +115,7 @@ export class HotelDetailPage {
           this.hotel.set(hotel);
           this.activeImage.set(0);
           this.loading.set(false);
-          this.title.setTitle(`${this.locale.pick(hotel.name, hotel.nameAr) || 'Hotel'} · Plaza Inn`);
+          this.title.setTitle(`${this.locale.pick(hotel.name, hotel.nameAr) || this.locale.t('noun.hotel')} · ${this.locale.t('brand.plaza')}`);
           this.loadRooms();
         },
         error: (error) => {
@@ -147,18 +146,18 @@ export class HotelDetailPage {
       return;
     }
     if (checkIn < this.today) {
-      this.roomsError.set('Check-in cannot be before today.');
+      this.roomsError.set(this.locale.t('hotel.checkInPast'));
       this.rooms.set([]);
       return;
     }
     if (!checkOut || checkOut <= checkIn) {
-      this.roomsError.set('Choose a check-out date after check-in.');
+      this.roomsError.set(this.locale.t('hotel.checkoutAfter'));
       this.rooms.set([]);
       return;
     }
     const guestCount = Number(adults);
     if (!Number.isInteger(guestCount) || guestCount < 1) {
-      this.roomsError.set('Enter at least 1 adult.');
+      this.roomsError.set(this.locale.t('hotel.adultsMin'));
       this.rooms.set([]);
       return;
     }
@@ -169,7 +168,7 @@ export class HotelDetailPage {
         const fitted = rooms.filter((room) => !room.maxSleep || room.maxSleep >= guestCount);
         this.rooms.set(fitted);
         if (!fitted.length && rooms.length) {
-          this.roomsError.set(`No rooms sleep ${guestCount} adults for these dates.`);
+          this.roomsError.set(this.locale.t('hotel.noSleep', { n: guestCount }));
         }
         this.roomsLoading.set(false);
       },
@@ -181,17 +180,17 @@ export class HotelDetailPage {
   }
 
   roomName(room: AvailableRoom | Room): string {
-    return this.locale.pick(room.name, room.nameAr) || 'Room';
+    return this.locale.pick(room.name, room.nameAr) || this.locale.t('noun.room');
   }
 
   roomTypeLabel(type: RoomType | null | undefined): string {
     if (type === RoomType.Double) {
-      return 'Double';
+      return this.locale.t('hotel.double');
     }
     if (type === RoomType.Suite) {
-      return 'Suite';
+      return this.locale.t('hotel.suite');
     }
-    return 'Single';
+    return this.locale.t('hotel.single');
   }
 
   roomFeatures(room: Room | null): [string, boolean][] {
@@ -248,10 +247,7 @@ export class HotelDetailPage {
   }
 
   nightWord(count: number): string {
-    if (this.locale.isAr()) {
-      return count === 1 ? 'ليلة' : 'ليالٍ';
-    }
-    return count === 1 ? 'night' : 'nights';
+    return this.locale.t(count === 1 ? 'noun.night' : 'noun.nights');
   }
 
   addToCart(room: AvailableRoom): void {
@@ -263,11 +259,11 @@ export class HotelDetailPage {
       return;
     }
     if (checkIn < this.today || !checkOut || checkOut <= checkIn) {
-      this.roomsError.set('Choose a check-out date after check-in.');
+      this.roomsError.set(this.locale.t('hotel.checkoutAfter'));
       return;
     }
     if (!Number.isInteger(guestCount) || guestCount < 1 || guestCount > 20) {
-      this.roomsError.set('Enter 1 to 20 adults.');
+      this.roomsError.set(this.locale.t('hotel.adultsRange'));
       return;
     }
     const added = this.cart.add({
@@ -286,7 +282,10 @@ export class HotelDetailPage {
   }
 
   menuName(kind: string, index: number, total: number): string {
-    return total > 1 ? `${kind} menu ${index + 1}` : `${kind} menu`;
+    const label = kind === 'Cafe' ? this.locale.t('hotel.cafe') : this.locale.t('hotel.restaurant');
+    return total > 1
+      ? this.locale.t('hotel.menuN', { kind: label, n: index + 1 })
+      : this.locale.t('hotel.menu', { kind: label });
   }
 
   private photos(files: FileDto[] | null | undefined): string[] {

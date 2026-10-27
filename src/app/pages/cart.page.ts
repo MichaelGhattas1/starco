@@ -9,6 +9,7 @@ import { AuthService } from '../core/auth.service';
 import { CartLine, CartStore, lineBase, lineTotal, stayNights, UNPAID_KEY, UnpaidStay } from '../core/cart.store';
 import { PAYMENT_CURRENCY, CurrencyService } from '../core/currency.service';
 import { paymentLink, toApiDateTime } from '../core/media';
+import { LocaleService } from '../core/locale.service';
 import { BookingResult, BookingType } from '../core/models';
 import { HotelPrice } from '../shared/hotel-price';
 
@@ -24,6 +25,7 @@ export class CartPage {
   readonly auth = inject(AuthService);
   readonly cart = inject(CartStore);
   readonly currency = inject(CurrencyService);
+  readonly locale = inject(LocaleService);
   readonly nights = stayNights;
   readonly lineBase = lineBase;
   readonly lineTotal = lineTotal;
