@@ -238,6 +238,7 @@ export const I18N = {
   'contact.us': { en: 'Contact us', ar: 'تواصل معنا' },
   'contact.lead': { en: 'Call, visit, or write. A message opens in your email app, addressed to the desk.', ar: 'اتصل أو زر أو اكتب. تُفتح الرسالة في تطبيق البريد وموجّهة إلى المكتب.' },
   'contact.hours': { en: 'Hours', ar: 'الساعات' },
+  'contact.map': { en: 'Map of the address', ar: 'خريطة العنوان' },
   'contact.social': { en: 'Social', ar: 'التواصل' },
   'contact.write': { en: 'Write to us', ar: 'اكتب لنا' },
   'contact.sent': { en: 'Your email app is opening with this message to {email}.', ar: 'تطبيق البريد يفتح هذه الرسالة إلى {email}.' },
