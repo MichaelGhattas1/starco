@@ -22,6 +22,15 @@ describe('media URLs', () => {
     );
   });
 
+  it('routes API-host media through the same-origin proxy', () => {
+    expect(mediaUrl('http://plazainn.runasp.net/images/homeSlider/169.jpg', '/media')).toBe(
+      '/media/images/homeSlider/169.jpg',
+    );
+    expect(mediaUrl('images/homeSlider/169.jpg', '/media')).toBe(
+      '/media/images/homeSlider/169.jpg',
+    );
+  });
+
   it('leaves other hosts and existing HTTPS links unchanged', () => {
     expect(mediaUrl('https://accept.paymob.com/api/acceptance/iframes/1', HTTPS_API)).toBe(
       'https://accept.paymob.com/api/acceptance/iframes/1',

@@ -38,7 +38,7 @@ This will compile your project and store the build artifacts in the `dist/` dire
 
 ## Production API
 
-The production build sends API requests to the same origin. On Netlify, `netlify.toml` proxies `/api/*` to the Plaza API. The API host currently does not complete an HTTPS handshake, so the proxy avoids browser mixed-content blocking; enabling HTTPS on the API host is still recommended for end-to-end TLS.
+The production build sends API requests and Plaza media through the same origin. On Netlify, `netlify.toml` proxies `/api/*` and `/media/*` to the Plaza API. The API host currently does not complete an HTTPS handshake, so the proxy avoids browser mixed-content blocking; enabling HTTPS on the API host is still recommended for end-to-end TLS.
 
 ## Running unit tests
 

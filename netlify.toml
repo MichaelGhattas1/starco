@@ -3,3 +3,9 @@
   to = "http://plazainn.runasp.net/api/:splat"
   status = 200
   force = true
+
+[[redirects]]
+  from = "/media/*"
+  to = "http://plazainn.runasp.net/:splat"
+  status = 200
+  force = true

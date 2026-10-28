@@ -3,7 +3,7 @@ import { FileDto } from './models';
 
 export function mediaUrl(
   url: string | null | undefined,
-  apiBase: string = environment.apiUrl,
+  apiBase: string = environment.mediaBaseUrl,
 ): string | null {
   if (!url) {
     return null;
@@ -14,13 +14,30 @@ export function mediaUrl(
   return preferApiHttps(absolute, apiBase);
 }
 
-/** Upgrade same-host http links only after the configured API base is https. */
+/** Route API-host media through the configured same-origin proxy when available. */
 function preferApiHttps(url: string, apiBase: string): string {
+  if (url.startsWith('/')) {
+    return url;
+  }
+
   let target: URL;
   let current: URL;
   try {
-    target = new URL(apiBase);
     current = new URL(url);
+  } catch {
+    return url;
+  }
+
+  if (current.hostname !== environment.apiHost) {
+    return url;
+  }
+
+  if (apiBase.startsWith('/')) {
+    return `${apiBase.replace(/\/+$/, '')}${current.pathname}${current.search}${current.hash}`;
+  }
+
+  try {
+    target = new URL(apiBase);
   } catch {
     return url;
   }
