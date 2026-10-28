@@ -15,8 +15,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const notice = inject(NoticeService);
   const locale = inject(LocaleService);
   const token = session.token();
+  const isApiRequest = environment.apiUrl
+    ? req.url.startsWith(environment.apiUrl)
+    : req.url.startsWith('/api/');
   const authed =
-    token && req.url.startsWith(environment.apiUrl)
+    token && isApiRequest
       ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
       : req;
 
@@ -26,7 +29,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         error instanceof HttpErrorResponse &&
         error.status === 401 &&
         token &&
-        req.url.startsWith(environment.apiUrl) &&
+        isApiRequest &&
         !ACCOUNT_AUTH.test(req.url)
       ) {
         session.clear();

@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/api/*"
+  to = "http://plazainn.runasp.net/api/:splat"
+  status = 200
+  force = true

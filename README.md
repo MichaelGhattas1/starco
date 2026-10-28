@@ -36,6 +36,10 @@ ng build
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
+## Production API
+
+The production build sends API requests to the same origin. On Netlify, `netlify.toml` proxies `/api/*` to the Plaza API. The API host currently does not complete an HTTPS handshake, so the proxy avoids browser mixed-content blocking; enabling HTTPS on the API host is still recommended for end-to-end TLS.
+
 ## Running unit tests
 
 To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
