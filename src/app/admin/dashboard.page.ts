@@ -14,10 +14,10 @@ import { AdminDashboardSummary, CatalogCount } from '../core/models';
   imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <p class="kicker">{{ locale.t('admin.desk') }}</p>
-    <h1 class="font-display text-5xl">{{ locale.t('admin.dashboard') }}</h1>
-    <p class="mt-2 max-w-2xl text-sm text-gold-200/80">{{ locale.t('admin.lead') }}</p>
-    <div class="mt-5 flex flex-wrap gap-3">
+    <p class="kicker no-print">{{ locale.t('admin.desk') }}</p>
+    <h1 class="no-print font-display text-5xl">{{ locale.t('admin.dashboard') }}</h1>
+    <p class="no-print mt-2 max-w-2xl text-sm text-gold-200/80">{{ locale.t('admin.lead') }}</p>
+    <div class="no-print mt-5 flex flex-wrap items-end gap-3">
       <label class="grid gap-1 text-sm">
         {{ locale.t('field.from') }}
         <input class="field" type="date" [value]="from()" (change)="setFrom($event)" />
@@ -26,13 +26,14 @@ import { AdminDashboardSummary, CatalogCount } from '../core/models';
         {{ locale.t('field.to') }}
         <input class="field" type="date" [value]="to()" (change)="setTo($event)" />
       </label>
+      <button type="button" class="btn btn-line" [disabled]="!summary()" (click)="exportPdf()">{{ locale.t('admin.exportPdf') }}</button>
     </div>
     @if (loading()) {
-      <p class="mt-4" role="status">{{ locale.t('admin.loadingDesk') }}</p>
+      <p class="no-print mt-4" role="status">{{ locale.t('admin.loadingDesk') }}</p>
     } @else if (error()) {
-      <p class="mt-4 text-red-200" role="alert">{{ error() }}</p>
+      <p class="no-print mt-4 text-red-200" role="alert">{{ error() }}</p>
     }
-    <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="no-print mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <a routerLink="/admin/hotels" class="panel p-5"><p class="kicker">{{ locale.t('nav.hotels') }}</p><p class="font-display text-5xl">{{ hotels() }}</p><p class="text-xs text-gold-200/70">{{ activeLine(hotelCounts()) }}</p></a>
       <a routerLink="/admin/rooms" class="panel p-5"><p class="kicker">{{ locale.t('admin.rooms') }}</p><p class="font-display text-5xl">{{ rooms() }}</p><p class="text-xs text-gold-200/70">{{ activeLine(roomCounts()) }}</p></a>
       <a routerLink="/admin/trips" class="panel p-5"><p class="kicker">{{ locale.t('nav.trips') }}</p><p class="font-display text-5xl">{{ trips() }}</p><p class="text-xs text-gold-200/70">{{ activeLine(tripCounts()) }}</p></a>
@@ -45,13 +46,13 @@ import { AdminDashboardSummary, CatalogCount } from '../core/models';
       <a routerLink="/admin/currency" class="panel p-5"><p class="kicker">{{ locale.t('admin.currency') }}</p><p class="font-display text-5xl">{{ currency.applied() }}</p></a>
     </div>
     @if (summary(); as desk) {
-      <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div class="no-print mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <article class="panel p-5"><p class="kicker">{{ locale.t('admin.confirmed') }}</p><p class="font-display text-4xl">{{ desk.kpis.confirmedBookings }}</p><p class="text-sm text-gold-300">{{ currency.charge(desk.kpis.totalConfirmedRevenue) }}</p></article>
         <article class="panel p-5"><p class="kicker">{{ locale.t('admin.pending') }}</p><p class="font-display text-4xl">{{ desk.kpis.pendingBookings }}</p><p class="text-sm text-gold-300">{{ currency.charge(desk.kpis.pendingRevenue) }}</p></article>
         <article class="panel p-5"><p class="kicker">{{ locale.t('admin.cancelled') }}</p><p class="font-display text-4xl">{{ desk.kpis.cancelledBookings }}</p></article>
         <article class="panel p-5"><p class="kicker">{{ locale.t('admin.expired') }}</p><p class="font-display text-4xl">{{ desk.kpis.expiredBookings }}</p><p class="text-sm text-gold-300">{{ locale.t('admin.taxCollected') }} · {{ currency.charge(desk.kpis.totalTaxCollected) }}</p></article>
       </div>
-      <div class="mt-6 grid gap-4 lg:grid-cols-3">
+      <div class="no-print mt-6 grid gap-4 lg:grid-cols-3">
         <section class="panel p-5">
           <h2 class="font-display text-3xl">{{ locale.t('admin.revenueByService') }}</h2>
           <ul class="mt-3 grid gap-2 text-sm">
@@ -94,7 +95,7 @@ import { AdminDashboardSummary, CatalogCount } from '../core/models';
           </ul>
         </section>
       </div>
-      <div class="mt-6 grid gap-4 lg:grid-cols-2">
+      <div class="no-print mt-6 grid gap-4 lg:grid-cols-2">
         <section class="panel p-5">
           <h2 class="font-display text-3xl">{{ locale.t('admin.monthly') }}</h2>
           <ul class="mt-3 grid gap-2 text-sm">
@@ -126,6 +127,143 @@ import { AdminDashboardSummary, CatalogCount } from '../core/models';
           </div>
         </section>
       </div>
+      <article class="desk-report">
+        <p class="kicker">Plaza Inn</p>
+        <h1 class="font-display text-4xl">{{ locale.t('admin.dashboard') }}</h1>
+        <p>{{ locale.t('field.from') }} / {{ locale.t('field.to') }}: {{ periodLabel() }}</p>
+        <p>{{ generatedLabel() }}</p>
+        <section>
+          <h2 class="font-display text-2xl">{{ locale.t('admin.catalog') }}</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>{{ locale.t('admin.catalog') }}</th>
+                <th>{{ locale.t('book.total') }}</th>
+                <th>{{ locale.t('admin.active') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of catalogRows(); track row.label) {
+                <tr>
+                  <td>{{ row.label }}</td>
+                  <td>{{ row.total }}</td>
+                  <td>{{ row.active ?? '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </section>
+        <section>
+          <h2 class="font-display text-2xl">{{ locale.t('nav.bookings') }}</h2>
+          <table>
+            <tbody>
+              <tr><td>{{ locale.t('admin.confirmed') }}</td><td>{{ desk.kpis.confirmedBookings }}</td><td>{{ currency.charge(desk.kpis.totalConfirmedRevenue) }}</td></tr>
+              <tr><td>{{ locale.t('admin.pending') }}</td><td>{{ desk.kpis.pendingBookings }}</td><td>{{ currency.charge(desk.kpis.pendingRevenue) }}</td></tr>
+              <tr><td>{{ locale.t('admin.cancelled') }}</td><td>{{ desk.kpis.cancelledBookings }}</td><td></td></tr>
+              <tr><td>{{ locale.t('admin.expired') }}</td><td>{{ desk.kpis.expiredBookings }}</td><td></td></tr>
+              <tr><td>{{ locale.t('admin.taxCollected') }}</td><td></td><td>{{ currency.charge(desk.kpis.totalTaxCollected) }}</td></tr>
+            </tbody>
+          </table>
+        </section>
+        <section>
+          <h2 class="font-display text-2xl">{{ locale.t('admin.revenueByService') }}</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>{{ locale.t('admin.catalog') }}</th>
+                <th>{{ locale.t('nav.bookings') }}</th>
+                <th>{{ locale.t('admin.confirmed') }}</th>
+                <th>{{ locale.t('admin.revenue') }}</th>
+                <th>{{ locale.t('admin.share') }}</th>
+                <th>{{ locale.t('admin.taxCollected') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of desk.revenueByServiceType ?? []; track row.bookingType) {
+                <tr>
+                  <td>{{ locale.label(row.bookingTypeName ?? '') }}</td>
+                  <td>{{ row.bookingsCount }}</td>
+                  <td>{{ row.confirmedCount }}</td>
+                  <td>{{ currency.charge(row.revenue) }}</td>
+                  <td>{{ row.revenueSharePercentage }}%</td>
+                  <td>{{ currency.charge(row.taxAmount) }}</td>
+                </tr>
+              } @empty {
+                <tr><td colspan="6">{{ locale.t('empty.noneYet') }}</td></tr>
+              }
+            </tbody>
+          </table>
+        </section>
+        <section>
+          <h2 class="font-display text-2xl">{{ locale.t('admin.recentBookings') }}</h2>
+          <table>
+            <tbody>
+              @for (row of desk.operationalInsights?.recentBookings ?? []; track row.encodedId ?? row.createdAt) {
+                <tr>
+                  <td>{{ row.itemName || row.bookingReference }}</td>
+                  <td>{{ locale.label(row.status ?? '') }}</td>
+                  <td>{{ locale.label(row.paymentStatus ?? '') }}</td>
+                  <td>{{ currency.charge(row.totalPrice) }}</td>
+                  <td>{{ fromApiDateTime(row.createdAt) }}</td>
+                </tr>
+              } @empty {
+                <tr><td>{{ locale.t('empty.noneYet') }}</td></tr>
+              }
+            </tbody>
+          </table>
+        </section>
+        <section>
+          <h2 class="font-display text-2xl">{{ locale.t('admin.lowCapacity') }}</h2>
+          <table>
+            <tbody>
+              @for (row of desk.operationalInsights?.lowCapacityAlerts ?? []; track row.encodedId ?? row.name) {
+                <tr>
+                  <td>{{ row.name }}</td>
+                  <td>{{ locale.label(row.itemType ?? '') }}</td>
+                  <td>{{ locale.t('admin.remaining', { n: row.remaining }) }}</td>
+                  <td>{{ fromApiDate(row.serviceDate) }}</td>
+                </tr>
+              } @empty {
+                <tr><td>{{ locale.t('empty.noneYet') }}</td></tr>
+              }
+            </tbody>
+          </table>
+        </section>
+        <section>
+          <h2 class="font-display text-2xl">{{ locale.t('admin.monthly') }}</h2>
+          <table>
+            <tbody>
+              @for (row of desk.monthlyTrends ?? []; track row.year + '-' + row.month) {
+                <tr>
+                  <td>{{ row.periodLabel || row.month + '/' + row.year }}</td>
+                  <td>{{ locale.t('admin.bookingsCount', { n: row.bookingsCount }) }}</td>
+                  <td>{{ currency.charge(row.confirmedRevenue) }}</td>
+                </tr>
+              } @empty {
+                <tr><td>{{ locale.t('empty.noneYet') }}</td></tr>
+              }
+            </tbody>
+          </table>
+        </section>
+        <section>
+          <h2 class="font-display text-2xl">{{ locale.t('admin.topPerformers') }}</h2>
+          @for (group of performerGroups(desk); track group.title) {
+            @if (group.rows.length) {
+              <h3 class="mt-2 text-sm font-bold">{{ group.title }}</h3>
+              <table>
+                <tbody>
+                  @for (row of group.rows; track row.name) {
+                    <tr>
+                      <td>{{ row.name }}</td>
+                      <td>{{ currency.charge(row.totalRevenue) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          }
+        </section>
+      </article>
     }
   `,
 })
@@ -160,6 +298,52 @@ export class DashboardPage {
     inject(Title).setTitle('Admin · Plaza Inn');
     this.api.partners().pipe(catchError(() => of([]))).subscribe((list) => this.partners.set(list.length));
     this.reload(true);
+  }
+
+  exportPdf(): void {
+    if (!this.summary()) {
+      return;
+    }
+    const previous = document.title;
+    document.title = `Plaza Inn summary ${new Date().toISOString().slice(0, 10)}`;
+    const restore = (): void => {
+      document.title = previous;
+      window.removeEventListener('afterprint', restore);
+    };
+    window.addEventListener('afterprint', restore);
+    window.print();
+  }
+
+  periodLabel(): string {
+    const from = this.from();
+    const to = this.to();
+    if (!from && !to) {
+      return this.locale.t('admin.allDates');
+    }
+    return [from, to].filter(Boolean).join(' – ');
+  }
+
+  generatedLabel(): string {
+    const date = new Date().toLocaleDateString(this.locale.lang() === 'ar' ? 'ar-EG' : 'en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+    return this.locale.t('admin.generated', { date });
+  }
+
+  catalogRows(): { label: string; total: number; active: number | null }[] {
+    return [
+      { label: this.locale.t('nav.hotels'), total: this.hotels(), active: this.hotelCounts()?.active ?? null },
+      { label: this.locale.t('admin.rooms'), total: this.rooms(), active: this.roomCounts()?.active ?? null },
+      { label: this.locale.t('nav.trips'), total: this.trips(), active: this.tripCounts()?.active ?? null },
+      { label: this.locale.t('nav.transport'), total: this.transport(), active: this.transportCounts()?.active ?? null },
+      { label: this.locale.t('nav.events'), total: this.events(), active: this.eventCounts()?.active ?? null },
+      { label: this.locale.t('home.packages'), total: this.packages(), active: this.packageCounts()?.active ?? null },
+      { label: this.locale.t('nav.bookings'), total: this.bookings(), active: null },
+      { label: this.locale.t('admin.partners'), total: this.partners(), active: null },
+      { label: this.locale.t('admin.users'), total: this.users(), active: null },
+    ];
   }
 
   setFrom(event: Event): void {

@@ -3,6 +3,7 @@ import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
+import { ConfirmService } from '../core/confirm.service';
 import { LocaleService } from '../core/locale.service';
 import { NoticeService } from '../core/notice.service';
 import { Hotel } from '../core/models';
@@ -54,6 +55,7 @@ import { Hotel } from '../core/models';
 export class HotelsAdminPage {
   private readonly api = inject(ApiService);
   private readonly notice = inject(NoticeService);
+  private readonly confirm = inject(ConfirmService);
   readonly locale = inject(LocaleService);
   readonly hotels = signal<Hotel[]>([]);
   readonly query = signal('');
@@ -82,10 +84,20 @@ export class HotelsAdminPage {
   }
 
   remove(hotel: Hotel): void {
-    if (!hotel.id || !confirm(this.locale.t('action.deleteAsk', { name: hotel.name || this.locale.t('noun.hotel') }))) {
+    if (!hotel.id) {
       return;
     }
-    this.api.deleteHotel(hotel.id).subscribe({
+    const id = hotel.id;
+    void this.confirm.ask(this.locale.t('action.deleteAsk', { name: hotel.name || this.locale.t('noun.hotel') })).then((ok) => {
+      if (!ok) {
+        return;
+      }
+      this.deleteHotel(id);
+    });
+  }
+
+  private deleteHotel(id: string): void {
+    this.api.deleteHotel(id).subscribe({
       next: () => {
         this.notice.success(this.locale.t('toast.deleted', { name: this.locale.t('noun.hotel') }));
         this.load();

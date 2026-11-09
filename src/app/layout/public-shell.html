@@ -29,12 +29,6 @@
         <a routerLink="/contact" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">{{ locale.t('nav.contact') }}</a>
       </div>
       <div class="site-actions">
-        @if (auth.canWrite()) {
-          <a routerLink="/admin" class="nav-link" (click)="closeMenu()">{{ locale.t('nav.admin') }}</a>
-        }
-        @if (auth.isLoggedIn()) {
-          <a routerLink="/bookings" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">{{ locale.t('nav.bookings') }}</a>
-        }
         <a
           routerLink="/cart"
           class="btn btn-line nav-cart"
@@ -50,14 +44,43 @@
             <span class="nav-count" aria-hidden="true">{{ cart.count() }}</span>
           }
         </a>
-        @if (auth.isLoggedIn()) {
-          <button type="button" class="btn btn-line" (click)="logout()">{{ locale.t('nav.signOut') }}</button>
-        } @else {
-          <a routerLink="/login" class="btn btn-gold" (click)="closeMenu()">{{ locale.t('nav.signIn') }}</a>
-        }
-        <button type="button" class="btn btn-line nav-lang" (click)="locale.toggle()">
-          {{ locale.isAr() ? 'EN' : 'عربي' }}
-        </button>
+        <div class="nav-account" (click)="$event.stopPropagation()">
+          <button
+            type="button"
+            class="btn btn-line nav-account-btn"
+            [attr.aria-expanded]="accountOpen()"
+            aria-controls="account-menu"
+            (click)="accountOpen.set(!accountOpen())"
+          >
+            @if (auth.isLoggedIn()) {
+              <span class="nav-account-mark" aria-hidden="true">{{ accountInitial() }}</span>
+              <span class="nav-account-name">{{ auth.name() || locale.t('nav.account') }}</span>
+            } @else {
+              {{ locale.t('nav.account') }}
+            }
+          </button>
+          @if (accountOpen()) {
+            <div id="account-menu" class="nav-account-menu">
+              @if (auth.canWrite()) {
+                <a routerLink="/admin" routerLinkActive="nav-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link" (click)="closeMenu()">{{ locale.t('admin.dashboard') }}</a>
+                <a routerLink="/admin/hotels" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">{{ locale.t('nav.hotels') }}</a>
+                <a routerLink="/admin/rooms" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">{{ locale.t('admin.rooms') }}</a>
+                <a routerLink="/admin/bookings" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">{{ locale.t('nav.bookings') }}</a>
+                <a routerLink="/admin/users" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">{{ locale.t('admin.users') }}</a>
+              }
+              @if (auth.isLoggedIn()) {
+                <a routerLink="/bookings" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">{{ locale.t('nav.bookings') }}</a>
+                <button type="button" class="nav-link" (click)="logout()">{{ locale.t('nav.signOut') }}</button>
+              } @else {
+                <a routerLink="/login" class="nav-link" (click)="closeMenu()">{{ locale.t('nav.signIn') }}</a>
+              }
+              <div class="nav-lang" role="group" [attr.aria-label]="locale.t('nav.language')">
+                <button type="button" [class.is-active]="locale.lang() === 'en'" (click)="locale.set('en')">EN</button>
+                <button type="button" [class.is-active]="locale.lang() === 'ar'" (click)="locale.set('ar')">عربي</button>
+              </div>
+            </div>
+          }
+        </div>
       </div>
     </nav>
   </div>

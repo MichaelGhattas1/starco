@@ -32,3 +32,13 @@
     <router-outlet />
   </section>
 </div>
+
+<dialog #confirmDialog class="confirm-dialog" aria-labelledby="confirm-title" (close)="onConfirmClose()" (click)="onConfirmBackdrop($event)">
+  <div class="p-6">
+    <p id="confirm-title" class="font-display text-3xl leading-tight">{{ confirm.message() }}</p>
+    <div class="mt-6 flex flex-wrap justify-end gap-2">
+      <button type="button" class="btn btn-line" (click)="confirm.answer(false)">{{ locale.t('action.cancel') }}</button>
+      <button type="button" class="btn btn-danger" (click)="confirm.answer(true)">{{ locale.t('action.delete') }}</button>
+    </div>
+  </div>
+</dialog>
