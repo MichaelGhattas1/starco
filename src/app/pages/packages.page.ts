@@ -50,6 +50,7 @@ import { plainText } from '../shared/plain-text';
               [kicker]="item.durationDays + ' days'"
               [summary]="plain(locale.pick(item.description, item.descriptionAr))"
               [price]="currency.display(item.packagePrice)"
+              [range]="item.priceRange"
               [image]="firstImage(item.images)"
               [link]="['/packages', item.id]"
             />

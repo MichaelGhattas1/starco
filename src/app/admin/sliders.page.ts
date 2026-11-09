@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
+import { ConfirmService } from '../core/confirm.service';
 import { NoticeService } from '../core/notice.service';
 import { firstPhotoProblem } from '../core/image-file';
 import { extractIds } from '../core/media';
@@ -17,6 +18,7 @@ import { HomeSlider, PlazaInnType } from '../core/models';
 export class SlidersPage {
   private readonly api = inject(ApiService);
   private readonly notice = inject(NoticeService);
+  private readonly confirm = inject(ConfirmService);
   readonly slides = signal<HomeSlider[]>([]);
   readonly editingId = signal<number | null>(null);
   readonly imageIds = signal<number[]>([]);
@@ -101,15 +103,17 @@ export class SlidersPage {
   }
 
   remove(slide: HomeSlider): void {
-    if (!confirm('Delete this slide?')) {
-      return;
-    }
-    this.api.deleteSlider(slide.id).subscribe({
-      next: () => {
-        this.notice.success('Slide deleted.');
-        this.load();
-      },
-      error: (error) => this.notice.error(errorMessage(error)),
+    void this.confirm.ask('Delete this slide?').then((ok) => {
+      if (!ok) {
+        return;
+      }
+      this.api.deleteSlider(slide.id).subscribe({
+        next: () => {
+          this.notice.success('Slide deleted.');
+          this.load();
+        },
+        error: (error) => this.notice.error(errorMessage(error)),
+      });
     });
   }
 

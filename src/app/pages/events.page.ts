@@ -42,6 +42,7 @@ import { plainText } from '../shared/plain-text';
               [kicker]="locale.pick(item.location, item.locationAr)"
               [summary]="plain(locale.pick(item.description, item.descriptionAr))"
               [price]="currency.display(item.ticketPrice)"
+              [range]="item.priceRange"
               [image]="firstImage(item.images)"
               [link]="['/events', item.id]"
             />

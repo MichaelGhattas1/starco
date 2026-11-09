@@ -29,7 +29,12 @@ import { firstImage } from '../core/media';
         </h3>
         <p class="line-clamp-3 text-sm text-gold-200/80">{{ summary() }}</p>
         <div class="mt-auto flex items-center justify-between gap-3 pt-2 text-sm">
-          <span>{{ locale.t('hotel.rooms', { n: hotel().numOfAvailableRoomsToReserve }) }}</span>
+          <span>
+            {{ locale.t('hotel.rooms', { n: hotel().numOfAvailableRoomsToReserve }) }}
+            @if (hotel().priceRange) {
+              <span class="mt-1 block text-xs text-gold-100/80">{{ hotel().priceRange }}</span>
+            }
+          </span>
           <a class="font-bold text-gold-300" [routerLink]="['/hotels', hotel().id]" [queryParams]="query()">{{ locale.t('action.viewStay') }}</a>
         </div>
       </div>

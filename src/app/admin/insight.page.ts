@@ -5,6 +5,7 @@ import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
+import { ConfirmService } from '../core/confirm.service';
 import { NoticeService } from '../core/notice.service';
 import { firstPhotoProblem } from '../core/image-file';
 import { extractIds, featureLabel, mediaUrl } from '../core/media';
@@ -20,6 +21,7 @@ export class InsightPage {
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
   private readonly notice = inject(NoticeService);
+  private readonly confirm = inject(ConfirmService);
   readonly featureLabel = featureLabel;
   readonly mediaUrl = mediaUrl;
   readonly hotels = signal<HotelLookup[]>([]);
@@ -123,9 +125,15 @@ export class InsightPage {
 
   drop(target: MediaTarget, id: number): void {
     const kind = target.endsWith('Menu') ? 'menu' : 'photo';
-    if (!confirm(`Delete this ${kind}?`)) {
-      return;
-    }
+    void this.confirm.ask(`Delete this ${kind}?`).then((ok) => {
+      if (!ok) {
+        return;
+      }
+      this.dropFile(target, id, kind);
+    });
+  }
+
+  private dropFile(target: MediaTarget, id: number, kind: string): void {
     const list = this.list(target);
     const previous = list();
     list.set(previous.filter((file) => file.id !== id));
@@ -145,9 +153,18 @@ export class InsightPage {
 
   remove(): void {
     const id = this.hotelId();
-    if (!id || !confirm('Remove dining details for this hotel?')) {
+    if (!id) {
       return;
     }
+    void this.confirm.ask('Remove dining details for this hotel?').then((ok) => {
+      if (!ok) {
+        return;
+      }
+      this.removeDining(id);
+    });
+  }
+
+  private removeDining(id: string): void {
     this.api.deleteInsight(id).subscribe({
       next: () => {
         this.exists.set(false);

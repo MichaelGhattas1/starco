@@ -42,6 +42,7 @@ import { plainText } from '../shared/plain-text';
               [kicker]="locale.pick(trip.city, trip.cityAr)"
               [summary]="plain(locale.pick(trip.description, trip.descriptionAr))"
               [price]="currency.display(trip.pricePerPerson) + ' ' + currency.per('person')"
+              [range]="trip.priceRange"
               [image]="firstImage(trip.images)"
               [link]="['/trips', trip.id]"
             />

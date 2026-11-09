@@ -3,6 +3,7 @@ import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
+import { ConfirmService } from '../core/confirm.service';
 import { LocaleService } from '../core/locale.service';
 import { CurrencyService } from '../core/currency.service';
 import { Trip } from '../core/models';
@@ -57,6 +58,7 @@ import { NoticeService } from '../core/notice.service';
 export class TripsAdminPage {
   private readonly api = inject(ApiService);
   private readonly notice = inject(NoticeService);
+  private readonly confirm = inject(ConfirmService);
   readonly locale = inject(LocaleService);
   private readonly currency = inject(CurrencyService);
   readonly money = (value: number | null | undefined) => this.currency.charge(value);
@@ -96,15 +98,21 @@ export class TripsAdminPage {
   }
 
   remove(trip: Trip): void {
-    if (!trip.id || !confirm(this.locale.t('action.deleteAsk', { name: this.label(trip) }))) {
+    if (!trip.id) {
       return;
     }
-    this.api.deleteTrip(trip.id).subscribe({
-      next: () => {
-        this.notice.success(this.locale.t('toast.deleted', { name: this.locale.t('noun.trip') }));
-        this.load();
-      },
-      error: (error) => this.notice.error(errorMessage(error)),
+    const id = trip.id;
+    void this.confirm.ask(this.locale.t('action.deleteAsk', { name: this.label(trip) })).then((ok) => {
+      if (!ok) {
+        return;
+      }
+      this.api.deleteTrip(id).subscribe({
+        next: () => {
+          this.notice.success(this.locale.t('toast.deleted', { name: this.locale.t('noun.trip') }));
+          this.load();
+        },
+        error: (error) => this.notice.error(errorMessage(error)),
+      });
     });
   }
 }

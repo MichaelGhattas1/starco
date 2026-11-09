@@ -34,6 +34,7 @@ import { ServiceBooking } from '../shared/service-booking';
           </p>
           <p>{{ locale.t('noun.passengers', { n: offer.maxPassengers }) }} · {{ locale.t('noun.bags', { n: offer.maxLuggage }) }} · {{ locale.t('noun.vehicles', { n: offer.availableVehicles }) }}</p>
           <p class="text-gold-300">{{ currency.display(offer.pricePerTrip) }} {{ currency.per('trip') }}</p>
+          @if (offer.priceRange) { <p class="text-sm text-gold-100/80">{{ offer.priceRange }}</p> }
           <div class="rich-text text-gold-100/90" [innerHTML]="locale.pick(offer.description, offer.descriptionAr)"></div>
         </article>
         @if (offer.id) {

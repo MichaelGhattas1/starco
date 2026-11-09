@@ -28,10 +28,9 @@ export class PaymentResultPage {
   constructor() {
     inject(Title).setTitle('Payment · Plaza Inn');
     this.message.set(this.locale.t('pay.needRef'));
-    const orderId = this.params.get('order') ?? this.params.get('id');
-    if (this.paymentRef()) {
-      this.confirm();
-    } else if (orderId) {
+    const orderId = this.params.get('order') ?? this.params.get('id') ?? this.paymentRef();
+    if (orderId) {
+      this.paymentRef.set(orderId);
       this.check(orderId);
     }
   }
@@ -84,18 +83,7 @@ export class PaymentResultPage {
       this.message.set(this.locale.t('pay.enterRef'));
       return;
     }
-    this.loading.set(true);
-    this.api.confirmPayment(paymentRef).subscribe({
-      next: (result) => {
-        this.loading.set(false);
-        this.message.set(this.locale.t('pay.sent'));
-        this.detail.set(typeof result === 'string' ? result : JSON.stringify(result));
-      },
-      error: (error) => {
-        this.loading.set(false);
-        this.message.set(errorMessage(error));
-      },
-    });
+    this.check(paymentRef);
   }
 
   private check(orderId: string): void {

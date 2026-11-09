@@ -16,7 +16,12 @@ import { LocaleService } from '../core/locale.service';
         <h2 class="font-display text-3xl leading-none break-words">{{ title() }}</h2>
         <p class="line-clamp-3 text-sm text-gold-200/80">{{ summary() }}</p>
         <div class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-4">
-          <span class="min-w-0 text-gold-300">{{ price() }}</span>
+          <span class="min-w-0 text-gold-300">
+            {{ price() }}
+            @if (range()) {
+              <span class="mt-1 block text-xs text-gold-100/80">{{ range() }}</span>
+            }
+          </span>
           <a class="font-bold text-gold-300" [routerLink]="link()">{{ locale.t('action.view') }}</a>
         </div>
       </div>
@@ -29,6 +34,7 @@ export class CatalogCard {
   readonly kicker = input('');
   readonly summary = input('');
   readonly price = input('');
+  readonly range = input<string | null>(null);
   readonly image = input<string | null>(null);
   readonly link = input.required<string[]>();
 }

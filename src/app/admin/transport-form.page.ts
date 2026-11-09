@@ -42,6 +42,7 @@ import { NoticeService } from '../core/notice.service';
           }
         </div>
         <label class="field">Vehicles <input type="number" min="1" formControlName="availableVehicles" /></label>
+        <label class="field md:col-span-2">Price range <input formControlName="priceRange" /></label>
       </div>
       <label class="field">Description <textarea rows="4" formControlName="description"></textarea></label>
       <label class="field">Arabic description <textarea rows="4" formControlName="descriptionAr" dir="rtl"></textarea></label>
@@ -93,6 +94,7 @@ export class TransportFormPage {
     maxPassengers: [1, [Validators.required, Validators.min(1)]],
     maxLuggage: [0, [Validators.required, Validators.min(0)]],
     pricePerTrip: [0.01, [Validators.required, Validators.min(0.01)]],
+    priceRange: [''],
     availableVehicles: [1, [Validators.required, Validators.min(1)]],
     isActive: true,
   });
@@ -131,6 +133,7 @@ export class TransportFormPage {
           maxPassengers: item.maxPassengers,
           maxLuggage: item.maxLuggage,
           availableVehicles: item.availableVehicles,
+          priceRange: item.priceRange ?? '',
           isActive: item.isActive,
         });
         this.storedUsd.set({ pricePerTrip: item.pricePerTrip });
@@ -197,6 +200,7 @@ export class TransportFormPage {
       maxPassengers: Number(value.maxPassengers),
       maxLuggage: Number(value.maxLuggage),
       pricePerTrip,
+      priceRange: value.priceRange.trim() || null,
       availableVehicles: Number(value.availableVehicles),
       isActive: value.isActive,
       imageIds: this.imageIds(),

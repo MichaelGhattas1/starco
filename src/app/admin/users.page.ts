@@ -3,6 +3,7 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { Title } from '@angular/platform-browser';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
+import { ConfirmService } from '../core/confirm.service';
 import { NoticeService } from '../core/notice.service';
 import { ADMIN_ROLE, ROLE_OPTIONS, Role, UserAccount } from '../core/models';
 import { AuthService } from '../core/auth.service';
@@ -16,6 +17,7 @@ import { AuthService } from '../core/auth.service';
 export class UsersPage {
   private readonly api = inject(ApiService);
   private readonly notice = inject(NoticeService);
+  private readonly confirm = inject(ConfirmService);
   private readonly auth = inject(AuthService);
   readonly roles = ROLE_OPTIONS;
   readonly users = signal<UserAccount[]>([]);
@@ -40,7 +42,17 @@ export class UsersPage {
   }
 
   edit(user: UserAccount): void {
+    if (!user.id) {
+      return;
+    }
     this.editingId.set(user.id);
+    this.api.user(user.id).subscribe({
+      next: (fresh) => this.fillUser(fresh),
+      error: () => this.fillUser(user),
+    });
+  }
+
+  private fillUser(user: UserAccount): void {
     this.form.patchValue({
       userName: user.userName ?? '',
       email: user.email ?? '',
@@ -125,15 +137,21 @@ export class UsersPage {
   }
 
   remove(user: UserAccount): void {
-    if (!user.id || !confirm(`Delete ${user.userName ?? 'this user'}?`)) {
+    if (!user.id) {
       return;
     }
-    this.api.deleteUser(user.id).subscribe({
-      next: () => {
-        this.notice.success('User deleted.');
-        this.load();
-      },
-      error: (error) => this.notice.error(errorMessage(error)),
+    const id = user.id;
+    void this.confirm.ask(`Delete ${user.userName ?? 'this user'}?`).then((ok) => {
+      if (!ok) {
+        return;
+      }
+      this.api.deleteUser(id).subscribe({
+        next: () => {
+          this.notice.success('User deleted.');
+          this.load();
+        },
+        error: (error) => this.notice.error(errorMessage(error)),
+      });
     });
   }
 

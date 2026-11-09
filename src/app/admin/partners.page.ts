@@ -4,6 +4,7 @@ import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
+import { ConfirmService } from '../core/confirm.service';
 import { LocaleService } from '../core/locale.service';
 import { NoticeService } from '../core/notice.service';
 import { HotelLookup, Partner } from '../core/models';
@@ -17,6 +18,7 @@ import { HotelLookup, Partner } from '../core/models';
 export class PartnersPage {
   private readonly api = inject(ApiService);
   private readonly notice = inject(NoticeService);
+  private readonly confirm = inject(ConfirmService);
   private readonly locale = inject(LocaleService);
   readonly partners = signal<Partner[]>([]);
   readonly hotels = signal<HotelLookup[]>([]);
@@ -103,15 +105,21 @@ export class PartnersPage {
   }
 
   remove(partner: Partner): void {
-    if (!partner.id || !confirm(`Delete ${partner.name ?? 'this partner'}?`)) {
+    if (!partner.id) {
       return;
     }
-    this.api.deletePartner(partner.id).subscribe({
-      next: () => {
-        this.notice.success('Partner deleted.');
-        this.load();
-      },
-      error: (error) => this.notice.error(errorMessage(error)),
+    const id = partner.id;
+    void this.confirm.ask(`Delete ${partner.name ?? 'this partner'}?`).then((ok) => {
+      if (!ok) {
+        return;
+      }
+      this.api.deletePartner(id).subscribe({
+        next: () => {
+          this.notice.success('Partner deleted.');
+          this.load();
+        },
+        error: (error) => this.notice.error(errorMessage(error)),
+      });
     });
   }
 

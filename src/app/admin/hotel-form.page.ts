@@ -6,7 +6,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
 import { NoticeService } from '../core/notice.service';
-import { firstPhotoProblem } from '../core/image-file';
+import { firstLogoProblem, firstPhotoProblem } from '../core/image-file';
 import { extractIds } from '../core/media';
 import { PlazaInnType } from '../core/models';
 
@@ -45,6 +45,7 @@ export class HotelFormPage {
     facebook: [''],
     whatsApp: [''],
     space: [''],
+    priceRange: [''],
     logoId: [0],
   });
 
@@ -77,6 +78,7 @@ export class HotelFormPage {
             facebook: hotel.facebook ?? '',
             whatsApp: hotel.whatsApp ?? '',
             space: hotel.space ?? '',
+            priceRange: hotel.priceRange ?? '',
             logoId: hotel.logo?.id ?? 0,
           });
           this.imageIds.set((hotel.images ?? []).map((image) => image.id));
@@ -92,12 +94,14 @@ export class HotelFormPage {
     if (!files.length) {
       return;
     }
-    void firstPhotoProblem(files).then((problem) => {
+    const validation = kind === 'logo' ? firstLogoProblem(files) : firstPhotoProblem(files);
+    void validation.then((problem) => {
       if (problem) {
         this.error.set(problem);
         input.value = '';
         return;
       }
+      this.error.set(null);
       this.sendHotelImage(input, files, kind);
     });
   }
@@ -142,6 +146,7 @@ export class HotelFormPage {
       facebook: value.facebook || null,
       whatsApp: value.whatsApp || null,
       space: value.space || null,
+      priceRange: value.priceRange.trim() || null,
       imageIds: this.imageIds(),
     };
     this.saving.set(true);

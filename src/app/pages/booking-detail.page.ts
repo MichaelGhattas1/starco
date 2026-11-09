@@ -24,16 +24,19 @@ interface BookingFact {
   imports: [RouterLink, HotelPrice],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <a [routerLink]="backLink()" class="text-sm text-gold-300">{{ locale.t('list.allBookings') }}</a>
+    <a [routerLink]="backLink()" class="no-print text-sm text-gold-300">{{ locale.t('list.allBookings') }}</a>
     @if (loading()) {
       <p class="mt-6" role="status">{{ locale.t('load.booking') }}</p>
     } @else if (error()) {
       <p class="mt-6 text-red-200" role="alert">{{ error() }}</p>
     } @else if (item(); as booking) {
-      <article class="panel mt-4 grid gap-6 p-6">
-        <div>
-          <p class="kicker">{{ locale.label(typeLabel(booking.bookingType)) }} · {{ locale.label(statusLabel(booking.status)) }}</p>
-          <h1 class="font-display text-5xl leading-none">{{ booking.customerName || locale.t('noun.booking') }}</h1>
+      <article class="booking-sheet panel mt-4 grid gap-6 p-6">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p class="kicker">{{ locale.label(typeLabel(booking.bookingType)) }} · {{ locale.label(statusLabel(booking.status)) }}</p>
+            <h1 class="font-display text-5xl leading-none">{{ booking.customerName || locale.t('noun.booking') }}</h1>
+          </div>
+          <button type="button" class="btn btn-line no-print" (click)="print()">{{ locale.t('action.print') }}</button>
         </div>
         @if (isHotel(booking)) {
           <app-hotel-price [base]="hotelBase(booking)" [quote]="booking.totalPrice" mode="charge" />
@@ -55,7 +58,7 @@ interface BookingFact {
           }
         </dl>
         @if (booking.encodedId && !cancelled(booking)) {
-          <button type="button" class="btn btn-danger w-fit" [disabled]="busy()" (click)="cancel(booking)">
+          <button type="button" class="btn btn-danger no-print w-fit" [disabled]="busy()" (click)="cancel(booking)">
             {{ locale.t('book.cancelBooking') }}
           </button>
         }
@@ -146,6 +149,10 @@ export class BookingDetailPage {
 
   hotelBase(booking: BookingResult): number {
     return hotelBaseFromTotal(booking.totalPrice);
+  }
+
+  print(): void {
+    window.print();
   }
 
   backLink(): string {

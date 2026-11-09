@@ -29,6 +29,7 @@ import { ServiceBooking } from '../shared/service-booking';
           <h1 class="font-display text-5xl leading-none">{{ label(item) }}</h1>
           <p>{{ locale.t('noun.days', { n: item.durationDays }) }} · {{ locale.t('noun.hours', { n: item.durationHours }) }} · {{ locale.t('noun.guests', { n: item.maxCapacity }) }}</p>
           <p class="text-gold-300">{{ currency.display(item.pricePerPerson) }} {{ currency.per('person') }} · {{ currency.display(item.pricePerChild) }} {{ currency.per('child') }}</p>
+          @if (item.priceRange) { <p class="text-sm text-gold-100/80">{{ item.priceRange }}</p> }
           @if (item.startDate || item.endDate) {
             <p class="text-sm text-gold-200/80">{{ fromApiDate(item.startDate) }} – {{ fromApiDate(item.endDate) }}</p>
           }

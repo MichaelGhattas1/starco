@@ -3,6 +3,7 @@ import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
+import { ConfirmService } from '../core/confirm.service';
 import { LocaleService } from '../core/locale.service';
 import { CurrencyService } from '../core/currency.service';
 import { fromApiDate } from '../core/media';
@@ -58,6 +59,7 @@ import { NoticeService } from '../core/notice.service';
 export class EventsAdminPage {
   private readonly api = inject(ApiService);
   private readonly notice = inject(NoticeService);
+  private readonly confirm = inject(ConfirmService);
   readonly locale = inject(LocaleService);
   private readonly currency = inject(CurrencyService);
   readonly money = (value: number | null | undefined) => this.currency.charge(value);
@@ -98,15 +100,21 @@ export class EventsAdminPage {
   }
 
   remove(item: PlazaEvent): void {
-    if (!item.id || !confirm(this.locale.t('action.deleteAsk', { name: this.label(item) }))) {
+    if (!item.id) {
       return;
     }
-    this.api.deleteEvent(item.id).subscribe({
-      next: () => {
-        this.notice.success(this.locale.t('toast.deleted', { name: this.locale.t('noun.event') }));
-        this.load();
-      },
-      error: (error) => this.notice.error(errorMessage(error)),
+    const id = item.id;
+    void this.confirm.ask(this.locale.t('action.deleteAsk', { name: this.label(item) })).then((ok) => {
+      if (!ok) {
+        return;
+      }
+      this.api.deleteEvent(id).subscribe({
+        next: () => {
+          this.notice.success(this.locale.t('toast.deleted', { name: this.locale.t('noun.event') }));
+          this.load();
+        },
+        error: (error) => this.notice.error(errorMessage(error)),
+      });
     });
   }
 }

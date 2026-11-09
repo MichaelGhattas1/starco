@@ -44,6 +44,7 @@ import { plainText } from '../shared/plain-text';
               [kicker]="locale.pick(item.vehicleType, item.vehicleTypeAr)"
               [summary]="plain(locale.pick(item.description, item.descriptionAr))"
               [price]="currency.display(item.pricePerTrip) + ' ' + currency.per('trip')"
+              [range]="item.priceRange"
               [image]="firstImage(item.images)"
               [link]="['/transport', item.id]"
             />

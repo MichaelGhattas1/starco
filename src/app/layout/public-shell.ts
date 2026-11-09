@@ -14,6 +14,7 @@ import { NoticeService } from '../core/notice.service';
   templateUrl: './public-shell.html',
   host: {
     '(document:keydown.escape)': 'closeMenu()',
+    '(document:click)': 'closeAccount()',
   },
 })
 export class PublicShell {
@@ -22,6 +23,7 @@ export class PublicShell {
   readonly locale = inject(LocaleService);
   readonly notice = inject(NoticeService);
   readonly menuOpen = signal(false);
+  readonly accountOpen = signal(false);
   readonly year = new Date().getFullYear();
 
   private readonly route = inject(ActivatedRoute);
@@ -55,6 +57,16 @@ export class PublicShell {
 
   closeMenu(): void {
     this.menuOpen.set(false);
+    this.accountOpen.set(false);
+  }
+
+  closeAccount(): void {
+    this.accountOpen.set(false);
+  }
+
+  accountInitial(): string {
+    const name = this.auth.name()?.trim();
+    return name ? name.charAt(0).toLocaleUpperCase() : 'A';
   }
 
   logout(): void {

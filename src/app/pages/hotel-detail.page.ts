@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
+import { ApplicationRef, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, computed, inject, signal, viewChild, viewChildren } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DomSanitizer, Title } from '@angular/platform-browser';
@@ -22,6 +22,7 @@ import { HotelPrice } from '../shared/hotel-price';
 })
 export class HotelDetailPage {
   private readonly api = inject(ApiService);
+  private readonly appRef = inject(ApplicationRef);
   private readonly route = inject(ActivatedRoute);
   private readonly title = inject(Title);
   private readonly sanitizer = inject(DomSanitizer);
@@ -30,6 +31,9 @@ export class HotelDetailPage {
   readonly cart = inject(CartStore);
   private readonly notice = inject(NoticeService);
   private readonly roomDialog = viewChild<ElementRef<HTMLDialogElement>>('roomDialog');
+  private readonly slides = viewChildren<ElementRef<HTMLButtonElement>>('slide');
+  private galleryTimer: ReturnType<typeof setInterval> | null = null;
+  private galleryPaused = false;
   readonly openRoom = signal<AvailableRoom | null>(null);
   readonly roomRecord = signal<Room | null>(null);
   readonly roomBusy = signal(false);
@@ -64,6 +68,30 @@ export class HotelDetailPage {
     return url ? this.sanitizer.bypassSecurityTrustResourceUrl(url) : null;
   });
   readonly gallery = computed(() => this.hotel()?.images ?? []);
+  readonly socials = computed(() => {
+    const hotel = this.hotel();
+    if (!hotel) {
+      return [];
+    }
+    const items: { key: 'facebook' | 'instagram' | 'space' | 'whatsapp'; href: string }[] = [];
+    const facebook = webLink(hotel.facebook);
+    const instagram = webLink(hotel.instagram);
+    const space = webLink(hotel.space);
+    const whatsApp = whatsAppLink(hotel.whatsApp);
+    if (facebook) {
+      items.push({ key: 'facebook', href: facebook });
+    }
+    if (instagram) {
+      items.push({ key: 'instagram', href: instagram });
+    }
+    if (space) {
+      items.push({ key: 'space', href: space });
+    }
+    if (whatsApp) {
+      items.push({ key: 'whatsapp', href: whatsApp });
+    }
+    return items;
+  });
   readonly photo = computed(() => mediaUrl(this.gallery()[this.activeImage()]?.url) || firstImage(this.gallery()));
   readonly facilities = computed(() => Object.entries(this.hotel()?.insight?.facilities ?? {}));
   readonly restaurantText = computed(() =>
@@ -123,6 +151,80 @@ export class HotelDetailPage {
           this.loading.set(false);
         },
       });
+    this.startGallery();
+    inject(DestroyRef).onDestroy(() => this.stopGallery());
+  }
+
+  socialLabel(key: 'facebook' | 'instagram' | 'space' | 'whatsapp'): string {
+    if (key === 'facebook') {
+      return this.locale.t('field.facebook');
+    }
+    if (key === 'instagram') {
+      return this.locale.t('field.instagram');
+    }
+    if (key === 'whatsapp') {
+      return this.locale.t('field.whatsApp');
+    }
+    return this.locale.t('field.space');
+  }
+
+  showPhoto(index: number): void {
+    const count = this.gallery().length;
+    if (!count) {
+      return;
+    }
+    const next = ((index % count) + count) % count;
+    this.activeImage.set(next);
+    queueMicrotask(() => this.centerSlide(next));
+  }
+
+  private centerSlide(index: number): void {
+    const slide = this.slides().at(index)?.nativeElement;
+    const scroller = slide?.parentElement;
+    if (!slide || !scroller) {
+      return;
+    }
+    const scrollerBox = scroller.getBoundingClientRect();
+    const slideBox = slide.getBoundingClientRect();
+    const delta = slideBox.left - scrollerBox.left - (scrollerBox.width - slideBox.width) / 2;
+    if (Math.abs(delta) < 1) {
+      return;
+    }
+    scroller.scrollBy({ left: delta, behavior: 'smooth' });
+  }
+
+  stepGallery(delta: number): void {
+    this.showPhoto(this.activeImage() + delta);
+    this.startGallery();
+  }
+
+  pauseGallery(): void {
+    this.galleryPaused = true;
+  }
+
+  resumeGallery(): void {
+    this.galleryPaused = false;
+  }
+
+  private startGallery(): void {
+    this.stopGallery();
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+    this.galleryTimer = setInterval(() => {
+      if (this.galleryPaused || document.hidden || this.gallery().length < 2) {
+        return;
+      }
+      this.showPhoto(this.activeImage() + 1);
+      this.appRef.tick();
+    }, 4000);
+  }
+
+  private stopGallery(): void {
+    if (this.galleryTimer) {
+      clearInterval(this.galleryTimer);
+      this.galleryTimer = null;
+    }
   }
 
   alignCheckout(checkIn: string): void {
@@ -348,4 +450,30 @@ function mapsLinkEmbed(location: string | null | undefined): string | null {
 
 function embedQuery(query: string): string {
   return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&z=15&output=embed`;
+}
+
+function webLink(value: string | null): string | null {
+  const text = value?.trim();
+  if (!text) {
+    return null;
+  }
+  if (/^https?:\/\//i.test(text)) {
+    return text;
+  }
+  if (!text.includes('.')) {
+    return null;
+  }
+  return `https://${text}`;
+}
+
+function whatsAppLink(value: string | null): string | null {
+  const text = value?.trim();
+  if (!text) {
+    return null;
+  }
+  if (/^https?:\/\//i.test(text)) {
+    return text;
+  }
+  const digits = text.replace(/\D/g, '');
+  return digits.length >= 8 ? `https://wa.me/${digits}` : webLink(text);
 }

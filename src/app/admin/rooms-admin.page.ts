@@ -3,6 +3,7 @@ import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
+import { ConfirmService } from '../core/confirm.service';
 import { LocaleService } from '../core/locale.service';
 import { NoticeService } from '../core/notice.service';
 import { HotelPrice } from '../shared/hotel-price';
@@ -52,6 +53,7 @@ import { ROOM_TYPE_OPTIONS, Room } from '../core/models';
 export class RoomsAdminPage {
   private readonly api = inject(ApiService);
   private readonly notice = inject(NoticeService);
+  private readonly confirm = inject(ConfirmService);
   readonly locale = inject(LocaleService);
   readonly rooms = signal<Room[]>([]);
   readonly query = signal('');
@@ -92,15 +94,21 @@ export class RoomsAdminPage {
   }
 
   remove(room: Room): void {
-    if (!room.id || !confirm(this.locale.t('action.deleteAsk', { name: room.name || this.locale.t('noun.room') }))) {
+    if (!room.id) {
       return;
     }
-    this.api.deleteRoom(room.id).subscribe({
-      next: () => {
-        this.notice.success(this.locale.t('toast.deleted', { name: this.locale.t('noun.room') }));
-        this.load();
-      },
-      error: (error) => this.notice.error(errorMessage(error)),
+    const id = room.id;
+    void this.confirm.ask(this.locale.t('action.deleteAsk', { name: room.name || this.locale.t('noun.room') })).then((ok) => {
+      if (!ok) {
+        return;
+      }
+      this.api.deleteRoom(id).subscribe({
+        next: () => {
+          this.notice.success(this.locale.t('toast.deleted', { name: this.locale.t('noun.room') }));
+          this.load();
+        },
+        error: (error) => this.notice.error(errorMessage(error)),
+      });
     });
   }
 

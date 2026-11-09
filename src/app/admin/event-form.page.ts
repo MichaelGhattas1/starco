@@ -26,6 +26,7 @@ import { NoticeService } from '../core/notice.service';
         <label class="field">Ends <input type="date" formControlName="endDate" /></label>
         <label class="field">Ticket price (EGP) <input type="number" min="0.01" step="0.01" formControlName="ticketPrice" /></label>
         <label class="field">Tickets <input type="number" min="1" formControlName="totalTickets" /></label>
+        <label class="field md:col-span-2">Price range <input formControlName="priceRange" /></label>
       </div>
       <label class="field">Description <textarea rows="4" formControlName="description"></textarea></label>
       <label class="field">Arabic description <textarea rows="4" formControlName="descriptionAr" dir="rtl"></textarea></label>
@@ -69,6 +70,7 @@ export class EventFormPage {
     eventDate: ['', Validators.required],
     endDate: '',
     ticketPrice: [0.01, [Validators.required, Validators.min(0.01)]],
+    priceRange: [''],
     totalTickets: [1, [Validators.required, Validators.min(1)]],
     isActive: true,
   });
@@ -92,6 +94,7 @@ export class EventFormPage {
           eventDate: fromApiDate(item.eventDate),
           endDate: fromApiDate(item.endDate),
           ticketPrice: item.ticketPrice,
+          priceRange: item.priceRange ?? '',
           totalTickets: item.totalTickets,
           isActive: item.isActive,
         });
@@ -149,6 +152,7 @@ export class EventFormPage {
       eventDate: toApiDateTime(value.eventDate, 12),
       endDate: value.endDate ? toApiDateTime(value.endDate, 12) : null,
       ticketPrice: Number(value.ticketPrice),
+      priceRange: value.priceRange.trim() || null,
       totalTickets: Number(value.totalTickets),
       isActive: value.isActive,
       imageIds: this.imageIds(),
