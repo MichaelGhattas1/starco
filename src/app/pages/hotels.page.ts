@@ -29,7 +29,9 @@ export class HotelsPage {
   readonly filtered = computed(() => {
     const city = this.city().trim().toLowerCase();
     const query = this.query().trim().toLowerCase();
-    return this.hotels().filter((hotel) => {
+    const hotels = this.hotels();
+    const list = Array.isArray(hotels) ? hotels : [];
+    return list.filter((hotel) => {
       const cityName = `${hotel.city ?? ''} ${hotel.cityAr ?? ''}`.toLowerCase();
       const name = `${hotel.name ?? ''} ${hotel.nameAr ?? ''}`.toLowerCase();
       const cityOk = !city || cityName.includes(city);

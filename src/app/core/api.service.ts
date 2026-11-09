@@ -49,7 +49,7 @@ export class ApiService {
   private readonly base = environment.apiUrl;
 
   hotels(): Observable<Hotel[]> {
-    return this.get<Hotel[]>('/api/Hotel');
+    return this.get<unknown>('/api/Hotel').pipe(map((value) => readList<Hotel>(value)));
   }
 
   hotel(id: string): Observable<Hotel> {
@@ -465,6 +465,21 @@ function asFiles(payload: unknown): FileDto[] {
     }
     return [];
   });
+}
+
+function readList<T>(value: unknown): T[] {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    for (const key of ['data', 'items', '$values', 'hotels', 'results']) {
+      if (Array.isArray(record[key])) {
+        return record[key] as T[];
+      }
+    }
+  }
+  return [];
 }
 
 function unwrap<T>(text: string): T {
