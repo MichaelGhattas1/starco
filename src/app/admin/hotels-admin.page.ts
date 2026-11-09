@@ -60,11 +60,13 @@ export class HotelsAdminPage {
   readonly hotels = signal<Hotel[]>([]);
   readonly query = signal('');
   readonly visible = computed(() => {
+    const hotels = this.hotels();
+    const list = Array.isArray(hotels) ? hotels : [];
     const query = this.query().trim().toLowerCase();
     if (!query) {
-      return this.hotels();
+      return list;
     }
-    return this.hotels().filter((hotel) =>
+    return list.filter((hotel) =>
       `${hotel.name ?? ''} ${hotel.nameAr ?? ''} ${hotel.city ?? ''} ${hotel.cityAr ?? ''} ${hotel.phone ?? ''}`
         .toLowerCase()
         .includes(query),
