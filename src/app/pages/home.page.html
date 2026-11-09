@@ -136,7 +136,6 @@
     </div>
     <a routerLink="/packages" class="btn btn-line">{{ locale.t('action.seeAll') }}</a>
   </div>
-  <app-section-banner [type]="section.Package" />
   @if (loading()) {
     <p role="status">{{ locale.t('load.offers') }}</p>
   } @else if (offersError()) {
@@ -171,7 +170,6 @@
     </div>
     <a routerLink="/hotels" class="btn btn-line">{{ locale.t('action.seeAll') }}</a>
   </div>
-  <app-section-banner [type]="section.Hotel" />
   @if (loading()) {
     <p role="status">{{ locale.t('load.hotels') }}</p>
   } @else if (error()) {
@@ -193,7 +191,6 @@
     </div>
     <a routerLink="/trips" class="btn btn-line">{{ locale.t('action.seeAll') }}</a>
   </div>
-  <app-section-banner [type]="section.Trip" />
   @if (loading()) {
     <p role="status">{{ locale.t('load.trips') }}</p>
   } @else if (tripsError()) {
@@ -227,7 +224,6 @@
     </div>
     <a routerLink="/transport" class="btn btn-line">{{ locale.t('action.seeAll') }}</a>
   </div>
-  <app-section-banner [type]="section.Transport" />
   @if (loading()) {
     <p role="status">{{ locale.t('load.transport') }}</p>
   } @else if (transportError()) {

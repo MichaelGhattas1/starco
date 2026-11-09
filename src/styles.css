@@ -18,6 +18,37 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    color-scheme: dark;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-gold-500) var(--color-navy-900);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-gold-500) var(--color-navy-900);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-navy-900);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-gold-500);
+    border: 2px solid var(--color-navy-900);
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gold-400);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: var(--color-navy-900);
   }
 
   body {
@@ -671,20 +702,30 @@ input[type='email'] {
 }
 
 .admin-nav {
-  display: flex;
-  gap: 0.25rem;
-  overflow-x: auto;
-  padding-bottom: 0.35rem;
+  display: grid;
+  gap: 0.2rem;
 }
 
 .admin-nav a {
-  flex: none;
-  white-space: nowrap;
+  white-space: normal;
+}
+
+.admin-nav-split {
+  margin-top: 0.35rem;
+  border-top: 1px solid rgb(230 207 138 / 0.28);
+  padding-top: 0.65rem;
 }
 
 @media (min-width: 576px) {
   .filters {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .admin-shell {
+    grid-template-columns: 220px minmax(0, 1fr);
+    align-items: start;
   }
 }
 
@@ -701,16 +742,6 @@ input[type='email'] {
   .admin-shell {
     grid-template-columns: 220px minmax(0, 1fr);
     align-items: start;
-  }
-
-  .admin-nav {
-    display: grid;
-    overflow: visible;
-    padding-bottom: 0;
-  }
-
-  .admin-nav a {
-    white-space: normal;
   }
 }
 

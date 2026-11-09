@@ -6,21 +6,19 @@ import { ApiService } from '../core/api.service';
 import { LocaleService } from '../core/locale.service';
 import { CurrencyService } from '../core/currency.service';
 import { firstImage } from '../core/media';
-import { PlazaInnType, TransportOffer } from '../core/models';
+import { TransportOffer } from '../core/models';
 import { CatalogCard } from '../shared/catalog-card';
-import { SectionBanner } from '../shared/section-banner';
 import { plainText } from '../shared/plain-text';
 
 @Component({
   selector: 'app-transport-page',
-  imports: [ReactiveFormsModule, CatalogCard, SectionBanner],
+  imports: [ReactiveFormsModule, CatalogCard],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mb-6">
       <p class="kicker">{{ locale.t('home.transfers') }}</p>
       <h1 class="font-display text-5xl">{{ locale.t('nav.transport') }}</h1>
     </div>
-    <app-section-banner [type]="section.Transport" />
     <form class="panel filters filters-3 mb-6 p-4" [formGroup]="form" (ngSubmit)="load()">
       <label class="field">{{ locale.t('field.search') }} <input formControlName="Search" /></label>
       <label class="field">{{ locale.t('field.vehicle') }} <input formControlName="VehicleType" /></label>
@@ -59,7 +57,6 @@ import { plainText } from '../shared/plain-text';
 export class TransportPage {
   private readonly api = inject(ApiService);
   readonly locale = inject(LocaleService);
-  readonly section = PlazaInnType;
   readonly currency = inject(CurrencyService);
   readonly firstImage = firstImage;
   readonly plain = plainText;

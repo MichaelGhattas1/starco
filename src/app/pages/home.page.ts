@@ -9,16 +9,15 @@ import { ApiService } from '../core/api.service';
 import { LocaleService } from '../core/locale.service';
 import { firstImage, inputDate, mediaUrl, nextDate } from '../core/media';
 import { CurrencyService } from '../core/currency.service';
-import { AboutUs, HomeSlider, Hotel, PlazaInnType, TransportOffer, TravelPackage, Trip } from '../core/models';
+import { AboutUs, HomeSlider, Hotel, TransportOffer, TravelPackage, Trip } from '../core/models';
 import { CatalogCard } from '../shared/catalog-card';
 import { ContactSection } from '../shared/contact-section';
 import { HotelCard } from '../shared/hotel-card';
-import { SectionBanner } from '../shared/section-banner';
 import { plainText } from '../shared/plain-text';
 
 @Component({
   selector: 'app-home-page',
-  imports: [ReactiveFormsModule, RouterLink, HotelCard, CatalogCard, ContactSection, SectionBanner],
+  imports: [ReactiveFormsModule, RouterLink, HotelCard, CatalogCard, ContactSection],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './home.page.html',
 })
@@ -26,7 +25,6 @@ export class HomePage {
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
   readonly locale = inject(LocaleService);
-  readonly section = PlazaInnType;
   readonly currency = inject(CurrencyService);
   readonly firstImage = firstImage;
   readonly plain = plainText;

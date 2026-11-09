@@ -9,8 +9,6 @@
   </label>
 </section>
 
-<app-section-banner [type]="section.Hotel" />
-
 @if (city() || checkIn()) {
   <p class="mb-4 text-sm text-gold-300">
     @if (city()) { {{ locale.t('noun.cityLine', { city: city() }) }} }

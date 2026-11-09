@@ -5,20 +5,18 @@ import { ActivatedRoute } from '@angular/router';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
 import { LocaleService } from '../core/locale.service';
-import { Hotel, PlazaInnType } from '../core/models';
+import { Hotel } from '../core/models';
 import { HotelCard } from '../shared/hotel-card';
-import { SectionBanner } from '../shared/section-banner';
 
 @Component({
   selector: 'app-hotels-page',
-  imports: [HotelCard, SectionBanner],
+  imports: [HotelCard],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './hotels.page.html',
 })
 export class HotelsPage {
   private readonly api = inject(ApiService);
   readonly locale = inject(LocaleService);
-  readonly section = PlazaInnType;
   readonly hotels = signal<Hotel[]>([]);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);

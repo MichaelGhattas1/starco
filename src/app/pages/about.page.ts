@@ -4,19 +4,16 @@ import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
 import { LocaleService } from '../core/locale.service';
 import { mediaUrl } from '../core/media';
-import { AboutUs, PlazaInnType } from '../core/models';
-import { SectionBanner } from '../shared/section-banner';
+import { AboutUs } from '../core/models';
 
 @Component({
   selector: 'app-about-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SectionBanner],
   templateUrl: './about.page.html',
 })
 export class AboutPage {
   private readonly api = inject(ApiService);
   readonly locale = inject(LocaleService);
-  readonly section = PlazaInnType;
   readonly about = signal<AboutUs | null>(null);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
