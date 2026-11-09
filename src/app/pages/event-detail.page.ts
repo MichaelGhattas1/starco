@@ -30,6 +30,7 @@ import { ServiceBooking } from '../shared/service-booking';
           <p>{{ fromApiDate(event.eventDate) }}@if (event.endDate) { – {{ fromApiDate(event.endDate) }} }</p>
           <p>{{ locale.t('noun.tickets', { n: event.totalTickets }) }}</p>
           <p class="text-gold-300">{{ currency.display(event.ticketPrice) }}</p>
+          @if (event.priceRange) { <p class="text-sm text-gold-100/80">{{ event.priceRange }}</p> }
           <div class="rich-text text-gold-100/90" [innerHTML]="locale.pick(event.description, event.descriptionAr)"></div>
         </article>
         @if (event.id) {

@@ -40,7 +40,17 @@ export class UsersPage {
   }
 
   edit(user: UserAccount): void {
+    if (!user.id) {
+      return;
+    }
     this.editingId.set(user.id);
+    this.api.user(user.id).subscribe({
+      next: (fresh) => this.fillUser(fresh),
+      error: () => this.fillUser(user),
+    });
+  }
+
+  private fillUser(user: UserAccount): void {
     this.form.patchValue({
       userName: user.userName ?? '',
       email: user.email ?? '',

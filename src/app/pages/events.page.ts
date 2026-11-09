@@ -6,19 +6,21 @@ import { ApiService } from '../core/api.service';
 import { LocaleService } from '../core/locale.service';
 import { CurrencyService } from '../core/currency.service';
 import { firstImage, toApiDateTime } from '../core/media';
-import { PlazaEvent } from '../core/models';
+import { PlazaEvent, PlazaInnType } from '../core/models';
 import { CatalogCard } from '../shared/catalog-card';
+import { SectionBanner } from '../shared/section-banner';
 import { plainText } from '../shared/plain-text';
 
 @Component({
   selector: 'app-events-page',
-  imports: [ReactiveFormsModule, CatalogCard],
+  imports: [ReactiveFormsModule, CatalogCard, SectionBanner],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mb-6">
       <p class="kicker">{{ locale.t('home.calendar') }}</p>
       <h1 class="font-display text-5xl">{{ locale.t('nav.events') }}</h1>
     </div>
+    <app-section-banner [type]="section.Event" />
     <form class="panel filters filters-5 mb-6 p-4" [formGroup]="form" (ngSubmit)="load()">
       <label class="field">{{ locale.t('field.search') }} <input formControlName="Search" /></label>
       <label class="field">{{ locale.t('field.location') }} <input formControlName="Location" /></label>
@@ -42,6 +44,7 @@ import { plainText } from '../shared/plain-text';
               [kicker]="locale.pick(item.location, item.locationAr)"
               [summary]="plain(locale.pick(item.description, item.descriptionAr))"
               [price]="currency.display(item.ticketPrice)"
+              [range]="item.priceRange"
               [image]="firstImage(item.images)"
               [link]="['/events', item.id]"
             />
@@ -54,6 +57,7 @@ import { plainText } from '../shared/plain-text';
 export class EventsPage {
   private readonly api = inject(ApiService);
   readonly locale = inject(LocaleService);
+  readonly section = PlazaInnType;
   readonly currency = inject(CurrencyService);
   readonly firstImage = firstImage;
   readonly plain = plainText;

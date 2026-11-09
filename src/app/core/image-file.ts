@@ -8,6 +8,28 @@ export const PHOTO_RULES =
   'Use a JPEG, PNG, or WebP. The shorter side must be at least 480 pixels, the longer side at most 4096, and the file 5 MB or less.';
 
 export async function photoProblem(file: File): Promise<string | null> {
+  return imageProblem(file, MIN_EDGE);
+}
+
+export async function firstPhotoProblem(files: File[]): Promise<string | null> {
+  return firstImageProblem(files, MIN_EDGE);
+}
+
+export async function firstLogoProblem(files: File[]): Promise<string | null> {
+  return firstImageProblem(files, 0);
+}
+
+async function firstImageProblem(files: File[], minimumEdge: number): Promise<string | null> {
+  for (const file of files) {
+    const problem = await imageProblem(file, minimumEdge);
+    if (problem) {
+      return problem;
+    }
+  }
+  return null;
+}
+
+async function imageProblem(file: File, minimumEdge: number): Promise<string | null> {
   if (!TYPES.has(file.type) && !NAME.test(file.name)) {
     return `${file.name} is not a JPEG, PNG, or WebP photo.`;
   }
@@ -20,21 +42,11 @@ export async function photoProblem(file: File): Promise<string | null> {
   }
   const shortest = Math.min(size.width, size.height);
   const longest = Math.max(size.width, size.height);
-  if (shortest < MIN_EDGE) {
-    return `${file.name} is too small. The shorter side must be at least ${MIN_EDGE} pixels.`;
+  if (shortest < minimumEdge) {
+    return `${file.name} is too small. The shorter side must be at least ${minimumEdge} pixels.`;
   }
   if (longest > MAX_EDGE) {
     return `${file.name} is too large. The longer side must be ${MAX_EDGE} pixels or less.`;
-  }
-  return null;
-}
-
-export async function firstPhotoProblem(files: File[]): Promise<string | null> {
-  for (const file of files) {
-    const problem = await photoProblem(file);
-    if (problem) {
-      return problem;
-    }
   }
   return null;
 }

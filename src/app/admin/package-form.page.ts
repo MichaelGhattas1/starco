@@ -37,6 +37,7 @@ import { NoticeService } from '../core/notice.service';
           }
         </div>
         <label class="field">Available <input type="number" min="1" formControlName="maxPackagesAvailable" /></label>
+        <label class="field md:col-span-2">Price range <input formControlName="priceRange" /></label>
         <label class="field">Nights <input type="number" min="0" formControlName="nightsCount" /></label>
         <label class="field">Start <input type="date" formControlName="startDate" /></label>
         <label class="field">End <input type="date" formControlName="endDate" /></label>
@@ -76,7 +77,7 @@ import { NoticeService } from '../core/notice.service';
         @for (item of transports(); track item.id) {
           <label class="flex items-center gap-2">
             <input type="checkbox" [checked]="has(transportIds(), item.id)" (change)="toggle(transportIds, item.id)" />
-            {{ locale.pick(item.name, item.nameAr) }}
+            {{ locale.pick(item.name, item.nameAr) }}@if (item.vehicleType) { · {{ item.vehicleType }} }
           </label>
         }
       </fieldset>
@@ -138,6 +139,7 @@ export class PackageFormPage {
     descriptionAr: ['', Validators.required],
     durationDays: [1, [Validators.required, Validators.min(1), Validators.max(365)]],
     packagePrice: [0.01, [Validators.required, Validators.min(0.01)]],
+    priceRange: [''],
     maxPackagesAvailable: [1, [Validators.required, Validators.min(1)]],
     nightsCount: null as number | null,
     startDate: '',
@@ -180,6 +182,7 @@ export class PackageFormPage {
           description: item.description ?? '',
           descriptionAr: item.descriptionAr ?? '',
           durationDays: item.durationDays,
+          priceRange: item.priceRange ?? '',
           maxPackagesAvailable: item.maxPackagesAvailable,
           nightsCount: item.nightsCount,
           startDate: fromApiDate(item.startDate),
@@ -267,6 +270,7 @@ export class PackageFormPage {
       descriptionAr: value.descriptionAr.trim(),
       durationDays: Number(value.durationDays),
       packagePrice,
+      priceRange: value.priceRange.trim() || null,
       maxPackagesAvailable: Number(value.maxPackagesAvailable),
       startDate: value.startDate ? toApiDateTime(value.startDate, 12) : null,
       endDate: value.endDate ? toApiDateTime(value.endDate, 12) : null,

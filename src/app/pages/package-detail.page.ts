@@ -28,6 +28,7 @@ import { ServiceBooking } from '../shared/service-booking';
           <p class="kicker">{{ locale.t('noun.days', { n: pack.durationDays }) }}</p>
           <h1 class="font-display text-5xl leading-none">{{ label(pack) }}</h1>
           <p class="text-gold-300">{{ currency.display(pack.packagePrice) }}</p>
+          @if (pack.priceRange) { <p class="text-sm text-gold-100/80">{{ pack.priceRange }}</p> }
           @if (pack.hotelName || pack.hotelNameAr) {
             <p>
               {{ locale.t('field.hotel') }}: {{ locale.pick(pack.hotelName, pack.hotelNameAr) }}

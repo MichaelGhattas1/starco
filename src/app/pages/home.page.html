@@ -136,6 +136,7 @@
     </div>
     <a routerLink="/packages" class="btn btn-line">{{ locale.t('action.seeAll') }}</a>
   </div>
+  <app-section-banner [type]="section.Package" />
   @if (loading()) {
     <p role="status">{{ locale.t('load.offers') }}</p>
   } @else if (offersError()) {
@@ -151,6 +152,7 @@
             [kicker]="locale.t('noun.days', { n: item.durationDays })"
             [summary]="plain(locale.pick(item.description, item.descriptionAr))"
             [price]="currency.display(item.packagePrice)"
+            [range]="item.priceRange"
             [image]="firstImage(item.images)"
             [link]="['/packages', item.id]"
           />
@@ -169,6 +171,7 @@
     </div>
     <a routerLink="/hotels" class="btn btn-line">{{ locale.t('action.seeAll') }}</a>
   </div>
+  <app-section-banner [type]="section.Hotel" />
   @if (loading()) {
     <p role="status">{{ locale.t('load.hotels') }}</p>
   } @else if (error()) {
@@ -190,6 +193,7 @@
     </div>
     <a routerLink="/trips" class="btn btn-line">{{ locale.t('action.seeAll') }}</a>
   </div>
+  <app-section-banner [type]="section.Trip" />
   @if (loading()) {
     <p role="status">{{ locale.t('load.trips') }}</p>
   } @else if (tripsError()) {
@@ -205,6 +209,7 @@
             [kicker]="locale.pick(trip.city, trip.cityAr)"
             [summary]="plain(locale.pick(trip.description, trip.descriptionAr))"
             [price]="currency.display(trip.pricePerPerson) + ' ' + currency.per('person')"
+            [range]="trip.priceRange"
             [image]="firstImage(trip.images)"
             [link]="['/trips', trip.id]"
           />
@@ -222,6 +227,7 @@
     </div>
     <a routerLink="/transport" class="btn btn-line">{{ locale.t('action.seeAll') }}</a>
   </div>
+  <app-section-banner [type]="section.Transport" />
   @if (loading()) {
     <p role="status">{{ locale.t('load.transport') }}</p>
   } @else if (transportError()) {
@@ -237,6 +243,7 @@
             [kicker]="locale.pick(item.vehicleType, item.vehicleTypeAr)"
             [summary]="plain(locale.pick(item.description, item.descriptionAr))"
             [price]="currency.display(item.pricePerTrip) + ' ' + currency.per('trip')"
+            [range]="item.priceRange"
             [image]="firstImage(item.images)"
             [link]="['/transport', item.id]"
           />

@@ -105,6 +105,7 @@ export interface Hotel {
   facebook: string | null;
   whatsApp: string | null;
   space: string | null;
+  priceRange: string | null;
   numOfAvailableRoomsToReserve: number;
   numOfAvailableSuitesToReserve: number;
   images: FileDto[] | null;
@@ -279,6 +280,7 @@ export interface HotelWrite {
   facebook: string | null;
   whatsApp: string | null;
   space: string | null;
+  priceRange: string | null;
   imageIds: number[];
   logoId: number;
 }
@@ -329,6 +331,8 @@ export interface CatalogLookup {
   id: string | null;
   name: string | null;
   nameAr: string | null;
+  vehicleType?: string | null;
+  packagePrice?: number | null;
 }
 
 export interface Trip {
@@ -345,6 +349,7 @@ export interface Trip {
   durationHours: number;
   pricePerPerson: number;
   pricePerChild: number;
+  priceRange: string | null;
   maxCapacity: number;
   startDate: string | null;
   endDate: string | null;
@@ -365,6 +370,7 @@ export interface TripWrite {
   durationHours: number;
   pricePerPerson: number;
   pricePerChild: number;
+  priceRange: string | null;
   maxCapacity: number;
   startDate?: string | null;
   endDate?: string | null;
@@ -396,6 +402,7 @@ export interface TransportOffer {
   maxPassengers: number;
   maxLuggage: number;
   pricePerTrip: number;
+  priceRange: string | null;
   availableVehicles: number;
   isActive: boolean;
   images: FileDto[] | null;
@@ -415,6 +422,7 @@ export interface TransportWrite {
   maxPassengers: number;
   maxLuggage: number;
   pricePerTrip: number;
+  priceRange: string | null;
   availableVehicles: number;
   isActive: boolean;
   imageIds: number[];
@@ -442,6 +450,7 @@ export interface PlazaEvent {
   eventDate: string;
   endDate: string | null;
   ticketPrice: number;
+  priceRange: string | null;
   totalTickets: number;
   isActive: boolean;
   images: FileDto[] | null;
@@ -457,6 +466,7 @@ export interface EventWrite {
   eventDate: string;
   endDate?: string | null;
   ticketPrice: number;
+  priceRange: string | null;
   totalTickets: number;
   isActive: boolean;
   imageIds: number[];
@@ -479,6 +489,7 @@ export interface TravelPackage {
   descriptionAr: string | null;
   durationDays: number;
   packagePrice: number;
+  priceRange: string | null;
   maxPackagesAvailable: number;
   startDate: string | null;
   endDate: string | null;
@@ -503,6 +514,7 @@ export interface PackageWrite {
   descriptionAr: string;
   durationDays: number;
   packagePrice: number;
+  priceRange: string | null;
   maxPackagesAvailable: number;
   startDate?: string | null;
   endDate?: string | null;
@@ -524,6 +536,88 @@ export interface PackageQuery {
   DurationDays?: number | null;
   IncludesHotel?: boolean | null;
   IsActive?: boolean | null;
+}
+
+export interface CatalogCount {
+  active: number;
+  total: number;
+}
+
+export interface DashboardPerformer {
+  bookingsCount: number;
+  encodedId: string | null;
+  name: string | null;
+  totalRevenue: number;
+}
+
+export interface AdminDashboardSummary {
+  kpis: {
+    cancelledBookings: number;
+    catalogCounts: {
+      events: CatalogCount;
+      hotels: CatalogCount;
+      packages: CatalogCount;
+      rooms: CatalogCount;
+      transports: CatalogCount;
+      trips: CatalogCount;
+    };
+    confirmedBookings: number;
+    expiredBookings: number;
+    pendingBookings: number;
+    pendingRevenue: number;
+    totalBookings: number;
+    totalConfirmedRevenue: number;
+    totalTaxCollected: number;
+    totalUsers: number;
+  };
+  monthlyTrends: {
+    bookingsCount: number;
+    confirmedRevenue: number;
+    month: number;
+    periodLabel: string | null;
+    year: number;
+  }[] | null;
+  operationalInsights: {
+    lowCapacityAlerts: {
+      booked: number;
+      capacity: number;
+      encodedId: string | null;
+      itemType: string | null;
+      name: string | null;
+      remaining: number;
+      serviceDate: string | null;
+    }[] | null;
+    recentBookings: {
+      bookingReference: string | null;
+      bookingType: number;
+      bookingTypeName: string | null;
+      createdAt: string;
+      email: string | null;
+      encodedId: string | null;
+      itemName: string | null;
+      paymentStatus: string | null;
+      status: string | null;
+      totalPrice: number;
+      userName: string | null;
+    }[] | null;
+  } | null;
+  revenueByServiceType: {
+    bookingType: number;
+    bookingTypeName: string | null;
+    bookingsCount: number;
+    confirmedCount: number;
+    revenue: number;
+    revenueSharePercentage: number;
+    taxAmount: number;
+  }[] | null;
+  topPerformers: {
+    events: DashboardPerformer[] | null;
+    hotels: DashboardPerformer[] | null;
+    packages: DashboardPerformer[] | null;
+    topDestinations: { bookingsCount: number; location: string | null; totalRevenue: number }[] | null;
+    transports: DashboardPerformer[] | null;
+    trips: DashboardPerformer[] | null;
+  } | null;
 }
 
 export interface PaymentRequest {

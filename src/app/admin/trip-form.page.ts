@@ -56,6 +56,7 @@ import { NoticeService } from '../core/notice.service';
             <p class="mt-1 text-xs text-gold-200/70">{{ currency.usdInputNote(form.controls.pricePerChild.value) }}</p>
           }
         </div>
+        <label class="field">Price range <input formControlName="priceRange" /></label>
         <label class="field">Start <input type="date" formControlName="startDate" /></label>
         <label class="field">End <input type="date" formControlName="endDate" /></label>
       </div>
@@ -111,6 +112,7 @@ export class TripFormPage {
     durationHours: [0, [Validators.required, Validators.min(0)]],
     pricePerPerson: [0.01, [Validators.required, Validators.min(0.01)]],
     pricePerChild: [0.01, [Validators.required, Validators.min(0.01)]],
+    priceRange: [''],
     maxCapacity: [1, [Validators.required, Validators.min(1)]],
     startDate: '',
     endDate: '',
@@ -151,6 +153,7 @@ export class TripFormPage {
           maxCapacity: trip.maxCapacity,
           startDate: fromApiDate(trip.startDate),
           endDate: fromApiDate(trip.endDate),
+          priceRange: trip.priceRange ?? '',
           isActive: trip.isActive,
         });
         this.storedUsd.set({
@@ -220,6 +223,7 @@ export class TripFormPage {
       durationHours: Number(value.durationHours),
       pricePerPerson,
       pricePerChild,
+      priceRange: value.priceRange.trim() || null,
       maxCapacity: Number(value.maxCapacity),
       startDate: value.startDate ? toApiDateTime(value.startDate, 12) : null,
       endDate: value.endDate ? toApiDateTime(value.endDate, 12) : null,

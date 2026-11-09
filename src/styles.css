@@ -720,6 +720,87 @@ input[type='email'] {
   }
 }
 
+select {
+  color-scheme: dark;
+  accent-color: var(--color-gold-400);
+}
+
+select option {
+  background-color: var(--color-navy-900);
+  color: var(--color-gold-100);
+}
+
+select option:checked {
+  background-color: var(--color-gold-400);
+  color: var(--color-navy-950);
+}
+
+@supports selector(select::picker(select)) {
+  select,
+  select::picker(select) {
+    appearance: base-select;
+  }
+
+  .field select {
+    border: 0;
+    background: transparent;
+    color: var(--color-gold-100);
+    padding-block: 0.15rem;
+    padding-inline: 0 1.6rem;
+  }
+
+  select.field {
+    border: 1px solid rgb(230 207 138 / 0.35);
+    border-radius: 0.85rem;
+    background: rgb(7 20 34 / 0.55);
+    padding-block: 0.7rem;
+    padding-inline: 0.9rem 2.2rem;
+  }
+
+  select::picker-icon {
+    color: var(--color-gold-300);
+  }
+
+  select::picker(select) {
+    margin-top: 0.35rem;
+    border: 1px solid rgb(230 207 138 / 0.45);
+    border-radius: 1rem;
+    background: var(--color-navy-900);
+    padding: 0.35rem;
+    color: var(--color-gold-100);
+    box-shadow: 0 18px 40px rgb(0 0 0 / 0.45);
+  }
+
+  select option {
+    border-radius: 0.7rem;
+    background: transparent;
+    padding: 0.55rem 0.75rem;
+    color: var(--color-gold-100);
+  }
+
+  select option:hover,
+  select option:focus {
+    background: var(--color-gold-400);
+    color: var(--color-navy-950);
+  }
+
+  select option:checked {
+    background: var(--color-gold-300);
+    color: var(--color-navy-950);
+    font-weight: 700;
+  }
+
+  select option:checked:hover,
+  select option:checked:focus {
+    background: var(--color-gold-400);
+    color: var(--color-navy-950);
+  }
+
+  select option::checkmark {
+    color: currentColor;
+  }
+}
+
 @media (max-width: 575px) {
   h1.font-display,
   h2.font-display.text-5xl,

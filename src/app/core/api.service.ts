@@ -6,6 +6,7 @@ import { environment } from './environment';
 import { NoticeService } from './notice.service';
 import {
   AboutUs,
+  AdminDashboardSummary,
   AvailableRoom,
   BookingQuery,
   BookingRequest,
@@ -110,16 +111,16 @@ export class ApiService {
     return this.send<BookingResult>('POST', '/api/bookings', body);
   }
 
-  confirmPayment(paymentRef: string): Observable<unknown> {
-    return this.send('POST', `/api/bookings/confirm-payment?paymentRef=${encodeURIComponent(paymentRef)}`);
-  }
-
   createPayment(body: PaymentRequest): Observable<unknown> {
     return this.send('POST', '/api/Payment/initiate', body);
   }
 
   checkOrder(paymobOrderId: string): Observable<unknown> {
     return this.send('GET', `/api/Payment/check-order/${encodeURIComponent(paymobOrderId)}`);
+  }
+
+  dashboardSummary(fromDate?: string | null, toDate?: string | null): Observable<AdminDashboardSummary> {
+    return this.get<AdminDashboardSummary>(`/api/AdminDashboard/summary${toQuery({ fromDate, toDate })}`);
   }
 
   sliders(): Observable<HomeSlider[]> {
@@ -310,6 +311,10 @@ export class ApiService {
     return this.get<UserAccount[]>('/api/User');
   }
 
+  user(id: string): Observable<UserAccount> {
+    return this.get<UserAccount>(`/api/User/${encodeURIComponent(id)}`);
+  }
+
   createUser(body: unknown): Observable<unknown> {
     return this.send('POST', '/api/User', body);
   }
@@ -401,7 +406,7 @@ function writesRecord(method: string, path: string): boolean {
   if (method === 'GET' || method === 'HEAD') {
     return false;
   }
-  if (path.includes('/calculate-price') || path.includes('/api/Payment/') || path.includes('/confirm-payment')) {
+  if (path.includes('/calculate-price') || path.includes('/api/Payment/')) {
     return false;
   }
   if (/\/api\/hotels\/[^/]+\/rooms(?:\?|$)/.test(path)) {
