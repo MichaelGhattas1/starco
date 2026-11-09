@@ -175,9 +175,22 @@ export class HotelDetailPage {
     }
     const next = ((index % count) + count) % count;
     this.activeImage.set(next);
-    queueMicrotask(() => {
-      this.slides().at(next)?.nativeElement.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-    });
+    queueMicrotask(() => this.centerSlide(next));
+  }
+
+  private centerSlide(index: number): void {
+    const slide = this.slides().at(index)?.nativeElement;
+    const scroller = slide?.parentElement;
+    if (!slide || !scroller) {
+      return;
+    }
+    const scrollerBox = scroller.getBoundingClientRect();
+    const slideBox = slide.getBoundingClientRect();
+    const delta = slideBox.left - scrollerBox.left - (scrollerBox.width - slideBox.width) / 2;
+    if (Math.abs(delta) < 1) {
+      return;
+    }
+    scroller.scrollBy({ left: delta, behavior: 'smooth' });
   }
 
   stepGallery(delta: number): void {
