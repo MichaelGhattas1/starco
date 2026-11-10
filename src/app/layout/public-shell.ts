@@ -6,10 +6,11 @@ import { AuthService } from '../core/auth.service';
 import { CartStore } from '../core/cart.store';
 import { LocaleService } from '../core/locale.service';
 import { NoticeService } from '../core/notice.service';
+import { PaperAirplaneHero } from '../shared/paper-airplane-hero';
 
 @Component({
   selector: 'app-public-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, PaperAirplaneHero],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './public-shell.html',
   host: {

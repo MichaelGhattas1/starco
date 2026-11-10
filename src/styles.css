@@ -276,6 +276,12 @@
     width: auto;
   }
 
+  main,
+  footer {
+    position: relative;
+    z-index: 1;
+  }
+
   .site-header {
     position: sticky;
     top: 0;
@@ -764,7 +770,8 @@ body.menu-lock {
 }
 
 @media screen {
-  .desk-report {
+  .desk-report,
+  .booking-print-logo {
     display: none;
   }
 }
@@ -772,6 +779,7 @@ body.menu-lock {
 @media print {
   header,
   footer,
+  app-paper-airplane-hero,
   .admin-shell > aside,
   .toast-host,
   .no-print {
@@ -792,10 +800,19 @@ body.menu-lock {
   }
 
   .booking-sheet {
+    margin-top: 0;
     border-color: #d4af37;
     background: #fff;
     box-shadow: none;
     color: #071422;
+  }
+
+  .booking-print-logo {
+    display: block;
+    width: 12rem;
+    max-width: 70%;
+    height: auto;
+    margin: 0 auto 1.5rem;
   }
 
   .booking-sheet :is(h1, p, dd, a) {

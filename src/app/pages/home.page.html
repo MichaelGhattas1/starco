@@ -1,11 +1,11 @@
-<section class="panel overflow-hidden">
+<section class="panel relative">
   <div class="grid lg:grid-cols-[1.35fr_0.65fr]">
-    <div class="relative min-h-80 sm:min-h-[28rem] lg:min-h-[32rem]">
+    <div class="relative min-h-80 overflow-hidden max-lg:rounded-t-[1.25rem] sm:min-h-[28rem] lg:min-h-[32rem] lg:rounded-s-[1.25rem]">
       @if (heroImage()) {
         <img [src]="heroImage()" [alt]="slide()?.tittle || locale.t('brand.plaza')" class="absolute inset-0 h-full w-full object-cover" />
       }
       <div class="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/55 to-navy-950/10"></div>
-      <div class="relative flex h-full min-h-80 flex-col justify-end gap-5 p-5 sm:min-h-[28rem] sm:p-8 lg:min-h-[32rem] lg:p-10">
+      <div class="relative z-[2] flex h-full min-h-80 flex-col justify-end gap-5 p-5 sm:min-h-[28rem] sm:p-8 lg:min-h-[32rem] lg:p-10">
         <p class="kicker">{{ locale.t('home.kicker') }}</p>
         <h1 class="max-w-xl font-display text-4xl leading-[0.95] sm:text-6xl lg:text-7xl">
           {{ slide()?.tittle || locale.t('home.stay') }}
@@ -48,7 +48,7 @@
         }
       </div>
     </div>
-    <form class="grid content-center gap-4 border-t border-gold-300/15 p-6 md:p-8 lg:border-s lg:border-t-0" [formGroup]="form" (ngSubmit)="search()">
+    <form class="relative z-[2] grid content-center gap-4 border-t border-gold-300/15 p-6 md:p-8 lg:border-s lg:border-t-0" [formGroup]="form" (ngSubmit)="search()">
       <p class="kicker">{{ locale.t('home.findRoom') }}</p>
       <h2 class="font-display text-4xl leading-none">{{ locale.t('home.plan') }}</h2>
       <label class="grid gap-1 text-sm">
