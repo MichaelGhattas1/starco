@@ -1,1 +1,3 @@
-/*    /index.html   200
+/api/*     http://plazainn.runasp.net/api/:splat   200!
+/media/*   http://plazainn.runasp.net/:splat       200!
+/*         /index.html                             200
