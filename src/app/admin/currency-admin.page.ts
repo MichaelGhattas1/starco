@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { FieldError } from '../shared/field-error';
 import { Title } from '@angular/platform-browser';
 import { CurrencyCode, CurrencyService } from '../core/currency.service';
 import { LocaleService } from '../core/locale.service';
@@ -7,7 +8,7 @@ import { NoticeService } from '../core/notice.service';
 
 @Component({
   selector: 'app-currency-admin-page',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FieldError],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mb-5">

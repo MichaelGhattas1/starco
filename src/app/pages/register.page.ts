@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FieldError, matches } from '../shared/field-error';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
@@ -10,7 +11,7 @@ import { NoticeService } from '../core/notice.service';
 
 @Component({
   selector: 'app-register-page',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, FieldError, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './register.page.html',
 })
@@ -26,7 +27,7 @@ export class RegisterPage {
     userName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(100)]],
-    passwordConfirm: ['', Validators.required],
+    passwordConfirm: ['', [Validators.required, matches('password')]],
   });
 
   constructor() {
@@ -38,12 +39,11 @@ export class RegisterPage {
   }
 
   submit(): void {
-    const value = this.form.getRawValue();
-    if (this.form.invalid || value.password !== value.passwordConfirm) {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.error.set(value.password !== value.passwordConfirm ? this.locale.t('auth.passwordMismatch') : null);
       return;
     }
+    const value = this.form.getRawValue();
     this.saving.set(true);
     this.error.set(null);
     this.api.register(value).subscribe({

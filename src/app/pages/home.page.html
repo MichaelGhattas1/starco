@@ -69,9 +69,6 @@
         {{ locale.t('field.adults') }}
         <input class="field" type="number" min="1" max="20" step="1" formControlName="adults" />
       </label>
-      @if (searchError()) {
-        <p class="text-red-200" role="alert">{{ searchError() }}</p>
-      }
       <button class="btn btn-gold" type="submit">{{ locale.t('action.searchHotels') }}</button>
     </form>
   </div>
@@ -145,7 +142,7 @@
   } @else {
     <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       @for (item of offers(); track item.id) {
-        @if (item.id) {
+        @if (item.id && item.isActive) {
           <app-catalog-card
             [title]="locale.pick(item.name, item.nameAr) || locale.t('noun.offer')"
             [kicker]="locale.t('noun.days', { n: item.durationDays })"

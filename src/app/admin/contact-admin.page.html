@@ -17,13 +17,19 @@
     </div>
     @for (hour of form.controls.workingHours.controls; track $index; let index = $index) {
       <div class="grid gap-2 md:grid-cols-[1fr_1fr_1fr_auto]" [formGroupName]="index">
-        <select class="field" formControlName="day">
-          @for (day of weekdays; track day; let dayIndex = $index) {
-            <option [ngValue]="dayIndex">{{ day }}</option>
-          }
-        </select>
-        <input class="field" type="time" formControlName="openTime" />
-        <input class="field" type="time" formControlName="closeTime" />
+        <label class="grid gap-1">
+          <select class="field" formControlName="day">
+            @for (day of weekdays; track day; let dayIndex = $index) {
+              <option [ngValue]="dayIndex">{{ day }}</option>
+            }
+          </select>
+        </label>
+        <label class="grid gap-1">
+          <input class="field" type="time" formControlName="openTime" />
+        </label>
+        <label class="grid gap-1">
+          <input class="field" type="time" formControlName="closeTime" />
+        </label>
         <button type="button" class="btn btn-danger" (click)="removeHour(index)">Remove</button>
       </div>
     }

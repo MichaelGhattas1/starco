@@ -115,6 +115,21 @@
     box-shadow: 0 0 0 3px rgb(212 175 55 / 0.25);
   }
 
+  .field.is-invalid,
+  .field:has(.is-invalid),
+  app-rich-text.is-invalid .rich-text {
+    border-color: rgb(252 165 165);
+    box-shadow: 0 0 0 3px rgb(248 113 113 / 0.22);
+  }
+
+  .field-error {
+    display: block;
+    margin: 0.35rem 0 0;
+    color: rgb(254 202 202);
+    font-size: 0.75rem;
+    line-height: 1.35;
+  }
+
   .btn {
     display: inline-flex;
     min-height: 2.75rem;

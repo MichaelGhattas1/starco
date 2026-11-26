@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FieldError } from '../shared/field-error';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
@@ -12,7 +13,7 @@ import { NoticeService } from '../core/notice.service';
 
 @Component({
   selector: 'app-trip-form-page',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, FieldError, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <a routerLink="/admin/trips" class="text-sm text-gold-300">All trips</a>
@@ -200,7 +201,7 @@ export class TripFormPage {
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.error.set('Check the required fields. Prices must be at least 0.01 and capacity at least 1.');
+      this.error.set(null);
       return;
     }
     const value = this.form.getRawValue();

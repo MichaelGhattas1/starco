@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { FieldError } from '../shared/field-error';
 import { Title } from '@angular/platform-browser';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
@@ -12,7 +13,7 @@ import { plainText } from '../shared/plain-text';
 
 @Component({
   selector: 'app-transport-page',
-  imports: [ReactiveFormsModule, CatalogCard],
+  imports: [ReactiveFormsModule, FieldError, CatalogCard],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mb-6">

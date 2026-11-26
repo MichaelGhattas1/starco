@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FieldError } from '../shared/field-error';
 import { Title } from '@angular/platform-browser';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
@@ -15,7 +16,7 @@ function messageLength(control: AbstractControl<string>) {
 
 @Component({
   selector: 'app-broadcast-page',
-  imports: [ReactiveFormsModule, RichText],
+  imports: [ReactiveFormsModule, FieldError, RichText],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './broadcast.page.html',
 })
@@ -86,7 +87,6 @@ export class BroadcastPage {
     this.error.set(null);
     if (this.mail.invalid) {
       this.mail.markAllAsTouched();
-      this.error.set('Choose a hotel, then enter a subject and a message of at least 10 characters.');
       return;
     }
     const value = this.mail.getRawValue();

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FieldError } from './field-error';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
 import { AuthService } from '../core/auth.service';
@@ -8,7 +9,7 @@ import { ContactUs } from '../core/models';
 
 @Component({
   selector: 'app-contact-section',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FieldError],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './contact-section.html',
 })
@@ -79,7 +80,7 @@ export class ContactSection {
     this.sent.set(null);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.formError.set(this.locale.t('contact.invalid'));
+      this.formError.set(null);
       return;
     }
     const desk = this.contact()?.email;

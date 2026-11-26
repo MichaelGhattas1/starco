@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FieldError } from '../shared/field-error';
 import { Title } from '@angular/platform-browser';
 import { Router, RouterLink } from '@angular/router';
 import { concatMap, from, tap, toArray } from 'rxjs';
@@ -15,7 +16,7 @@ import { HotelPrice } from '../shared/hotel-price';
 
 @Component({
   selector: 'app-cart-page',
-  imports: [ReactiveFormsModule, RouterLink, HotelPrice],
+  imports: [ReactiveFormsModule, FieldError, RouterLink, HotelPrice],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './cart.page.html',
 })
@@ -74,7 +75,6 @@ export class CartPage {
     }
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.error.set('Enter your name, email, and a phone number of 6 to 15 digits.');
       return;
     }
     const lines = this.cart.lines();

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FieldError } from './field-error';
 import { Router, RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
@@ -11,7 +12,7 @@ import { BookingRequest, BookingType } from '../core/models';
 
 @Component({
   selector: 'app-service-booking',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, FieldError, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form class="panel grid gap-4 p-5" [formGroup]="form" (ngSubmit)="submit()">
@@ -114,7 +115,6 @@ export class ServiceBooking {
     }
     if (this.form.invalid || !this.itemId()) {
       this.form.markAllAsTouched();
-      this.error.set('Enter your name, email, phone, a date, and a quantity.');
       return;
     }
     const value = this.form.getRawValue();

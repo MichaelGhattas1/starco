@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FieldError } from '../shared/field-error';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
@@ -14,7 +15,7 @@ import { NoticeService } from '../core/notice.service';
 
 @Component({
   selector: 'app-package-form-page',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, FieldError, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <a routerLink="/admin/packages" class="text-sm text-gold-300">All packages</a>
@@ -249,7 +250,7 @@ export class PackageFormPage {
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.error.set('Check the required fields. Price must be at least 0.01 and duration between 1 and 365 days.');
+      this.error.set(null);
       return;
     }
     const value = this.form.getRawValue();
