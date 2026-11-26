@@ -1,6 +1,7 @@
 import { ApplicationRef, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, computed, inject, signal, viewChild, viewChildren } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FieldError, wholeNumber } from '../shared/field-error';
 import { DomSanitizer, Title } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { switchMap } from 'rxjs';
@@ -16,7 +17,7 @@ import { HotelPrice } from '../shared/hotel-price';
 
 @Component({
   selector: 'app-hotel-detail-page',
-  imports: [ReactiveFormsModule, RouterLink, HotelPrice],
+  imports: [ReactiveFormsModule, FieldError, RouterLink, HotelPrice],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './hotel-detail.page.html',
 })
@@ -52,7 +53,7 @@ export class HotelDetailPage {
   readonly today = inputDate(0);
   readonly minCheckOut = signal(nextDate(inputDate(1)));
   readonly form = inject(FormBuilder).nonNullable.group({
-    adults: [1, [Validators.required, Validators.min(1), Validators.max(20)]],
+    adults: [1, [Validators.required, wholeNumber, Validators.min(1), Validators.max(20)]],
     checkIn: [inputDate(1)],
     checkOut: [inputDate(3)],
   });
@@ -247,22 +248,12 @@ export class HotelDetailPage {
     if (!hotel?.id) {
       return;
     }
-    if (checkIn < this.today) {
-      this.roomsError.set(this.locale.t('hotel.checkInPast'));
-      this.rooms.set([]);
-      return;
-    }
-    if (!checkOut || checkOut <= checkIn) {
-      this.roomsError.set(this.locale.t('hotel.checkoutAfter'));
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       this.rooms.set([]);
       return;
     }
     const guestCount = Number(adults);
-    if (!Number.isInteger(guestCount) || guestCount < 1) {
-      this.roomsError.set(this.locale.t('hotel.adultsMin'));
-      this.rooms.set([]);
-      return;
-    }
     this.roomsLoading.set(true);
     this.roomsError.set(null);
     this.api.availability(hotel.id, toApiDateTime(checkIn, 12), toApiDateTime(checkOut, 12)).subscribe({

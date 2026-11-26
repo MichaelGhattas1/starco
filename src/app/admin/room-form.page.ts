@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FieldError } from '../shared/field-error';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -15,7 +16,7 @@ import { HotelPrice } from '../shared/hotel-price';
 
 @Component({
   selector: 'app-room-form-page',
-  imports: [ReactiveFormsModule, RouterLink, HotelPrice],
+  imports: [ReactiveFormsModule, FieldError, RouterLink, HotelPrice],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './room-form.page.html',
 })
@@ -140,7 +141,7 @@ export class RoomFormPage {
   submit(): void {
     if (this.form.invalid || !this.imageIds().length) {
       this.form.markAllAsTouched();
-      this.error.set(this.imageIds().length ? 'Check the required fields.' : 'Upload at least one room image.');
+      this.error.set(this.imageIds().length ? null : 'Upload at least one room image.');
       return;
     }
     const value = this.form.getRawValue();

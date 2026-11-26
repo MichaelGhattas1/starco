@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { FieldError } from '../shared/field-error';
 import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
@@ -15,7 +16,7 @@ import { HotelPrice } from '../shared/hotel-price';
 
 @Component({
   selector: 'app-bookings-admin-page',
-  imports: [ReactiveFormsModule, RouterLink, HotelPrice],
+  imports: [ReactiveFormsModule, FieldError, RouterLink, HotelPrice],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mb-5">

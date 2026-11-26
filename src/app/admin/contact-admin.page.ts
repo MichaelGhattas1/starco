@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FieldError } from '../shared/field-error';
 import { Title } from '@angular/platform-browser';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
@@ -8,7 +9,7 @@ import { WEEKDAYS } from '../core/models';
 
 @Component({
   selector: 'app-contact-admin-page',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FieldError],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './contact-admin.page.html',
 })

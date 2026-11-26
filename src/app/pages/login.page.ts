@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FieldError } from '../shared/field-error';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
@@ -9,7 +10,7 @@ import { LocaleService } from '../core/locale.service';
 
 @Component({
   selector: 'app-login-page',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, FieldError, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './login.page.html',
 })

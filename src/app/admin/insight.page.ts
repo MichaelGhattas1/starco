@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { FieldError } from '../shared/field-error';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
@@ -13,7 +14,7 @@ import { FileDto, HOTEL_FACILITIES, HotelLookup, PlazaInnType } from '../core/mo
 
 @Component({
   selector: 'app-insight-page',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, FieldError, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './insight.page.html',
 })

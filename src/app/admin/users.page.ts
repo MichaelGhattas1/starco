@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FieldError, matches } from '../shared/field-error';
 import { Title } from '@angular/platform-browser';
 import { errorMessage } from '../core/api-error';
 import { ApiService } from '../core/api.service';
@@ -10,7 +11,7 @@ import { AuthService } from '../core/auth.service';
 
 @Component({
   selector: 'app-users-page',
-  imports: [ReactiveFormsModule, FormsModule],
+  imports: [ReactiveFormsModule, FieldError, FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './users.page.html',
 })
@@ -29,7 +30,7 @@ export class UsersPage {
     email: ['', [Validators.required, Validators.email]],
     role: [Role.Member, Validators.required],
     password: [''],
-    passwordConfirmed: [''],
+    passwordConfirmed: ['', matches('password')],
   });
 
   constructor() {
@@ -72,12 +73,8 @@ export class UsersPage {
   save(): void {
     const editing = this.editingId();
     const value = this.form.getRawValue();
-    if (!value.userName || (!editing && this.form.invalid)) {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
-      return;
-    }
-    if (value.password && value.password !== value.passwordConfirmed) {
-      this.error.set('Passwords do not match.');
       return;
     }
     this.saving.set(true);

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FieldError } from '../shared/field-error';
 import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
@@ -11,7 +12,7 @@ import { HotelLookup, Partner } from '../core/models';
 
 @Component({
   selector: 'app-partners-page',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, FieldError, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './partners.page.html',
 })

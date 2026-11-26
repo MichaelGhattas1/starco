@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FieldError } from '../shared/field-error';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { errorMessage } from '../core/api-error';
@@ -12,7 +13,7 @@ import { PlazaInnType } from '../core/models';
 
 @Component({
   selector: 'app-hotel-form-page',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, FieldError, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './hotel-form.page.html',
 })
@@ -136,7 +137,7 @@ export class HotelFormPage {
   submit(): void {
     if (this.form.invalid || !this.imageIds().length) {
       this.form.markAllAsTouched();
-      this.error.set(this.imageIds().length ? 'Check the required fields.' : 'Upload at least one hotel image.');
+      this.error.set(this.imageIds().length ? null : 'Upload at least one hotel image.');
       return;
     }
     const value = this.form.getRawValue();

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FieldError, wholeNumber } from '../shared/field-error';
 import { Title } from '@angular/platform-browser';
 import { Router, RouterLink } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
@@ -17,7 +18,7 @@ import { plainText } from '../shared/plain-text';
 
 @Component({
   selector: 'app-home-page',
-  imports: [ReactiveFormsModule, RouterLink, HotelCard, CatalogCard, ContactSection],
+  imports: [ReactiveFormsModule, FieldError, RouterLink, HotelCard, CatalogCard, ContactSection],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './home.page.html',
 })
@@ -51,11 +52,10 @@ export class HomePage {
   });
   readonly heroImage = computed(() => firstImage(this.slide()?.images ?? null));
   readonly today = inputDate(0);
-  readonly searchError = signal<string | null>(null);
   readonly minCheckOut = signal(nextDate(inputDate(1)));
   readonly form = inject(FormBuilder).nonNullable.group({
     city: [''],
-    adults: [1, [Validators.required, Validators.min(1), Validators.max(20)]],
+    adults: [1, [Validators.required, wholeNumber, Validators.min(1), Validators.max(20)]],
     checkIn: [inputDate(1)],
     checkOut: [inputDate(3)],
   });
@@ -146,23 +146,13 @@ export class HomePage {
 
   search(): void {
     this.alignCheckout(this.form.controls.checkIn.value);
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     const value = this.form.getRawValue();
-    const adults = Number(value.adults);
-    if (value.checkIn < this.today) {
-      this.searchError.set('Check-in cannot be before today.');
-      return;
-    }
-    if (value.checkOut <= value.checkIn) {
-      this.searchError.set('Check-out must be after check-in.');
-      return;
-    }
-    if (!Number.isInteger(adults) || adults < 1 || adults > 20) {
-      this.searchError.set('Enter 1 to 20 adults.');
-      return;
-    }
-    this.searchError.set(null);
     void this.router.navigate(['/hotels'], {
-      queryParams: { city: value.city, checkIn: value.checkIn, checkOut: value.checkOut, adults },
+      queryParams: { city: value.city, checkIn: value.checkIn, checkOut: value.checkOut, adults: Number(value.adults) },
     });
   }
 }

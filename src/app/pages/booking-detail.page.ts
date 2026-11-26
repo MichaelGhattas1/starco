@@ -31,6 +31,7 @@ interface BookingFact {
       <p class="mt-6 text-red-200" role="alert">{{ error() }}</p>
     } @else if (item(); as booking) {
       <article class="booking-sheet panel mt-4 grid gap-6 p-6">
+        <img class="booking-print-logo" src="assets/logo.png" alt="Starco" />
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p class="kicker">{{ locale.label(typeLabel(booking.bookingType)) }} · {{ locale.label(statusLabel(booking.status)) }}</p>
